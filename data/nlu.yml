@@ -1,0 +1,86 @@
+version: "3.1"
+
+nlu:
+  - intent: greet
+    examples: |
+      - oi
+      - olá
+      - e aí
+      - bom dia
+      - boa tarde
+      - boa noite
+
+  - intent: inform
+    examples: |
+      - Meu nome é [Bruno](name)
+      - Eu sou o [Pedro](name)
+      - Me chamo [Maria](name)
+      - [Lucas](name)
+      - Sou a [Ana](name)
+      - Chamo-me [Fernanda](name)
+      - Me apresento como [Rodrigo](name)
+      - Pode me chamar de [Gabriel](name)
+      - Meu nome completo é [João Silva](name)
+      - Eu sou o [Carlos Eduardo](name)
+      - Me chamo [Luiza](name)
+      - Sou [Patrícia](name)
+      - [Renato](name)
+      - [Camila](name)
+      - [Marcia](name)
+      - Me chamam de [Fernando](name)
+      - O pessoal me chama de [Cláudia](name)
+      - Podem me chamar de [Juliana](name)
+      - Pode me chamar de [Leonardo](name)
+      - Prefiro que me chame de [Marcelo](name)
+      - Você pode me chamar de [Tatiane](name)
+      - Todo mundo me conhece como [Rafael](name)
+      - Meus amigos me chamam de [Flávia](name)
+      - Costumam me chamar de [Adriana](name)
+      - Chamam-me de [Vitor](name)
+      - Apenas [Bianca](name)
+      - Meu nome de batismo é [Anderson](name)
+      - O meu nome é [Gabriela](name)
+      - [Eduardo](name), prazer
+      - Sou chamado de [Raquel](name)
+      - As pessoas me chamam de [Tiago](name)
+      - Pode anotar: [Mônica](name)
+      - Na minha identidade está [Sérgio](name)
+      - Me chamo [Gustavo](name), mas me chamam de [Guga](name)
+      - Eu atendo por [Helena](name)
+      - [Fábio](name) aqui
+      - Pode colocar aí: [Larissa](name)
+      - O nome que uso é [Diego](name)
+      - Sou a [Samantha](name)
+      - Chame-me de [César](name)
+      - Eu me identifico como [Júlia](name)
+      - Todos me conhecem como [Mauro](name)
+      - [Elaine](name), esse é meu nome
+      - Prefiro que me chame de [Carla](name)
+      - O nome é [Vinícius](name)
+      - [Breno](name), com B mudo
+      - Podem me chamar pelo meu apelido: [Dani](name)
+      - Formalmente sou [Ricardo](name), mas prefiro [Rick](name)
+      - Todo mundo me chama de [Léo](name), mas meu nome é [Leonardo](name)
+      - Prefiro ser chamado de [Murilo](name)
+      - Em documentos sou [Antônio](name), mas me chamam de [Toninho](name)
+      - Como está no RG: [Roberto](name)
+      - [Tatiana](name), prazer
+      - Sou [Simone](name), e você?
+      - Pode me chamar de [Emanuel](name)
+      - O nome que uso no trabalho é [Alex](name)
+      - No meu passaporte está [Sophia](name)
+      - Todos os meus amigos me chamam de [Luana](name)
+      - Me apelidaram de [Dudu](name), mas meu nome é [Eduardo](name)
+      - Chama por [Renata](name)
+      - Meu sobrenome é [Almeida](name), mas pode chamar pelo primeiro nome [Thiago](name)
+      - [Aline](name), com "A" maiúsculo
+      - [Augusto](name), mas prefiro [Guto](name)
+      - [Henrique](name), e o seu?
+      - Me identifico como [Samuel](name)
+      - Costumo usar [Matheus](name), mas meu nome tem "th"
+      - [Cecília](name), escrito com dois "c"
+      - No trabalho me chamam de [Cristiano](name)
+      - Em casa sou chamado de [Felipe](name)
+      - Para os amigos sou [Pablo](name)
+      - Como me chamam? [Diana](name)
+      - Nome social: [Beatriz](name)

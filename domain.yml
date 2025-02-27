@@ -1,0 +1,22 @@
+version: "3.1"
+
+intents:
+  - greet
+  - inform
+
+entities:
+  - name
+
+slots:
+  name:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: name
+
+responses:
+  utter_ask_name:
+    - text: "Olá! Qual é o seu nome?"
+
+  utter_greet_user:
+    - text: "Prazer, {name}!"

@@ -1,0 +1,12 @@
+version: "3.1"
+
+rules:
+  - rule: Perguntar o nome após um cumprimento
+    steps:
+      - intent: greet
+      - action: utter_ask_name
+
+  - rule: Responder após o nome ser informado
+    steps:
+      - intent: inform
+      - action: utter_greet_user

@@ -1,0 +1,6 @@
+models
+.rasa/cache/
+*__pycache__*
+credentials.yml
+.rasa
+endpoints.yml
