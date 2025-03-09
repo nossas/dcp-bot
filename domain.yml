@@ -1,22 +1,33 @@
 version: "3.1"
 
-intents:
-  - greet
-  - inform
-
-entities:
-  - name
-
-slots:
-  name:
-    type: text
-    mappings:
-      - type: from_entity
-        entity: name
-
 responses:
-  utter_ask_name:
-    - text: "Olá! Qual é o seu nome?"
+  utter_welcome:
+    - text: "Olá! Escolha uma opção:"
+      buttons:
+        - title: "Opção 1"
+          payload: "/opcao_1"
+        - title: "Opção 2"
+          payload: "/opcao_2"
+        - title: "Opção 3"
+          payload: "/opcao_3"
 
-  utter_greet_user:
-    - text: "Prazer, {name}!"
+  utter_resposta_opcao_1:
+    - text: "Obrigado por escolher a opção 1!"
+
+  utter_resposta_opcao_2:
+    - text: "Você escolheu a opção 2!"
+
+  utter_resposta_opcao_3:
+    - text: "Você escolheu a opção 3!"
+
+intents:
+  - opcao_1
+  - opcao_2
+  - opcao_3
+  - tentar_novamente
+  - menu_inicial
+  - saudacao
+
+actions:
+  - action_fallback_buttons
+  - action_repeat_last_message

@@ -1,12 +1,17 @@
 version: "3.1"
 
 rules:
-  - rule: Perguntar o nome após um cumprimento
+  - rule: Fallback padrão
     steps:
-      - intent: greet
-      - action: utter_ask_name
+      - intent: nlu_fallback
+      - action: action_fallback_buttons
+  
+  - rule: Voltar ao menu inicial
+    steps:
+      - intent: menu_inicial
+      - action: utter_welcome
 
-  - rule: Responder após o nome ser informado
+  - rule: Tentar novamente
     steps:
-      - intent: inform
-      - action: utter_greet_user
+      - intent: tentar_novamente
+      - action: action_repeat_last_message

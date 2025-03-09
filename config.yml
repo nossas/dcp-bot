@@ -17,8 +17,7 @@ pipeline:
 - name: ResponseSelector
   epochs: 100
 - name: FallbackClassifier
-  threshold: 0.3
-
+  threshold: 0.7
 policies:
 - name: MemoizationPolicy
   max_history: 5

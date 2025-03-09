@@ -1,13 +1,21 @@
 version: "3.1"
-
 stories:
-  - story: saudação e nome
-    steps:
-      - intent: greet
-      - action: utter_ask_name
-      - intent: inform
-        entities:
-          - name: João
-      - slot_was_set:
-          - name: João
-      - action: utter_greet_user
+- story: Saudação inicial
+  steps:
+  - intent: saudacao
+  - action: utter_welcome
+
+- story: Responder opção 1
+  steps:
+  - intent: opcao_1
+  - action: utter_resposta_opcao_1
+
+- story: Responder opção 2
+  steps:
+  - intent: opcao_2
+  - action: utter_resposta_opcao_2
+
+- story: Responder opção 3
+  steps:
+  - intent: opcao_3
+  - action: utter_resposta_opcao_3
