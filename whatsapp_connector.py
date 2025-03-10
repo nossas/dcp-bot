@@ -6,6 +6,7 @@ from typing import Dict, Text, Any, Callable, Awaitable, Optional, List
 
 from rasa.core.channels.channel import InputChannel, UserMessage, OutputChannel
 from heyoo import WhatsApp
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -117,6 +118,10 @@ class WhatsAppInput(InputChannel):
             response = self.client.get_interactive_response(data)
             if response.get("type") == "button_reply":
                 return response["button_reply"]["id"]
+        if message_type == "location":
+            response =  self.client.get_location(data)
+            json_string = json.dumps(response)
+            return json_string
         return self.client.get_message(data)
 
     def blueprint(self, on_new_message: Callable[[UserMessage], Awaitable[Any]]) -> Blueprint:
@@ -135,6 +140,7 @@ class WhatsAppInput(InputChannel):
 
         @whatsapp_webhook.route("/webhook", methods=["POST"])
         async def message(request: Request) -> HTTPResponse:
+            logger.debug(f"full message: {request.json}")
             sender = self.client.get_mobile(request.json)
             text = self.get_message(request.json)
             logger.debug(f"Received message: {text}")
@@ -143,6 +149,12 @@ class WhatsAppInput(InputChannel):
                 metadata = self.get_metadata(request)
                 out_channel = self.get_output_channel()
                 try:
+                    logger.debug(f"text: {text}")
+                    logger.debug(f"out_channel: {out_channel}")
+                    logger.debug(f"sender: {sender}")
+                    logger.debug(f"input_channel: {self.name()}")
+                    logger.debug(f"metadata: {metadata}")
+
                     await on_new_message(
                         UserMessage(text, out_channel, sender, input_channel=self.name(), metadata=metadata)
                     )
@@ -151,7 +163,7 @@ class WhatsAppInput(InputChannel):
                     if self.debug_mode:
                         raise
 
-            return response.text("", status=204)
+            return response.text("", status=200)
 
         return whatsapp_webhook
 

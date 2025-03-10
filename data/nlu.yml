@@ -47,3 +47,10 @@ nlu:
     - Quero tentar de novo
     - Repetir a pergunta
     - Mostrar a última mensagem
+
+- intent: informar_localizacao
+  examples: |
+    - {"latitude": 38.748666, "longitude": -9.103002}
+    - { "latitude": -23.550520, "longitude": -46.633308 }
+    - { "latitude": 12.34, "longitude": 56.78 }    
+    - { "latitude": 76.11, "longitude": -6.73 }
