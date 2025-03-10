@@ -18,11 +18,31 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
 
     def __init__(self, auth_token: Optional[Text], phone_number_id: Optional[Text]) -> None:
         super().__init__(auth_token, phone_number_id=phone_number_id)
-
+    
     async def send_text_message(self, recipient_id: Text, text: Text, **kwargs: Any) -> None:
         """Sends text message"""
         for message_part in text.strip().split("\n\n"):
             self.send_message(message_part, recipient_id=recipient_id)
+    
+    async def send_custom_json(self,recipient_id, custom, **kwargs: Any) -> None:
+        if custom.get('type') == "location_request":
+            json={
+               "messaging_product": "whatsapp",
+               "recipient_type": "individual",
+               "type": "interactive",
+               "to": recipient_id,
+               "interactive": {
+                   "type": "location_request_message",
+                   "body": {
+                   "text": "Envie a localização"
+                   },
+                   "action": {
+                   "name": "send_location"
+                   }
+               }
+            }
+            WhatsApp.send_custom_json(self,data=json, recipient_id=recipient_id)
+            
 
     async def send_text_with_buttons(
         self, recipient_id: Text, text: Text, buttons: List[Dict[Text, Any]], **kwargs: Any

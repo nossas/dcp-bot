@@ -5,10 +5,10 @@ stories:
   - intent: saudacao
   - action: utter_welcome
 
-- story: Responder opção 1
+- story: Responder compartilhar risco
   steps:
-  - intent: opcao_1
-  - action: utter_resposta_opcao_1
+  - intent: compartilhar_risco
+  - action: action_request_location
 
 - story: Responder opção 2
   steps:

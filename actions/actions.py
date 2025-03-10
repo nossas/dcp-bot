@@ -24,6 +24,14 @@ class ActionFallbackButtons(Action):
         # Faz o bot esquecer a última entrada do usuário para que ele tente novamente
         return [UserUtteranceReverted()]
 
+class ActionRequestLocation(Action):
+    def name(self):
+        return "action_request_location"
+
+    def run(self, dispatcher, tracker, domain):    
+        dispatcher.utter_message(text="Certo. Você pode me enviar sua localização?",custom={"type": "location_request"})
+        return []
+
 class ActionRepeatLastMessage(Action):
     def name(self):
         return "action_repeat_last_message"

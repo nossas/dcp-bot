@@ -9,12 +9,15 @@ nlu:
     - e aí
     - oi, tudo bem?
 
-- intent: opcao_1
+- intent: compartilhar_risco
   examples: |
-    - Quero escolher a opção 1
-    - Escolher opção 1
-    - Opção 1
-    - /opcao_1
+    - Quero compartilhar um risco
+    - Quero compartilhar risco
+    - Escolher compartilhar risco
+    - Compartilhar um risco
+    - Compartilhar risco
+    - compartilhar_risco
+
 
 - intent: opcao_2
   examples: |

@@ -2,17 +2,15 @@ version: "3.1"
 
 responses:
   utter_welcome:
-    - text: "Olá! Escolha uma opção:"
+    - text: "Olá! Aqui é o chatbot da Defesa Climática Popular. Como posso te ajudar?"
       buttons:
-        - title: "Opção 1"
-          payload: "/opcao_1"
-        - title: "Opção 2"
+        - title: "Compartilhar Risco"
+          payload: "/compartilhar_risco"
+        - title: "Situação na Região"
           payload: "/opcao_2"
-        - title: "Opção 3"
+        - title: "Locais Seguros"
           payload: "/opcao_3"
 
-  utter_resposta_opcao_1:
-    - text: "Obrigado por escolher a opção 1!"
 
   utter_resposta_opcao_2:
     - text: "Você escolheu a opção 2!"
@@ -21,7 +19,7 @@ responses:
     - text: "Você escolheu a opção 3!"
 
 intents:
-  - opcao_1
+  - compartilhar_risco
   - opcao_2
   - opcao_3
   - tentar_novamente
@@ -31,3 +29,4 @@ intents:
 actions:
   - action_fallback_buttons
   - action_repeat_last_message
+  - action_request_location
