@@ -17,21 +17,7 @@ nlu:
     - Compartilhar um risco
     - Compartilhar risco
     - compartilhar_risco
-
-
-- intent: opcao_2
-  examples: |
-    - Quero escolher a opção 2
-    - Escolher opção 2
-    - Opção 2
-    - /opcao_2
-
-- intent: opcao_3
-  examples: |
-    - Quero escolher a opção 3
-    - Escolher opção 3
-    - Opção 3
-    - /opcao_3
+    - /compartilhar_risco
 
 - intent: menu_inicial
   examples: |
@@ -54,3 +40,11 @@ nlu:
     - { "latitude": -23.550520, "longitude": -46.633308 }
     - { "latitude": 12.34, "longitude": 56.78 }    
     - { "latitude": 76.11, "longitude": -6.73 }
+
+- intent: informar_endereco_texto
+  examples: |
+    - Rua das Flores, 123
+    - Av. Paulista, São Paulo
+    - Rua dos Andradas, Porto Alegre
+    - Avenida Central, 45, Centro, Rio de Janeiro
+    - Rua Bahia, número 200

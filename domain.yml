@@ -1,5 +1,41 @@
 version: "3.1"
 
+intents:
+  - compartilhar_risco
+  - opcao_2
+  - opcao_3
+  - tentar_novamente
+  - menu_inicial
+  - saudacao
+  - informar_localizacao
+  - sim
+  - nao
+  - informar_endereco_texto
+
+actions:
+  - action_fallback_buttons
+  - action_repeat_last_message
+  - action_request_location
+  - action_buscar_endereco_openstreet
+  - action_buscar_endereco_texto_openstreet
+
+slots:
+  latitude:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+  longitude:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+  endereco:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
 responses:
   utter_welcome:
     - text: "Olá! Aqui é o chatbot da Defesa Climática Popular. Como posso te ajudar?"
@@ -11,22 +47,14 @@ responses:
         - title: "Locais Seguros"
           payload: "/opcao_3"
 
-
   utter_resposta_opcao_2:
     - text: "Você escolheu a opção 2!"
 
   utter_resposta_opcao_3:
     - text: "Você escolheu a opção 3!"
 
-intents:
-  - compartilhar_risco
-  - opcao_2
-  - opcao_3
-  - tentar_novamente
-  - menu_inicial
-  - saudacao
+  utter_ask_endereco:
+    - text: "Por favor, envie o endereço completo."
 
-actions:
-  - action_fallback_buttons
-  - action_repeat_last_message
-  - action_request_location
+  utter_ok:
+    - text: "Tudo bem! Se precisar de mais alguma coisa, só me avisar."

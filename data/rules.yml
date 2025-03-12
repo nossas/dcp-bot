@@ -1,17 +1,13 @@
 version: "3.1"
 
 rules:
-  - rule: Fallback padrão
+  - rule: Processar localização após pedido
     steps:
-      - intent: nlu_fallback
-      - action: action_fallback_buttons
-  
-  - rule: Voltar ao menu inicial
+    - action: action_request_location
+    - intent: informar_localizacao
+    - action: action_buscar_endereco_openstreet
+  - rule: Processar endereço em texto após pedido
     steps:
-      - intent: menu_inicial
-      - action: utter_welcome
-
-  - rule: Tentar novamente
-    steps:
-      - intent: tentar_novamente
-      - action: action_repeat_last_message
+      - action: action_request_location
+      - intent: informar_endereco_texto
+      - action: action_buscar_endereco_texto_openstreet

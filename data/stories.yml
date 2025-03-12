@@ -9,6 +9,16 @@ stories:
   steps:
   - intent: compartilhar_risco
   - action: action_request_location
+  - intent: informar_localizacao
+  - action: action_buscar_endereco_openstreet
+
+
+- story: Responder compartilhar risco com texto de endereço
+  steps:
+  - intent: compartilhar_risco
+  - action: action_request_location
+  - intent: informar_endereco_texto
+  - action: action_buscar_endereco_texto_openstreet
 
 - story: Responder opção 2
   steps:
