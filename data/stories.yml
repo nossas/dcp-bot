@@ -11,7 +11,8 @@ stories:
   - action: action_request_location
   - intent: informar_localizacao
   - action: action_buscar_endereco_openstreet
-
+  - intent: confirmar_endereco
+  - action: action_pedir_descricao_ocorrido
 
 - story: Responder compartilhar risco com texto de endereço
   steps:
@@ -19,13 +20,5 @@ stories:
   - action: action_request_location
   - intent: informar_endereco_texto
   - action: action_buscar_endereco_texto_openstreet
-
-- story: Responder opção 2
-  steps:
-  - intent: opcao_2
-  - action: utter_resposta_opcao_2
-
-- story: Responder opção 3
-  steps:
-  - intent: opcao_3
-  - action: utter_resposta_opcao_3
+  - intent: confirmar_endereco
+  - action: action_pedir_descricao_ocorrido
