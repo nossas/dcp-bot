@@ -70,6 +70,7 @@ rules:
       - action: action_ask_descricao_risco
       - intent: informar_descricao_risco
       - action: action_salvar_descricao_risco
+      - action: utter_perguntar_por_midia
 
   # - rule: Risco com descrição
   #   steps:

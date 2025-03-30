@@ -298,6 +298,7 @@ class ActionSalvarDescricaoRisco(Action):
             domain):
         descricao = tracker.get_slot("descricao_risco")
         if descricao:
+            dispatcher.utter_message(text="Obrigado pela descrição!")
             return [FollowupAction("utter_perguntar_por_midia")]
         else:
             dispatcher.utter_message(text="Não consegui entender a descrição, tente novamente.")
