@@ -1,24 +1,112 @@
 version: "3.1"
 stories:
-- story: Saudação inicial
-  steps:
-  - intent: saudacao
-  - action: utter_welcome
 
-- story: Responder compartilhar risco
+- story: Saudação sem nome (primeira vez ou após deny)
+  steps:
+    - or:
+      - intent: saudacao
+      - intent: session_start
+    - action: action_perguntar_nome
+    - intent: informar_nome
+    - action: action_salvar_nome
+    - action: action_perguntar_nome
+
+- story: Saudação com nome salvo - deny
+  steps:
+    - or:
+      - intent: saudacao
+      - intent: session_start
+    - action: action_perguntar_nome
+    - intent: deny
+    - action: action_apagar_nome
+    - action: action_perguntar_nome
+
+- story: Saudação com nome salvo - affirm
+  steps:
+    - or:
+      - intent: saudacao
+      - intent: session_start
+    - action: action_perguntar_nome
+    - intent: affirm
+    - action: utter_menu_inicial
+
+
+- story: Responder compartilhar risco com texto e affirm
+  steps:
+  - action: utter_menu_inicial
+  - intent: compartilhar_risco
+  - action: action_request_location
+  - intent: informar_endereco_texto
+  - action: action_buscar_endereco_texto_openstreet
+  - intent: affirm
+  - action: utter_classificar_risco 
+
+
+
+- story: Responder compartilhar risco com loalização e affirm
+  steps:
+  - action: utter_menu_inicial
+  - intent: compartilhar_risco
+  - action: action_request_location
+  - intent: informar_localizacao
+  - action: action_buscar_endereco_openstreet
+  - intent: affirm
+  - action: utter_classificar_risco 
+
+- story: Responder compartilhar risco com localização e deny
   steps:
   - intent: compartilhar_risco
   - action: action_request_location
   - intent: informar_localizacao
   - action: action_buscar_endereco_openstreet
-  - intent: confirmar_endereco
-  - action: action_pedir_descricao_ocorrido
-
-- story: Responder compartilhar risco com texto de endereço
+  - intent: deny
+  - action: action_request_location 
+ 
+- story: Responder compartilhar risco com texto de endereço com deny
   steps:
   - intent: compartilhar_risco
   - action: action_request_location
   - intent: informar_endereco_texto
   - action: action_buscar_endereco_texto_openstreet
-  - intent: confirmar_endereco
-  - action: action_pedir_descricao_ocorrido
+  - intent: deny
+  - action: action_request_location 
+
+# - story: Classificar e descrever risco
+#   steps:  
+#   - action: action_ask_descricao_risco
+#   - action: action_salvar_descricao_risco
+#   - action: utter_perguntar_por_midia
+
+# - story: Responder compartilhar risco com texto de endereço com affirm
+#   steps:
+#   - intent: compartilhar_risco
+#   - action: action_request_location
+#   - intent: informar_endereco_texto
+#   - action: action_buscar_endereco_texto_openstreet
+#   - checkpoint: checagem_endereco
+#   - intent: affirm
+#   - action: utter_classificar_risco 
+
+
+
+
+
+
+# - story: Responder compartilhar risco com texto de endereço
+#   steps:
+#   - intent: compartilhar_risco
+#   - action: action_request_location
+#   - intent: informar_endereco_texto
+#   - action: action_buscar_endereco_texto_openstreet
+#   - intent: deny
+#   - action: action_request_location
+ 
+
+# - story: Descrevendo risco
+#   steps:
+#     - action: utter_classificar_risco
+#     - action: action_session_start
+#     - action: action_perguntar_nome
+#     - intent: informar_nome
+#     - action: action_salvar_nome
+#     - action: action_perguntar_nome

@@ -1,60 +1,105 @@
-version: "3.1"
-
+version: '3.1'
+session_config:
+  session_expiration_time: 3
+  carry_over_slots_to_new_session: true
+forms:
+  informar_descricao_risco:
+    required_slots:
+      - descricao_risco
 intents:
-  - compartilhar_risco
-  - opcao_2
-  - opcao_3
-  - tentar_novamente
-  - menu_inicial
-  - saudacao
-  - informar_localizacao
-  - sim
-  - nao
-  - informar_endereco_texto
-
+- saudacao
+- informar_nome
+- affirm
+- deny
+- compartilhar_risco
+- informar_endereco_texto
+- informar_localizacao
+- informar_classificacao_risco
+- informar_descricao_risco
+- pular_descricao_risco
+- enviar_midia_risco
+- nao_enviar_midia_risco
 actions:
-  - action_fallback_buttons
-  - action_repeat_last_message
-  - action_request_location
-  - action_buscar_endereco_openstreet
-  - action_buscar_endereco_texto_openstreet
+- action_request_location
+- action_apagar_nome
+- action_perguntar_nome
+- action_salvar_nome
+- utter_menu_inicial
+- action_buscar_endereco_texto_openstreet
+- descrever_risco
+- utter_classificar_risco
+- action_fallback_buttons
+- action_repeat_last_message
+- action_buscar_endereco_openstreet
+- action_salvar_classificacao_risco
+- action_ask_descricao_risco
+- action_salvar_descricao_risco
+- utter_perguntar_por_midia
+- action_confirmar_relato
 
 slots:
   latitude:
     type: text
     influence_conversation: false
     mappings:
-      - type: custom
+    - type: custom
   longitude:
     type: text
     influence_conversation: false
     mappings:
-      - type: custom
+    - type: custom
   endereco:
     type: text
     influence_conversation: false
     mappings:
-      - type: custom
+    - type: custom
+  nome:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: nome
+  classificacao_risco:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: classificacao_risco
 
+  descricao_risco:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        intent: informar_descricao_risco
+
+entities:
+- nome
+- classificacao_risco
 responses:
-  utter_welcome:
-    - text: "Olá! Aqui é o chatbot da Defesa Climática Popular. Como posso te ajudar?"
-      buttons:
-        - title: "Compartilhar Risco"
-          payload: "/compartilhar_risco"
-        - title: "Situação na Região"
-          payload: "/opcao_2"
-        - title: "Locais Seguros"
-          payload: "/opcao_3"
+  utter_menu_inicial:
+  - text: Como posso te ajudar?
+    buttons:
+    - title: Compartilhar Risco
+      payload: /compartilhar_risco
+    - title: Situação na Região
+      payload: /opcao_2
+    - title: Outros
+      payload: /utter_menu_inicial_2
+  utter_classificar_risco:
+  - text: Perfeito {nome}. Escolha a opção que descreva melhor o que está ocorrendo.
+    buttons:
+    - title: Alagamento
+      payload: '/informar_classificacao_risco{"classificacao_risco": "Alagamento"}'
+    - title: Lixo
+      payload: '/informar_classificacao_risco{"classificacao_risco": "Lixo"}'
+    - title: Outros
+      payload: '/informar_classificacao_risco{"classificacao_risco": "Outros"}'
+  
+  utter_perguntar_por_midia:
+  - text: Certo. Você gostaria de adicionar uma foto ou vídeo para ajudar na identificação?
+    buttons:
+    - title: Enviar mídia
+      payload: '/enviar_midia_risco'
+    - title: Não enviar
+      payload: '/nao_enviar_midia_risco'
 
-  utter_resposta_opcao_2:
-    - text: "Você escolheu a opção 2!"
-
-  utter_resposta_opcao_3:
-    - text: "Você escolheu a opção 3!"
-
-  utter_ask_endereco:
-    - text: "Por favor, envie o endereço completo."
-
-  utter_ok:
-    - text: "Tudo bem! Se precisar de mais alguma coisa, só me avisar."

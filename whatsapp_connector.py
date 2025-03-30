@@ -122,6 +122,13 @@ class WhatsAppInput(InputChannel):
             response =  self.client.get_location(data)
             json_string = json.dumps(response)
             return json_string
+        if message_type == "image":
+            response =  self.client.get_image(data)
+            json_string = json.dumps(response)
+            url = self.client.query_media_url(data.id)
+            logger.error(data)
+
+            return json_string
         return self.client.get_message(data)
 
     def blueprint(self, on_new_message: Callable[[UserMessage], Awaitable[Any]]) -> Blueprint:

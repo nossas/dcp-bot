@@ -6,11 +6,6 @@ rules:
       - intent: nlu_fallback
       - action: action_fallback_buttons
 
-  - rule: Voltar ao menu inicial
-    steps:
-      - intent: menu_inicial
-      - action: utter_welcome
-
   - rule: Tentar novamente
     steps:
       - intent: tentar_novamente
@@ -20,17 +15,92 @@ rules:
     steps:
       - intent: informar_localizacao
       - action: action_buscar_endereco_openstreet
-      - intent: confirmar_endereco
-      - action: action_pedir_descricao_ocorrido
 
+  - rule: Processar endereço texto e confirmar
+    steps:
+      - intent: compartilhar_risco
+      - action: action_request_location
   - rule: Processar endereço texto e confirmar
     steps:
       - intent: informar_endereco_texto
       - action: action_buscar_endereco_texto_openstreet
-      - intent: confirmar_endereco
-      - action: action_pedir_descricao_ocorrido
-
-  - rule: Rejeitar endereço e pedir localização novamente
+  
+  - rule: Processar endereço localização 
     steps:
-      - intent: recusar_endereco
-      - action: action_request_location
+      - intent: informar_localizacao
+      - action: action_buscar_endereco_openstreet
+
+  - rule: Confirmar endereço leva para classificação de risco
+    steps:
+      - action: action_buscar_endereco_texto_openstreet
+      - intent: affirm
+      - action: utter_classificar_risco
+
+  - rule: Confirmar localização leva para classificação de risco
+    steps:
+      - action: action_buscar_endereco_openstreet
+      - intent: affirm
+      - action: utter_classificar_risco
+  
+  - rule: recusar endereço texto
+    steps:
+    - action: action_buscar_endereco_openstreet
+    - intent: deny
+    - action: action_request_location 
+  
+  - rule: recusar endereço localização
+    steps:  
+    - action: action_buscar_endereco_texto_openstreet
+    - intent: deny
+    - action: action_request_location 
+
+  - rule: Classificar risco
+    steps:
+      - intent: informar_classificacao_risco
+      - action: action_salvar_classificacao_risco
+  
+
+  - rule: pular descrição do Risco
+    steps:
+      - intent: pular_descricao_risco
+      - action: utter_perguntar_por_midia
+
+  - rule: Descrever risco
+    steps:
+      - action: action_ask_descricao_risco
+      - intent: informar_descricao_risco
+      - action: action_salvar_descricao_risco
+
+  # - rule: Risco com descrição
+  #   steps:
+  #     - intent: pular_descricao_risco
+  #     - action: action_confirmar_relato
+    
+  # - rule: Confirmar endereço texto e classificar risco
+  #   steps:
+  #   - action: action_buscar_endereco_texto_openstreet
+  #   - intent: affirm
+  #   - action: utter_classificar_risco
+
+  # - rule: recusar endereço texto
+  #   steps:
+  #   - action: action_buscar_endereco_texto_openstreet
+  #   - intent: deny
+  #   - action: action_request_location
+
+
+  - rule: Salvar nome
+    steps:
+      - action: action_perguntar_nome
+      - intent: affirm
+      - action: utter_menu_inicial
+
+  # - rule: Boas-vindas ao iniciar sessão
+  #   steps:
+  #     - intent: saudacao
+  #     - action: action_perguntar_nome
+
+  # - rule: Retornar ao menu
+  #   steps:
+  #     - intent: menu_inicial
+  #     - action: utter_menu_inicial
