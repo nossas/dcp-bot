@@ -200,10 +200,57 @@ nlu:
     - Não quero descrever
     - Quero ir direto
 
-- intent: enviar_midia_risco
-  examples: |
-    - /enviar_midia_risco
-
 - intent: nao_enviar_midia_risco
   examples: |
     - /nao_enviar_midia_risco
+    - não enviar midia
+
+
+- intent: receber_midia_risco
+  examples: |
+    - {"mime_type": "image/jpeg","path": "media/87576578809.jpg"}
+    - {"mime_type": "image/jpg", "path": "media/100001.jpg"}
+    - {"mime_type": "image/jpg", "path": "media/100002.jpg"}
+    - {"mime_type": "image/jpg", "path": "media/100003.jpg"}
+    - {"mime_type": "image/jpeg", "path": "media/100004.jpeg"}
+    - {"mime_type": "image/jpeg", "path": "media/100005.jpeg"}
+    - {"mime_type": "image/jpeg", "path": "media/100006.jpeg"}
+    - {"mime_type": "image/png", "path": "media/100007.png"}
+    - {"mime_type": "image/png", "path": "media/100008.png"}
+    - {"mime_type": "image/png", "path": "media/100009.png"}
+    - {"mime_type": "image/webp", "path": "media/100010.webp"}
+    - {"mime_type": "image/webp", "path": "media/100011.webp"}
+    - {"mime_type": "image/webp", "path": "media/100012.webp"}
+    - {"mime_type": "image/avif", "path": "media/100013.avif"}
+    - {"mime_type": "image/avif", "path": "media/100014.avif"}
+    - {"mime_type": "image/avif", "path": "media/100015.avif"}
+    - {"mime_type": "image/gif", "path": "media/100016.gif"}
+    - {"mime_type": "image/gif", "path": "media/100017.gif"}
+    - {"mime_type": "image/gif", "path": "media/100018.gif"}
+    - {"mime_type": "image/heic", "path": "media/100019.heic"}
+    - {"mime_type": "image/heic", "path": "media/100020.heic"}
+    - {"mime_type": "image/heic", "path": "media/100021.heic"}
+    - {"mime_type": "image/heif", "path": "media/100022.heif"}
+    - {"mime_type": "image/heif", "path": "media/100023.heif"}
+    - {"mime_type": "image/heif", "path": "media/100024.heif"}
+    - {"mime_type": "image/tiff", "path": "media/100025.tiff"}
+    - {"mime_type": "image/tiff", "path": "media/100026.tiff"}
+    - {"mime_type": "image/tiff", "path": "media/100027.tiff"}
+    - {"mime_type": "video/mp4", "path": "media/200001.mp4"}
+    - {"mime_type": "video/mp4", "path": "media/200002.mp4"}
+    - {"mime_type": "video/mp4", "path": "media/200003.mp4"}
+    - {"mime_type": "video/avi", "path": "media/200004.avi"}
+    - {"mime_type": "video/avi", "path": "media/200005.avi"}
+    - {"mime_type": "video/avi", "path": "media/200006.avi"}
+    - {"mime_type": "video/quicktime", "path": "media/200007.mov"}
+    - {"mime_type": "video/quicktime", "path": "media/200008.mov"}
+    - {"mime_type": "video/quicktime", "path": "media/200009.mov"}
+    - {"mime_type": "video/3gpp", "path": "media/200010.3gp"}
+    - {"mime_type": "video/3gpp", "path": "media/200011.3gp"}
+    - {"mime_type": "video/3gpp", "path": "media/200012.3gp"}
+
+
+- intent: tentar_novamente
+  examples: |
+    - /tentar_novamente
+    - tentar novamente

@@ -10,6 +10,12 @@ rules:
     steps:
       - intent: tentar_novamente
       - action: action_repeat_last_message
+  
+  - rule: Salvar nome
+    steps:
+      - action: action_perguntar_nome
+      - intent: affirm
+      - action: utter_menu_inicial
 
   - rule: Processar localização e confirmar endereço
     steps:
@@ -72,6 +78,16 @@ rules:
       - action: action_salvar_descricao_risco
       - action: utter_perguntar_por_midia
 
+  - rule: Não enviar midia de risco e partir para revisão
+    steps:
+      - intent: nao_enviar_midia_risco
+      - action: action_confirmar_relato
+
+  - rule: Enviar midia de risco
+    steps:
+      - intent: receber_midia_risco
+      - action: action_salvar_midia_risco
+
   # - rule: Risco com descrição
   #   steps:
   #     - intent: pular_descricao_risco
@@ -90,11 +106,7 @@ rules:
   #   - action: action_request_location
 
 
-  - rule: Salvar nome
-    steps:
-      - action: action_perguntar_nome
-      - intent: affirm
-      - action: utter_menu_inicial
+
 
   # - rule: Boas-vindas ao iniciar sessão
   #   steps:

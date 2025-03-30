@@ -17,8 +17,10 @@ intents:
 - informar_classificacao_risco
 - informar_descricao_risco
 - pular_descricao_risco
-- enviar_midia_risco
 - nao_enviar_midia_risco
+- tentar_novamente
+- receber_midia_risco
+
 actions:
 - action_request_location
 - action_apagar_nome
@@ -35,6 +37,8 @@ actions:
 - action_ask_descricao_risco
 - action_salvar_descricao_risco
 - utter_perguntar_por_midia
+- action_salvar_midia_risco
+- utter_perguntar_por_nova_midia
 - action_confirmar_relato
 
 slots:
@@ -71,6 +75,11 @@ slots:
     mappings:
       - type: from_text
         intent: informar_descricao_risco
+  midias:
+    type: list
+    influence_conversation: false
+    mappings:
+      - type: custom
 
 entities:
 - nome
@@ -96,10 +105,15 @@ responses:
       payload: '/informar_classificacao_risco{"classificacao_risco": "Outros"}'
   
   utter_perguntar_por_midia:
-  - text: Certo. Você gostaria de adicionar uma foto ou vídeo para ajudar na identificação?
+  - text: Se você quiser pode enviar fotos ou vídeos, caso contrário clique em Não Enviar"
     buttons:
-    - title: Enviar mídia
-      payload: '/enviar_midia_risco'
-    - title: Não enviar
+    - title: Não Enviar
+      payload: '/nao_enviar_midia_risco'
+
+
+  utter_perguntar_por_nova_midia:
+  - text: Quer enviar mais fotos ou vídeos?"
+    buttons:
+    - title: Não Enviar mais
       payload: '/nao_enviar_midia_risco'
 

@@ -304,6 +304,27 @@ class ActionSalvarDescricaoRisco(Action):
             dispatcher.utter_message(text="Não consegui entender a descrição, tente novamente.")
             return [FollowupAction("action_ask_descricao_risco")]
 
+
+class ActionSalvarMidiaRisco(Action):
+    def name(self) -> str:
+        return "action_salvar_midia_risco"
+    def run(self, dispatcher,
+            tracker,
+            domain):
+        try:
+            user_message = tracker.latest_message.get("text")
+            midia_data = json.loads(user_message)
+            mime_type = midia_data["mime_type"]
+            path = midia_data["path"]
+            midias = tracker.get_slot("midias") or []
+            midias.append(path)
+            dispatcher.utter_message(text="Foto/vídeo adicionado!")
+            return [SlotSet("midias", midias), FollowupAction("utter_perguntar_por_nova_midia")]
+        except Exception as e:
+            dispatcher.utter_message(text="Ocorreu um erro ao salvar mídia.")
+            logger.error(f"Erro ao salvar mídia no slot: {e}")
+            return []
+
 class ActionConfirmarRisco(Action):
     def name(self) -> str:
         return "action_confirmar_relato"

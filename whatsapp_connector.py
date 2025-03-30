@@ -8,6 +8,8 @@ from rasa.core.channels.channel import InputChannel, UserMessage, OutputChannel
 from heyoo import WhatsApp
 import json
 
+from collections import defaultdict
+import asyncio
 logger = logging.getLogger(__name__)
 
 class WhatsAppOutput(WhatsApp, OutputChannel):
@@ -122,12 +124,25 @@ class WhatsAppInput(InputChannel):
             response =  self.client.get_location(data)
             json_string = json.dumps(response)
             return json_string
-        if message_type == "image":
+        if message_type == "image" or message_type == "video":
             response =  self.client.get_image(data)
-            json_string = json.dumps(response)
-            url = self.client.query_media_url(data.id)
-            logger.error(data)
-
+            try:    
+                media_id = response.get('id')
+                url = self.client.query_media_url(media_id)
+                mime_type = response.get('mime_type')
+                logger.error(f"response: {response}")
+                logger.error(f"url: {url}")
+                downloaded = self.client.download_media(url,mime_type, f"media/{media_id}")
+                logger.error(f"downloaded: {downloaded}")
+                response = {
+                    "mime_type": mime_type,
+                    "path":downloaded
+                }
+                json_string = json.dumps(response)
+            except Exception as e:
+                logger.error(f"Exception when downloading: {e}", exc_info=True)
+                if self.debug_mode:
+                    raise
             return json_string
         return self.client.get_message(data)
 
