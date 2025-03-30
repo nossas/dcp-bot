@@ -4,3 +4,7 @@ models
 credentials.yml
 .rasa
 endpoints.yml
+media/*
+*.dot
+*.db
+*.v2
