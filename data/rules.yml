@@ -17,6 +17,13 @@ rules:
       - intent: affirm
       - action: utter_menu_inicial
 
+  - rule: Apagar risco
+    steps:
+      - intent: apagar_risco
+      - action: action_apagar_risco
+      - action: action_request_location
+
+
   - rule: Processar localização e confirmar endereço
     steps:
       - intent: informar_localizacao
@@ -87,6 +94,52 @@ rules:
     steps:
       - intent: receber_midia_risco
       - action: action_salvar_midia_risco
+      - action: utter_perguntar_por_nova_midia
+
+  - rule: Confirmação positiva de risco
+    steps:
+      - intent: afirmar_confirmacao_risco
+      - action: utter_perguntar_se_identificar
+  
+  - rule: Confirmação negativa de risco
+    steps:
+      - intent: recusar_confirmacao_risco
+      - action: utter_menu_inicial
+
+  - rule: Usuário deseja se identificar
+    steps:
+      - slot_was_set:
+          - identificar: true
+      - action: action_solicitar_compartilhar_risco
+  
+  - rule: Rule Usuário deseja se identificar
+    steps:
+      - intent: indentificar_no_risco
+      - action: action_solicitar_compartilhar_risco
+
+  - rule: Rule Usuário não deseja se identificar
+    steps:
+      - intent: nao_indentificar_no_risco
+      - action: action_solicitar_compartilhar_risco
+
+  - rule: Usuário não deseja se identificar
+    steps:
+      - slot_was_set:
+          - identificar: false
+      - action: action_solicitar_compartilhar_risco
+
+  - rule: Compartilhar o risco
+    steps:
+      - intent: compartilhar_mensagem_risco
+      - action: utter_compartilhar_risco_message
+      - action: utter_imprime_risco
+      - action: utter_agradecimento
+
+  - rule: Não compartilhar o risco
+    steps:
+      - intent: nao_compartilhar_mensagem_risco
+      - action: utter_agradecimento
+
 
   # - rule: Risco com descrição
   #   steps:

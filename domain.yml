@@ -2,16 +2,15 @@ version: '3.1'
 session_config:
   session_expiration_time: 3
   carry_over_slots_to_new_session: true
-forms:
-  informar_descricao_risco:
-    required_slots:
-      - descricao_risco
+
 intents:
 - saudacao
 - informar_nome
 - affirm
 - deny
 - compartilhar_risco
+- apagar_risco
+- continuar_risco
 - informar_endereco_texto
 - informar_localizacao
 - informar_classificacao_risco
@@ -20,12 +19,18 @@ intents:
 - nao_enviar_midia_risco
 - tentar_novamente
 - receber_midia_risco
-
+- afirmar_confirmacao_risco
+- recusar_confirmacao_risco
+- indentificar_no_risco
+- nao_indentificar_no_risco
+- compartilhar_mensagem_risco
+- nao_compartilhar_mensagem_risco
 actions:
 - action_request_location
 - action_apagar_nome
 - action_perguntar_nome
 - action_salvar_nome
+- action_apagar_risco
 - utter_menu_inicial
 - action_buscar_endereco_texto_openstreet
 - descrever_risco
@@ -40,6 +45,12 @@ actions:
 - action_salvar_midia_risco
 - utter_perguntar_por_nova_midia
 - action_confirmar_relato
+- action_solicitar_compartilhar_risco
+- action_salvar_risco
+- utter_compartilhar_risco_message
+- utter_imprime_risco
+- utter_agradecimento
+
 
 slots:
   latitude:
@@ -63,6 +74,16 @@ slots:
     mappings:
     - type: from_entity
       entity: nome
+  identificar:
+    type: bool
+    influence_conversation: true
+    mappings:
+      - type: from_intent
+        intent: indentificar_no_risco
+        value: true
+      - type: from_intent
+        intent: nao_indentificar_no_risco
+        value: false
   classificacao_risco:
     type: text
     mappings:
@@ -105,15 +126,43 @@ responses:
       payload: '/informar_classificacao_risco{"classificacao_risco": "Outros"}'
   
   utter_perguntar_por_midia:
-  - text: Se você quiser pode enviar fotos ou vídeos, caso contrário clique em Não Enviar"
+  - text: Se você quiser pode enviar fotos ou vídeos, caso contrário clique em Não Enviar. Esta etapa pode demorar
     buttons:
     - title: Não Enviar
       payload: '/nao_enviar_midia_risco'
 
 
   utter_perguntar_por_nova_midia:
-  - text: Quer enviar mais fotos ou vídeos?"
+  - text: Quer enviar mais fotos ou vídeos?
     buttons:
     - title: Não Enviar mais
       payload: '/nao_enviar_midia_risco'
 
+
+  utter_perguntar_se_identificar:
+  - text: Você gostaria de se identificar no Alerta?
+    buttons:
+    - title: Me identificar
+      payload: '/indentificar_no_risco'
+    - title: Não me identificar
+      payload: '/nao_indentificar_no_risco'
+
+
+  utter_compartilhar_risco_message:
+  - text:  Basta tocar e segurar na mensagem a seguir para compartilhar.
+    
+  utter_imprime_risco:
+    - text: |
+        📍 Endereço: {endereco}
+        ⚠️ Classificação do risco: {classificacao_risco}
+        ⚠️ Descrição do risco: {descricao_risco}
+
+  utter_agradecimento:
+  - text: | 
+      Muito obrigado pelo seu relato!
+      Você precisa de mais alguma informação? Você pode acessar os últimos relatos, verificar locais e rotas seguras, obter contatos de emergência ou acessar recomendações para se proteger.
+      Se precisar clique no botão.
+    buttons:
+    - title: Mais informações
+      payload: '/menu_inicial'
+    

@@ -58,10 +58,55 @@ class ActionRequestLocation(Action):
         return "action_request_location"
 
     def run(self, dispatcher, tracker, domain): 
+        
+        latitude = tracker.get_slot("latitude")
+        longitude = tracker.get_slot("longitude")
+        endereco = tracker.get_slot("endereco")
+        nome = tracker.get_slot("nome")
+        classificacao_risco = tracker.get_slot("classificacao_risco")
+        if endereco and nome and classificacao_risco:
+            dispatcher.utter_message(
+                text="Você já iniciou o processo para relatar uma stuação de risco.",
+                buttons=[
+                    {"title": "Começar de novo", "payload": "/apagar_risco"},
+                    {"title": "Continuar/Corrigir", "payload": "/continuar_risco"}
+                ]
+            )
+            return[]
+        SlotSet("classificacao_risco", None),
+        SlotSet("descricao_risco", None),
+        SlotSet("endereco", None),
+        SlotSet("latitude", None),
+        SlotSet("longitude", None),
+        SlotSet("midias", None),
+        SlotSet("identificar", None),                  
         logger.debug(f"solicitando localização")
         dispatcher.utter_message(text="Ok! agora precisamos saber onde está o risco que você deseja compartilhar. Você pode clicar no botão para compartilhar ou escrever um endereço se estiver usando o WhastApp Web.",custom={"type": "location_request"})
         return []
-from rasa_sdk import Action
+
+class ActionApagarRisco(Action):
+    def name(self):
+        return "action_apagar_risco"
+
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(text="Ok, vamos recomeçar.")
+        return [
+            SlotSet("classificacao_risco", None),
+            SlotSet("descricao_risco", None),
+            SlotSet("endereco", None),
+            SlotSet("latitude", None),
+            SlotSet("longitude", None),
+            SlotSet("midias", []),
+            SlotSet("identificar", None),
+        ]
+
+class ActionRetomarRisco(Action):
+    def name(self):
+        return "retomar_risco"
+
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(text="Ok, vamos retomar.")
+        return[]
 
 class ActionRepeatLastMessage(Action):
     def name(self):
@@ -121,7 +166,7 @@ class ActionBuscarEnderecoOpenStreet(Action):
                     )
                     return [SlotSet("latitude", latitude), SlotSet("longitude", longitude), SlotSet("endereco", endereco)]
                 else:
-                    dispatcher.utter_message(text="Desculpe, não consegui encontrar o endereço. Vamos tentar de novo.")
+                    dispatcher.utter_message(text="Desculpe, não consegui encontrar o endereço.tente novamente.")
                     return [FollowupAction("action_perguntar_nome")]
             else:
                 logger.debug(f"tem endereço")
@@ -133,6 +178,8 @@ class ActionBuscarEnderecoOpenStreet(Action):
                         {"title": "Não", "payload": "/deny"}
                     ]
                 )
+                return [SlotSet("latitude", latitude), SlotSet("longitude", longitude), SlotSet("endereco", endereco)]
+
                 
         except (json.JSONDecodeError, KeyError) as e:
             logger.debug(f"Erro ao processar JSON ou chave não encontrada: {e}")
@@ -177,7 +224,7 @@ class ActionBuscarEnderecoTextoOpenStreet(Action):
                 return [SlotSet("latitude", latitude), SlotSet("longitude", longitude), SlotSet("endereco", endereco)]
             else:
                 dispatcher.utter_message(text="Não encontrei esse endereço. Você pode tentar novamente?")
-                return []
+                return [FollowupAction("action_perguntar_nome")]
         else:
             dispatcher.utter_message(text="Desculpe, não consegui buscar o endereço agora. Vamos tentar de novo.")
             return [FollowupAction("action_perguntar_nome")]
@@ -303,27 +350,34 @@ class ActionSalvarDescricaoRisco(Action):
         else:
             dispatcher.utter_message(text="Não consegui entender a descrição, tente novamente.")
             return [FollowupAction("action_ask_descricao_risco")]
-
-
 class ActionSalvarMidiaRisco(Action):
     def name(self) -> str:
         return "action_salvar_midia_risco"
-    def run(self, dispatcher,
-            tracker,
-            domain):
+
+    def run(self, dispatcher, tracker, domain):
         try:
             user_message = tracker.latest_message.get("text")
             midia_data = json.loads(user_message)
-            mime_type = midia_data["mime_type"]
-            path = midia_data["path"]
-            midias = tracker.get_slot("midias") or []
-            midias.append(path)
-            dispatcher.utter_message(text="Foto/vídeo adicionado!")
-            return [SlotSet("midias", midias), FollowupAction("utter_perguntar_por_nova_midia")]
+
+            midias_slot = tracker.get_slot("midias") or []
+
+            if midia_data.get("tipo") == "mídia_combinada":
+                novas_midias = [m["path"] for m in midia_data["midias"]]
+                midias_slot.extend(novas_midias)
+                dispatcher.utter_message(text=f"{len(novas_midias)} mídias adicionadas!")
+            else:
+                # Caso venha uma mídia só
+                path = midia_data["path"]
+                midias_slot.append(path)
+                dispatcher.utter_message(text="Foto/vídeo adicionado!")
+
+            return [SlotSet("midias", midias_slot)]
+
         except Exception as e:
             dispatcher.utter_message(text="Ocorreu um erro ao salvar mídia.")
             logger.error(f"Erro ao salvar mídia no slot: {e}")
             return []
+
 
 class ActionConfirmarRisco(Action):
     def name(self) -> str:
@@ -336,21 +390,52 @@ class ActionConfirmarRisco(Action):
         nome = tracker.get_slot("nome") or "não informado"
         endereco = tracker.get_slot("endereco") or "não informado"
         classificacao = tracker.get_slot("classificacao_risco") or "não informado"
+        descricao = tracker.get_slot("descricao_risco") or "não informado"
 
         mensagem = (
             f"Resumo do seu relato:\n"
             f"👤 Nome: {nome}\n"
             f"📍 Endereço: {endereco}\n"
             f"⚠️ Classificação do risco: {classificacao}\n\n"
+            f"⚠️ Descrição do risco: {descricao}\n\n"
             f"Essas informações estão corretas?"
         )
 
         dispatcher.utter_message(
             text=mensagem,
             buttons=[
-                {"title": "Sim", "payload": "/affirm"},
-                {"title": "Não", "payload": "/deny"}
+                {"title": "Sim", "payload": "/afirmar_confirmacao_risco"},
+                {"title": "Não", "payload": "/recusar_confirmacao_risco"}
             ]
         )
 
         return []
+
+class ActionSalvarRisco(Action):
+    def name(self) -> str:
+        return "action_solicitar_compartilhar_risco"
+
+    def run(self, dispatcher,
+            tracker,
+            domain):
+        # aqui vai a logica de cadastrar o risco no Mapa
+        
+        dispatcher.utter_message(
+            text='Se precisar de ajuda urgente, entre em contato com a Defesa Civil – 199.', #verificar a possibilidade de um template para chamar uma call-to-action com ligação externa.
+            
+        )
+        dispatcher.utter_message(
+            text='Obrigado, seu alerta foi registrado mas ainda não foi validado e não aparece no mapa oficial, mas você pode encaminhá-lo para outras pessoas para alertá-las sobre a situação. Você gostaria de compartilhar?',
+             buttons=[
+                {"title": "Sim", "payload": "/compartilhar_mensagem_risco"},
+                {"title": "Não", "payload": "/nao_compartilhar_mensagem_risco"}
+            ]
+        )
+
+        return [SlotSet("classificacao_risco", None),
+        SlotSet("descricao_risco", None),
+        SlotSet("endereco", None),
+        SlotSet("latitude", None),
+        SlotSet("longitude", None),
+        SlotSet("midias", []),
+        SlotSet("identificar", None)]

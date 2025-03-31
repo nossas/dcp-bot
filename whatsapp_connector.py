@@ -82,7 +82,9 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
 
 class WhatsAppInput(InputChannel):
     """WhatsApp Cloud API input channel"""
-
+    media_cache = defaultdict(list)
+    media_timers = {}
+    
     @classmethod
     def name(cls) -> Text:
         return "whatsapp"
@@ -113,6 +115,35 @@ class WhatsAppInput(InputChannel):
 
         # Log do auth_token para depuração
         logger.debug(f"WhatsAppInput initialized with auth_token: {self.auth_token}")
+    
+    async def handle_media(self, sender_id, media_object, on_new_message, out_channel):
+        if sender_id not in self.media_cache:
+            self.media_cache[sender_id] = []
+        self.media_cache[sender_id].append(media_object)
+
+        if sender_id in self.media_timers:
+            self.media_timers[sender_id].cancel()
+
+        self.media_timers[sender_id] = asyncio.create_task(
+            self.finalize_media_batch(sender_id, on_new_message, out_channel)
+        )
+
+    async def finalize_media_batch(self, sender_id, on_new_message, out_channel):
+        try:
+            await asyncio.sleep(3)
+            medias = self.media_cache.pop(sender_id, [])
+            self.media_timers.pop(sender_id, None)
+
+            combined_payload = json.dumps({
+                "tipo": "mídia_combinada",
+                "midias": medias
+            })
+
+            await on_new_message(
+                UserMessage(combined_payload, out_channel, sender_id, input_channel=self.name())
+            )
+        except asyncio.CancelledError:
+            pass
 
     def get_message(self, data):
         message_type = self.client.get_message_type(data)
@@ -123,26 +154,6 @@ class WhatsAppInput(InputChannel):
         if message_type == "location":
             response =  self.client.get_location(data)
             json_string = json.dumps(response)
-            return json_string
-        if message_type == "image" or message_type == "video":
-            response =  self.client.get_image(data)
-            try:    
-                media_id = response.get('id')
-                url = self.client.query_media_url(media_id)
-                mime_type = response.get('mime_type')
-                logger.error(f"response: {response}")
-                logger.error(f"url: {url}")
-                downloaded = self.client.download_media(url,mime_type, f"media/{media_id}")
-                logger.error(f"downloaded: {downloaded}")
-                response = {
-                    "mime_type": mime_type,
-                    "path":downloaded
-                }
-                json_string = json.dumps(response)
-            except Exception as e:
-                logger.error(f"Exception when downloading: {e}", exc_info=True)
-                if self.debug_mode:
-                    raise
             return json_string
         return self.client.get_message(data)
 
@@ -163,13 +174,32 @@ class WhatsAppInput(InputChannel):
         @whatsapp_webhook.route("/webhook", methods=["POST"])
         async def message(request: Request) -> HTTPResponse:
             logger.debug(f"full message: {request.json}")
-            sender = self.client.get_mobile(request.json)
-            text = self.get_message(request.json)
-            logger.debug(f"Received message: {text}")
 
+            sender = self.client.get_mobile(request.json)
+            message_type = self.client.get_message_type(request.json)
+            metadata = self.get_metadata(request)
+            out_channel = self.get_output_channel()
+
+            if message_type in ["image", "video"]:
+                media_data = self.client.get_video(request.json) if message_type == "video" else self.client.get_image(request.json)
+                logger.error(f"media_data: {media_data}")
+
+                media_id = media_data.get("id")
+                url = self.client.query_media_url(media_id)
+                mime_type = media_data.get("mime_type")
+                downloaded = self.client.download_media(url, mime_type, f"media/{media_id}")
+
+                media_object = {
+                    "mime_type": mime_type,
+                    "path": downloaded,
+                }
+
+                await self.handle_media(sender, media_object, on_new_message, out_channel)
+                return response.text("", status=200)
+
+            # Caso não seja mídia
+            text = self.get_message(request.json)
             if sender and text:
-                metadata = self.get_metadata(request)
-                out_channel = self.get_output_channel()
                 try:
                     logger.debug(f"text: {text}")
                     logger.debug(f"out_channel: {out_channel}")

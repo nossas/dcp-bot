@@ -89,6 +89,22 @@ nlu:
     - Compartilhar risco
     - compartilhar_risco
     - /compartilhar_risco
+
+- intent: apagar_risco
+  examples: |
+    - /apagar_risco
+    - começar de novo
+    - apagar risco
+    - reiniciar
+
+- intent: continuar_risco
+  examples: |
+    - continuar_risco
+    - /continuar_risco
+    - quero continuar
+    - continuar reportando
+    - corrigir relato
+
 - intent: informar_localizacao
   examples: |
     - {"latitude": 38.748666, "longitude": -9.103002}
@@ -205,52 +221,67 @@ nlu:
     - /nao_enviar_midia_risco
     - não enviar midia
 
-
 - intent: receber_midia_risco
   examples: |
-    - {"mime_type": "image/jpeg","path": "media/87576578809.jpg"}
-    - {"mime_type": "image/jpg", "path": "media/100001.jpg"}
-    - {"mime_type": "image/jpg", "path": "media/100002.jpg"}
-    - {"mime_type": "image/jpg", "path": "media/100003.jpg"}
-    - {"mime_type": "image/jpeg", "path": "media/100004.jpeg"}
-    - {"mime_type": "image/jpeg", "path": "media/100005.jpeg"}
-    - {"mime_type": "image/jpeg", "path": "media/100006.jpeg"}
-    - {"mime_type": "image/png", "path": "media/100007.png"}
-    - {"mime_type": "image/png", "path": "media/100008.png"}
-    - {"mime_type": "image/png", "path": "media/100009.png"}
-    - {"mime_type": "image/webp", "path": "media/100010.webp"}
-    - {"mime_type": "image/webp", "path": "media/100011.webp"}
-    - {"mime_type": "image/webp", "path": "media/100012.webp"}
-    - {"mime_type": "image/avif", "path": "media/100013.avif"}
-    - {"mime_type": "image/avif", "path": "media/100014.avif"}
-    - {"mime_type": "image/avif", "path": "media/100015.avif"}
-    - {"mime_type": "image/gif", "path": "media/100016.gif"}
-    - {"mime_type": "image/gif", "path": "media/100017.gif"}
-    - {"mime_type": "image/gif", "path": "media/100018.gif"}
-    - {"mime_type": "image/heic", "path": "media/100019.heic"}
-    - {"mime_type": "image/heic", "path": "media/100020.heic"}
-    - {"mime_type": "image/heic", "path": "media/100021.heic"}
-    - {"mime_type": "image/heif", "path": "media/100022.heif"}
-    - {"mime_type": "image/heif", "path": "media/100023.heif"}
-    - {"mime_type": "image/heif", "path": "media/100024.heif"}
-    - {"mime_type": "image/tiff", "path": "media/100025.tiff"}
-    - {"mime_type": "image/tiff", "path": "media/100026.tiff"}
-    - {"mime_type": "image/tiff", "path": "media/100027.tiff"}
-    - {"mime_type": "video/mp4", "path": "media/200001.mp4"}
-    - {"mime_type": "video/mp4", "path": "media/200002.mp4"}
-    - {"mime_type": "video/mp4", "path": "media/200003.mp4"}
-    - {"mime_type": "video/avi", "path": "media/200004.avi"}
-    - {"mime_type": "video/avi", "path": "media/200005.avi"}
-    - {"mime_type": "video/avi", "path": "media/200006.avi"}
-    - {"mime_type": "video/quicktime", "path": "media/200007.mov"}
-    - {"mime_type": "video/quicktime", "path": "media/200008.mov"}
-    - {"mime_type": "video/quicktime", "path": "media/200009.mov"}
-    - {"mime_type": "video/3gpp", "path": "media/200010.3gp"}
-    - {"mime_type": "video/3gpp", "path": "media/200011.3gp"}
-    - {"mime_type": "video/3gpp", "path": "media/200012.3gp"}
-
+    - {"mime_type": "image/jpeg", "path": "media/100100.jpg"}
+    - {"mime_type": "video/mp4", "path": "media/200100.mp4"}
+    - {"tipo": "mídia_combinada", "midias": [{"mime_type": "image/jpeg", "path": "media/300100.jpg"}, {"mime_type": "image/png", "path": "media/300101.png"}]}
+    - {"tipo": "mídia_combinada", "midias": [{"mime_type": "video/mp4", "path": "media/300102.mp4"}, {"mime_type": "image/gif", "path": "media/300103.gif"}, {"mime_type": "image/webp", "path": "media/300104.webp"}]}
+    - {"tipo": "mídia_combinada", "midias": [{"mime_type": "image/avif", "path": "media/300105.avif"}, {"mime_type": "video/avi", "path": "media/300106.avi"}]}
+    - {"tipo": "mídia_combinada", "midias": [{"mime_type": "video/quicktime", "path": "media/300107.mov"}, {"mime_type": "image/heic", "path": "media/300108.heic"}]}
+    - {"tipo": "mídia_combinada", "midias": [{"mime_type": "image/heif", "path": "media/300109.heif"}, {"mime_type": "video/3gpp", "path": "media/300110.3gp"}]}
+    - {"tipo": "mídia_combinada", "midias": [{"mime_type": "image/tiff", "path": "media/300111.tiff"}, {"mime_type": "image/jpeg", "path": "media/300112.jpeg"}, {"mime_type": "video/mp4", "path": "media/300113.mp4"}]}
+    - {"tipo": "mídia_combinada", "midias": [{"mime_type": "image/webp", "path": "media/300114.webp"}, {"mime_type": "image/heic", "path": "media/300115.heic"}, {"mime_type": "image/png", "path": "media/300116.png"}]}
+    - {"tipo": "mídia_combinada", "midias": [{"mime_type": "video/avi", "path": "media/300117.avi"}, {"mime_type": "video/mp4", "path": "media/300118.mp4"}]}
 
 - intent: tentar_novamente
   examples: |
     - /tentar_novamente
     - tentar novamente
+
+- intent: recusar_confirmacao_risco
+  examples: |
+    - /recusar_confirmacao_risco
+    - não está correto
+    - as informações não estão corretas
+    
+- intent: afirmar_confirmacao_risco
+  examples: |
+    - /afirmar_confirmacao_risco
+    - afirmar_confirmacao_risco
+    - as informações estão corretas
+    
+- intent: indentificar_no_risco
+  examples: |
+    - /indentificar_no_risco
+    - pode me identificar
+    - me identificar no alerta
+
+- intent: nao_indentificar_no_risco
+  examples: |
+    - /nao_indentificar_no_risco
+    - Não pode me identificar
+    - Não me identificar no alerta
+
+- intent: compartilhar_mensagem_risco
+  examples: |
+    - /compartilhar_mensagem_risco
+    - Quero compartlhar o risco
+    - posso compartilhar 
+    - compartilhar
+
+- intent: nao_compartilhar_mensagem_risco
+  examples: |
+    - /nao_compartilhar_mensagem_risco
+    - Não quero compartlhar o risco
+    - Não posso compartilhar 
+    - Não compartilhar
+
+
+- intent: menu_inicial
+  examples: |
+    - menu
+    - menu inicial
+    - /menu_inicial
+    - começar
+
