@@ -7,6 +7,8 @@ import sys
 import sqlite3
 from rasa_sdk.events import FollowupAction
 from rasa_sdk.executor import CollectingDispatcher
+import yaml
+from .db_utils import get_db_connection
 
 logging.basicConfig(level=logging.DEBUG)  # Força o nível global de debug
 logger = logging.getLogger(__name__)
@@ -241,37 +243,38 @@ class ActionSalvarNome(Action):
 
         if nome:
             try:
-                conn = sqlite3.connect("usuarios.db")
-                cursor = conn.cursor()
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS usuarios (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        whatsapp_id TEXT UNIQUE,
-                        nome TEXT
-                    )
-                """)
-                cursor.execute("""
-                    INSERT INTO usuarios (whatsapp_id, nome)
-                    VALUES (?, ?)
-                    ON CONFLICT(whatsapp_id) DO UPDATE SET nome = excluded.nome
-                """, (whatsapp_id, nome))
-                conn.commit()
-                conn.close()
+                conn = get_db_connection()
+                if conn:
+                    cursor = conn.cursor()
+                    cursor.execute("""
+                        INSERT INTO usuarios (nome,whatsapp_id)
+                        VALUES (%s, %s)
+                        ON CONFLICT (whatsapp_id) DO UPDATE SET nome = EXCLUDED.nome
+                    """, (nome,whatsapp_id))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+                    dispatcher.utter_message(text=f"Prazer em te conhecer, {nome}!")
+                else:
+                    dispatcher.utter_message(text="Erro ao conectar ao banco de dados.")
             except Exception as e:
                 dispatcher.utter_message(text="Ocorreu um erro ao salvar seu nome.")
                 print(f"[ERRO BANCO] {e}")
         else:
             dispatcher.utter_message(text="Não consegui entender seu nome.")
 
-        return []
+        return [SlotSet("nome", nome)]
 
 class ActionPerguntarNome(Action):
     def name(self):
         return "action_perguntar_nome"
 
     def run(self, dispatcher, tracker, domain):
+        sender_id = tracker.sender_id
         nome = tracker.get_slot("nome")
         if nome:
+            logger.error(f"Nome no Slot")
+
             dispatcher.utter_message(
                 text=f"O nome {nome} está correto?",
                 buttons=[
@@ -279,15 +282,67 @@ class ActionPerguntarNome(Action):
                     {"title": "Não", "payload": "/deny"}
                 ]
             )
-        else:
-            dispatcher.utter_message(text="Olá! Aqui é o chatbot da Defesa Climática Popular. Como posso te chamar?\nNão se preocupe pois manteremos o sigilo.")
+            return []
+
+        try:
+            
+            conn = get_db_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT nome FROM usuarios WHERE whatsapp_id = %s", (sender_id,))
+                row = cursor.fetchone()
+                cursor.close()
+                conn.close()
+
+                if row:
+                    logger.error(f"Nome no banco")
+
+                    nome = row[0]
+                    dispatcher.utter_message(
+                        text=f"O nome {nome} está correto?",
+                        buttons=[
+                            {"title": "Sim", "payload": "/affirm"},
+                            {"title": "Não", "payload": "/deny"}
+                        ]
+                    )
+                    return [SlotSet("nome", nome)]
+
+        except Exception as e:
+            logger.error(f"Erro ao buscar nome no banco: {e}")
+
+        dispatcher.utter_message(
+            text="Olá! Aqui é o chatbot da Defesa Climática Popular. Como posso te chamar?\nNão se preocupe pois manteremos o sigilo."
+        )
         return []
+
 
 class ActionApagarNome(Action):
     def name(self):
         return "action_apagar_nome"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("Apagando nome do slot e do banco.")
+
+        whatsapp_id = tracker.sender_id
+
+        try:
+            conn = get_db_connection()
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "DELETE FROM usuarios WHERE whatsapp_id = %s;",
+                    (whatsapp_id,)
+                )
+                conn.commit()
+                logger.debug(f"Nome apagado do banco para {whatsapp_id}")
+        except Exception as e:
+            logger.error(f"Erro ao apagar nome do banco: {e}")
+            dispatcher.utter_message(text="Ocorreu um erro ao apagar seu nome do sistema.")
+        finally:
+            if conn:
+                conn.close()
+
+        dispatcher.utter_message(text="Tudo bem, como posso te chamar então?")
         return [SlotSet("nome", None)]
     
 

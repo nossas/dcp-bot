@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: meu_postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: meuusuario
+      POSTGRES_PASSWORD: minhasenha
+      POSTGRES_DB: meubanco
+      POSTGRES_INITDB_ARGS: "--locale-provider=libc"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

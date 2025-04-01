@@ -155,6 +155,8 @@ class WhatsAppInput(InputChannel):
             response =  self.client.get_location(data)
             json_string = json.dumps(response)
             return json_string
+        if message_type != "text":
+            return ''
         return self.client.get_message(data)
 
     def blueprint(self, on_new_message: Callable[[UserMessage], Awaitable[Any]]) -> Blueprint:
