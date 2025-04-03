@@ -6,16 +6,48 @@ rules:
       - intent: nlu_fallback
       - action: action_fallback_buttons
 
+  - rule: menu inicial
+    steps:
+    - intent: menu_inicial
+    - action: utter_menu_inicial
+  
+  - rule: perguntar nome - salvar com intent
+    steps:
+    - action: action_perguntar_nome
+    - intent: informar_nome
+    - action: action_salvar_nome
+
+  - rule: perguntar nome - affirm
+    steps:
+    - action: action_perguntar_nome
+    - or:
+      - intent: affirm
+      - intent: affirm_name
+    - action: utter_menu_inicial
+
+  - rule: perguntar nome - deny
+    steps:
+    - action: action_perguntar_nome
+    - or:
+      - intent: deny
+      - intent: deny_name
+    - action: action_apagar_nome
+    - action: action_perguntar_nome
+
   - rule: Tentar novamente
     steps:
       - intent: tentar_novamente
       - action: action_repeat_last_message
   
-  - rule: Salvar nome
-    steps:
-      - action: action_perguntar_nome
-      - intent: affirm
-      - action: utter_menu_inicial
+  # - rule: iniciar
+  #   steps:
+  #     - intent: saudacao
+  #     - action: action_perguntar_nome
+
+  # - rule: iniciar 2
+  #   steps:
+  #     - intent: session_start
+  #     - action: action_perguntar_nome
 
   - rule: Apagar risco
     steps:
@@ -28,6 +60,16 @@ rules:
     steps:
       - intent: informar_localizacao
       - action: action_buscar_endereco_openstreet
+
+  - rule: Recusar endereço
+    steps:
+    - intent: deny_address
+    - action: action_request_location
+
+  - rule: Aceitar endereço
+    steps:
+    - intent: affirm_address
+    - action: utter_classificar_risco
 
   - rule: Processar endereço texto e confirmar
     steps:
@@ -133,13 +175,19 @@ rules:
       - intent: compartilhar_mensagem_risco
       - action: utter_compartilhar_risco_message
       - action: utter_imprime_risco
+      - action: action_finaliza_risco
       - action: utter_agradecimento
 
   - rule: Não compartilhar o risco
     steps:
       - intent: nao_compartilhar_mensagem_risco
+      - action: action_finaliza_risco
       - action: utter_agradecimento
 
+  - rule: Continuar o risco iniciado
+    steps:
+      - intent: continuar_risco
+      - action: action_retoma_risco
 
   # - rule: Risco com descrição
   #   steps:

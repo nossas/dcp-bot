@@ -8,6 +8,10 @@ intents:
 - informar_nome
 - affirm
 - deny
+- deny_name
+- affirm_name
+- deny_address
+- affirm_address
 - compartilhar_risco
 - apagar_risco
 - continuar_risco
@@ -25,6 +29,7 @@ intents:
 - nao_indentificar_no_risco
 - compartilhar_mensagem_risco
 - nao_compartilhar_mensagem_risco
+- menu_inicial
 actions:
 - action_request_location
 - action_apagar_nome
@@ -49,6 +54,8 @@ actions:
 - action_salvar_risco
 - utter_compartilhar_risco_message
 - utter_imprime_risco
+- action_finaliza_risco
+- action_retoma_risco
 - utter_agradecimento
 
 
@@ -70,10 +77,9 @@ slots:
     - type: custom
   nome:
     type: text
-    influence_conversation: true
+    influence_conversation: false
     mappings:
-    - type: from_entity
-      entity: nome
+    - type: custom
   identificar:
     type: bool
     influence_conversation: true

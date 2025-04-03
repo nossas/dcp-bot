@@ -27,59 +27,35 @@ nlu:
     - bom dia, tudo bem?
 - intent: informar_nome
   examples: |
-    - Me chamo [João](nome)
-    - Pode me chamar de [Ana](nome)
-    - Meu nome é [Carla](nome)
-    - Eu sou o [Pedro](nome)
-    - Sou o [Rafael](nome)
-    - [Camila](nome)
-    - Aqui é a [Beatriz](nome)
-    - É o [André](nome)
-    - Sou [Tiago](nome)
-    - [Vanessa](nome)
-    - Me chamo [Lucas](nome)
-    - Pode me chamar de [Fernanda](nome)
-    - Meu nome é [Bruno](nome)
-    - Eu sou [Mariana](nome)
-    - Sou [Felipe](nome)
-    - Oi, sou [Gustavo](nome)
-    - [Lívia](nome)
-    - Aqui quem fala é [Eduardo](nome)
-    - O nome é [Jéssica](nome)
-    - Pode anotar aí: [Natália](nome)
-    - [Henrique](nome)
-    - [Paula](nome)
-    - É a [Renata](nome)
-    - Olá, sou o [Rodrigo](nome)
-    - Quem fala é a [Luciana](nome)
-    - Me chamo [Vitor](nome)
-    - Sou a [Isabela](nome)
-    - Me chamo [Thiago souza Araujo](nome)
-    - Pode me chamar de [Mônica da silva santos](nome)
-    - Eu sou a [Patrícia](nome)
-    - É o [Marcelo](nome)
-    - Sou [Daniela](nome)
-    - Aqui é o [Caio](nome)
-    - [Helena](nome)
-    - Me chamo [Joana](nome)
-    - Me chamo [Carlos](nome)
-    - Sou o [Fernando](nome)
-    - Me chama de [Sabrina](nome)
-    - Meu nome é [Alan](nome)
-    - Oi, sou a [Débora](nome)
-    - É a [Larissa](nome)
-    - Sou [Sérgio](nome)
-    - [João alberto mario](nome)
-    - [Maria da silva ](nome)
-    - [Lucasde oliveira penteado](nome)
-    - [Juliana gomes](nome)
-    - [Gabriel](nome)
-    - [Renata](nome)
-    - [Eduardo](nome)
-    - [Letícia](nome)
-    - [Bruno](nome)
-    - Me chamo [Maria](nome)
-    - Me chamo [joana]{"entity": "nome", "value": "Joana"}
+    - ALDEMIR DA COSTA CARVALHO JUNIOR
+    - ALESSANDRO CARMO DE ASSUMPÇÃO RABELLO
+    - ALEXANDRE SODRE DA SILVA
+    - ANA CRISTINA BENEVIDES
+    - ARIANNA DA SILVA SANTOS
+    - BARBARA EZEQUIEL FERREIRA
+    - CAIO PARIZI BICALHO
+    - DAIANA SILVA TEIXEIRA RENTO
+    - EDNA MARA ABRANTES DUTRA FARIA
+    - ELTON LUÍS OLIVEIRA EDVIK
+    - EVELIN REGINALDO E SILVA
+    - FABIANA PEIXOTO CORREA
+    - FLAVIANE BARBOZA MALHEIROS CORRÊA
+    - IGOR DE CARVALHO GONÇALVES
+    - IRANI COELHO FERREIRA
+    - ISABEL HORTENCIA GARNICA PEREZ BARROS
+    - ISMAEL MACIEL DE MENEZES FILHO
+    - JOÃO LUÍS DA SILVA CESARIO
+    - JORDANA SILVA PEREIRA
+    - KATHLEEN MARIA PALOMA LATSCH CHEREM
+    - LEISY DA GLORIA MORAES
+    - LUCIANO LIMA DE OLIVEIRA
+    - LUCILVANIA DA SILVA ALVES
+    - MARIA DA CONCEIÇÃO DIONÍSIO CERQUEIRA
+    - MILLER DO CARMO KLEIN ALALUNA
+    - MIRLA MOREIRA DE PAULA
+    - MONALIZA LIMONGI ZIMBRAO
+    - PABLO VINICIUS DOMINGOS PORTILHO
+   
 - intent: compartilhar_risco
   examples: |
     - Quero compartilhar um risco
@@ -153,6 +129,66 @@ nlu:
     - rua irmão lucas, 83
     - rua deputado lacerda franco, 53
     - Estrada do cascalho, 1989
+    - beco do batman
+    - Rua das Flores, 123
+    - Av. Paulista, São Paulo
+    - Rua dos Andradas, Porto Alegre
+    - Avenida Central, 45, Centro, Rio de Janeiro
+    - Rua Bahia, número 200
+    - Irmão Lucas, 198
+    - Joaquim Antunes, 345
+    - Rua Teodoro Sampaio, 1999
+    - Rua Planejada
+    - Estrada do Cascalho
+    - Estrada do Evangelho Pleno
+    - Avenida Pedroso de Moraes
+    - Avenida Brasil
+    - Rua Irmão Lucas, 83
+    - Avenida Barra Funda, 12
+    - Rua Irmão Lucas, 83
+    - Rua Deputado Lacerda Franco, 53
+    - Estrada do Cascalho, 1989
+    - Beco do Batman
+    - Viela das Margaridas
+    - Viela do Sol
+    - Travessa das Palmeiras
+    - Travessa São Benedito, 78
+    - Alameda Santos, 940
+    - Alameda das Acácias
+    - Rodovia BR-101, Km 234
+    - Rodovia dos Imigrantes, km 25
+    - Caminho do Mar
+    - Ladeira dos Tabajaras
+    - Largo da Carioca
+    - Praça da Liberdade
+    - Praça Dom Pedro II
+    - Vila Nova Esperança
+    - Passagem das Rosas
+    - Servidão da Paz
+    - Servidão Recanto Feliz
+    - Estradinha do Ouro
+    - Linha Velha, km 17
+    - Sítio do Pica-Pau Amarelo
+    - Condomínio Jardim das Palmeiras
+    - Comunidade do Sapo
+    - Morro do Cantagalo
+    - Rua Projetada B, quadra 5, lote 12
+- intent: affirm_name
+  examples: |
+    - /affirm_name
+    - affirm_name
+- intent: deny_name
+  examples: |
+    - /deny_name
+    - deny_name
+- intent: affirm_address
+  examples: |
+    - /affirm_address
+    - affirm_address
+- intent: deny_address
+  examples: |
+    - /deny_address
+    - deny_address
 - intent: affirm
   examples: |
     - sim
@@ -238,6 +274,8 @@ nlu:
   examples: |
     - /tentar_novamente
     - tentar novamente
+    - tentar de novo
+    - tentar mais uma vez
 
 - intent: recusar_confirmacao_risco
   examples: |

@@ -1,5 +1,4 @@
 version: "3.0"
-
 language: br
 
 # See https://rasa.com/docs/rasa/tuning-your-model for more information.
