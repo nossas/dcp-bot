@@ -10,14 +10,15 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile    
     volumes:
-      - ./credentials.yml:/app/credentials.yml
-      - ./endpoints.yml:/app/endpoints.yml
-    command:
-      - 'run'
-      - '--connector' 
-      - 'whatsapp_connector.WhatsAppInput'
-      - '--debug'
-    
+      - .:/app
+    entrypoint: '/app/docker/entrypoint.sh'
+    environment:
+      POSTGRES_USER: usuario
+      POSTGRES_PASSWORD: senha
+      POSTGRES_DB: banco
+      POSTGRES_HOST: postgres
+      RASA_CACHE: disabled
+     
     ports:
       - '5005:5005'
 
@@ -25,6 +26,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile    
+    volumes:
+      - .:/app
     command:
       - 'run'
       - 'actions'
