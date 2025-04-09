@@ -3,8 +3,6 @@ from rasa_sdk.events import UserUtteranceReverted, SlotSet
 import requests
 import json
 import logging
-import sys
-import sqlite3
 from rasa_sdk.events import FollowupAction
 from rasa_sdk.executor import CollectingDispatcher
 import yaml
@@ -212,7 +210,7 @@ class ActionPerguntarNome(Action):
             logger.error(f"Erro ao buscar nome no banco: {e}")
 
         dispatcher.utter_message(
-            text="Olá! Aqui é o chatbot da Defesa Climática Popular. Como posso te chamar?\nNão se preocupe pois manteremos o sigilo."
+            text="Olá! Aqui é o chatbot da Defesa Climática Popular. Como posso te chamar?\nNão se preocupe Seu nome não será divulgado."
         )
         return []
 
@@ -309,7 +307,7 @@ class ActionBuscarEnderecoOpenStreet(Action):
                     )
                     return [SlotSet("latitude", latitude), SlotSet("longitude", longitude), SlotSet("endereco", endereco)]
                 else:
-                    dispatcher.utter_message(text="Desculpe, não consegui encontrar o endereço.tente novamente.")
+                    dispatcher.utter_message(text="Desculpe, não consegui encontrar o endereço. Tente novamente.")
                     return [FollowupAction("action_request_location")]
             else:
                 logger.debug(f"tem endereço")
@@ -342,6 +340,18 @@ class ActionBuscarEnderecoTextoOpenStreet(Action):
         return "action_buscar_endereco_texto_openstreet"
 
     def run(self, dispatcher, tracker, domain):
+        last_action = None
+        for event in reversed(tracker.events):
+            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons"]:
+                last_action = event.get("name")
+                break
+        logger.debug(f"Last action:{last_action}")
+        if last_action == "action_perguntar_nome":
+            user_message = tracker.latest_message.get("text")
+            logger.debug(f"Salvando fallback como nome: {user_message}")
+            return [
+                FollowupAction("action_salvar_nome")
+            ]
         endereco_texto = tracker.latest_message.get("text")
         logger.debug(f"Buscando endereço pelo texto: {endereco_texto}")
         
@@ -443,7 +453,7 @@ class ActionSalvarMidiaRisco(Action):
             if midia_data.get("tipo") == "mídia_combinada":
                 novas_midias = [m["path"] for m in midia_data["midias"]]
                 midias_slot.extend(novas_midias)
-                dispatcher.utter_message(text=f"{len(novas_midias)} mídias adicionadas!")
+                dispatcher.utter_message(text=f"{len(novas_midias)} mídias adicionadas! Aguarde se ainda estiver carregando alguma.")
             else:
                 # Caso venha uma mídia só
                 path = midia_data["path"]
@@ -493,18 +503,92 @@ class ActionSalvarRisco(Action):
     def name(self) -> str:
         return "action_solicitar_compartilhar_risco"
 
-    def run(self, dispatcher,
-            tracker,
-            domain):
-        # aqui vai a logica de cadastrar o risco no Mapa
-        
+    def run(self, dispatcher, tracker, domain):
+        logger.error(f"entrou")
+        try:
+            conn = get_db_connection()
+            if not conn:
+                dispatcher.utter_message(text="Erro ao conectar ao banco de dados.")
+                return []
+
+            cursor = conn.cursor()
+            nome = tracker.get_slot("nome")
+            endereco = tracker.get_slot("endereco")
+            classificacao = tracker.get_slot("classificacao_risco")
+            descricao = tracker.get_slot("descricao_risco")
+            identificar = tracker.get_slot("identificar")
+            latitude = tracker.get_slot("latitude")
+            longitude = tracker.get_slot("longitude")
+            midias = tracker.get_slot("midias") or []
+            whatsapp_id = tracker.sender_id
+
+            # Buscar ou criar usuário
+            cursor.execute("SELECT id FROM usuarios WHERE whatsapp_id = %s", (whatsapp_id,))
+            usuario = cursor.fetchone()
+            if usuario:
+                usuario_id = usuario[0]
+            else:
+                cursor.execute("INSERT INTO usuarios (whatsapp_id, nome) VALUES (%s, %s) RETURNING id", (whatsapp_id, nome))
+                usuario_id = cursor.fetchone()[0]
+            logger.error(f"usuário:{usuario_id}")
+
+            # Inserir mídias e coletar ids
+            id_midias = []
+            for midia_path in midias:
+                # Aqui mime_type é opcional — você pode adaptar para pegar do nome do arquivo ou outro slot
+                cursor.execute("""
+                    INSERT INTO midias (path, mime_type)
+                    VALUES (%s, %s) RETURNING id
+                """, (midia_path, None))  # ou extraia o tipo se quiser
+                midia_id = cursor.fetchone()[0]
+                id_midias.append(midia_id)
+            logger.error(f"midias:{id_midias}")
+
+            # Inserir risco
+            cursor.execute("""
+                INSERT INTO riscos (
+                    id_usuario,
+                    localizacao,
+                    endereco,
+                    classificacao,
+                    descricao,
+                    id_midias,
+                    identificar
+                )
+                VALUES (
+                    %s,
+                    ST_SetSRID(ST_MakePoint(%s, %s), 4326),
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
+            """, (
+                usuario_id,
+                float(longitude), float(latitude),
+                endereco,
+                classificacao,
+                descricao,
+                id_midias if id_midias else None,
+                identificar
+            ))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+        except Exception as e:
+            dispatcher.utter_message(text="Erro ao salvar os dados do risco.")
+            logger.error(f"[ERRO SALVAMENTO RISCO] {e}", exc_info=True)
+            return []
+
         dispatcher.utter_message(
-            text='Se precisar de ajuda urgente, entre em contato com a Defesa Civil – 199.', #verificar a possibilidade de um template para chamar uma call-to-action com ligação externa.
-            
+            text='Se precisar de ajuda urgente, entre em contato com a Defesa Civil – 199.'
         )
         dispatcher.utter_message(
             text='Obrigado, seu alerta foi registrado mas ainda não foi validado e não aparece no mapa oficial, mas você pode encaminhá-lo para outras pessoas para alertá-las sobre a situação. Você gostaria de compartilhar?',
-             buttons=[
+            buttons=[
                 {"title": "Sim", "payload": "/compartilhar_mensagem_risco"},
                 {"title": "Não", "payload": "/nao_compartilhar_mensagem_risco"}
             ]
