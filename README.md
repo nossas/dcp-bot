@@ -47,6 +47,7 @@ POSTGRES_HOST=postgres
 
 ### 🔐 Credenciais 
 
+Você pode copiar os arquivos de exemplo e configurar com os dados reais.
 - **`credentials.yml`** – Configuração de canal (WhatsApp, REST, etc.).
 - **`endpoints.yml`** – Informações para o endpoint de ações, tracker store (banco), etc.
 
