@@ -72,6 +72,30 @@ Execute localmente com:
 ```bash
 docker-compose -f docker-compose-local.yml up --build
 ```
+### 🌐 Executando Localmente com ngrok
+
+Para rodar o projeto **Defesa Climática Popular** localmente e integrar com o WhatsApp (ou outra interface externa), é necessário expor seu servidor Rasa na internet. A maneira mais simples de fazer isso é utilizando o [ngrok](https://ngrok.com/).
+
+#### Passos:
+
+1. **Instale o ngrok** (caso ainda não tenha):
+   ```bash
+   sudo apt install snapd
+   sudo snap install ngrok
+   ```
+   ou baixe diretamente pelo site [https://ngrok.com/download](https://ngrok.com/download).
+
+2. **Autentique seu ngrok** (substitua `SEU_TOKEN` pelo seu token pessoal):
+   ```bash
+   ngrok config add-authtoken SEU_TOKEN
+   ```
+
+3. **Inicie o túnel para a porta 5005**, que é onde o Rasa estará ouvindo:
+   ```bash
+   ngrok http 5005
+   ```
+
+4. Copie o **endpoint HTTPS** gerado pelo ngrok (exemplo: `https://abc123.ngrok.io`) e configure esse endereço no seu provedor de WhatsApp ou em sistemas externos que se comuniquem com o bot.
 
 Para produção:
 ```bash
