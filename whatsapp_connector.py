@@ -184,7 +184,6 @@ class WhatsAppInput(InputChannel):
 
             if message_type in ["image", "video"]:
                 media_data = self.client.get_video(request.json) if message_type == "video" else self.client.get_image(request.json)
-                logger.error(f"media_data: {media_data}")
 
                 media_id = media_data.get("id")
                 url = self.client.query_media_url(media_id)
