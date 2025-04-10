@@ -18,7 +18,10 @@ services:
       POSTGRES_DB: banco
       POSTGRES_HOST: postgres
       RASA_CACHE: disabled
-     
+      WORDPRESS_URL: wordpress
+    networks:
+      - interna
+ 
     ports:
       - '5005:5005'
 
@@ -35,13 +38,16 @@ services:
     ports: 
       - '5055:5055'
     user: root
-  
+    networks:
+      - wordpress-bot
+      - interna
+
+
+
   postgres:
     image: postgres:17
     container_name: postgres
     restart: always
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_USER: usuario
       POSTGRES_PASSWORD: senha
@@ -49,6 +55,11 @@ services:
       POSTGRES_INITDB_ARGS: "--locale-provider=libc"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - interna
 
-volumes:
-  postgres_data:
+networks:
+  interna:
+    driver: bridge
+  wordpress-bot:
+    external: true

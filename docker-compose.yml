@@ -17,7 +17,8 @@ services:
       - '--connector' 
       - 'whatsapp_connector.WhatsAppInput'
       - '--debug'
-    
+    environment:
+      WORDPRESS_URL: wordpress
     ports:
       - '5005:5005'
 
