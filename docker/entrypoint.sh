@@ -28,7 +28,7 @@ conn = psycopg2.connect(
     host="$POSTGRES_HOST"
 )
 cur = conn.cursor()
-cur.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users');")
+cur.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'usuarios');")
 exists = cur.fetchone()[0]
 cur.close()
 conn.close()
@@ -46,7 +46,7 @@ done
 cd /app
 
 if should_run_migrations; then
-  >&2 echo "Rodando migrations.py porque a tabela 'users' não existe."
+  >&2 echo "Rodando migrations.py porque a tabela 'usuarios' não existe."
   python migrations.py
 else
   >&2 echo "Tabela 'users' já existe. Pulando migrations."
