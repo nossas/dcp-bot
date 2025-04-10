@@ -4,9 +4,6 @@ def create_tables():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Ativa extensão PostGIS
-    cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis;")
-
     # Tabela usuários
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS usuarios (
@@ -24,14 +21,14 @@ def create_tables():
             mime_type TEXT
         );
     """)
-
     # Tabela riscos
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS riscos (
             id SERIAL PRIMARY KEY,
             timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             id_usuario BIGINT REFERENCES usuarios(id),
-            localizacao GEOMETRY(POINT, 4326),
+            latitude DOUBLE PRECISION,
+            longitude DOUBLE PRECISION,
             endereco TEXT,
             classificacao TEXT,
             descricao TEXT,
@@ -46,8 +43,8 @@ def create_tables():
             id SERIAL PRIMARY KEY,
             nome TEXT,
             descricao TEXT,
-            ponto GEOMETRY(POINT, 4326),
-            poligono GEOMETRY(POLYGON, 4326)
+            latitude DOUBLE PRECISION,
+            longitude DOUBLE PRECISION
         );
     """)
 

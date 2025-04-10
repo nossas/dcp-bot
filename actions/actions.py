@@ -548,7 +548,8 @@ class ActionSalvarRisco(Action):
             cursor.execute("""
                 INSERT INTO riscos (
                     id_usuario,
-                    localizacao,
+                    latitude,
+                    longitude,
                     endereco,
                     classificacao,
                     descricao,
@@ -556,17 +557,12 @@ class ActionSalvarRisco(Action):
                     identificar
                 )
                 VALUES (
-                    %s,
-                    ST_SetSRID(ST_MakePoint(%s, %s), 4326),
-                    %s,
-                    %s,
-                    %s,
-                    %s,
-                    %s
+                    %s, %s, %s, %s, %s, %s, %s, %s
                 )
             """, (
                 usuario_id,
-                float(longitude), float(latitude),
+                float(latitude),  
+                float(longitude),
                 endereco,
                 classificacao,
                 descricao,

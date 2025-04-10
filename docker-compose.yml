@@ -34,7 +34,7 @@ services:
     user: root
   
   postgres:
-    image: postgis/postgis:15-3.3
+    image: postgres:17
     container_name: postgres
     restart: always
     ports:
