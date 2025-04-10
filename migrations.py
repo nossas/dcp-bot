@@ -21,21 +21,24 @@ def create_tables():
             mime_type TEXT
         );
     """)
-    # Tabela riscos
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS riscos (
             id SERIAL PRIMARY KEY,
             timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            id_usuario BIGINT REFERENCES usuarios(id),
+            id_usuario BIGINT,
             latitude DOUBLE PRECISION,
             longitude DOUBLE PRECISION,
             endereco TEXT,
             classificacao TEXT,
             descricao TEXT,
             id_midias INTEGER[],
-            identificar BOOLEAN
-        );
-    """)
+            identificar BOOLEAN,
+            CONSTRAINT fk_usuario
+                FOREIGN KEY (id_usuario)
+                REFERENCES usuarios(id)
+                ON DELETE SET NULL
+    );
+""")
 
     # Tabela pontos de referência
     cursor.execute("""

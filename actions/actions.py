@@ -172,7 +172,6 @@ class ActionPerguntarNome(Action):
         sender_id = tracker.sender_id
         nome = tracker.get_slot("nome")
         if nome:
-            logger.error(f"Nome no Slot")
 
             dispatcher.utter_message(
                 text=f"O nome {nome} está correto?",
@@ -188,15 +187,18 @@ class ActionPerguntarNome(Action):
             conn = get_db_connection()
             if conn:
                 cursor = conn.cursor()
-                cursor.execute("SELECT nome FROM usuarios WHERE whatsapp_id = %s", (sender_id,))
+                cursor.execute("""
+                    SELECT nome FROM usuarios 
+                    WHERE whatsapp_id = %s AND nome IS NOT NULL
+                """, (sender_id,))
                 row = cursor.fetchone()
                 cursor.close()
                 conn.close()
 
                 if row:
-                    logger.error(f"Nome no banco")
-
                     nome = row[0]
+                    logger.debug(f"Nome encontrado no banco: {nome}")
+
                     dispatcher.utter_message(
                         text=f"O nome {nome} está correto?",
                         buttons=[
@@ -260,7 +262,7 @@ class ActionApagarNome(Action):
             if conn:
                 cursor = conn.cursor()
                 cursor.execute(
-                    "DELETE FROM usuarios WHERE whatsapp_id = %s;",
+                    "UPDATE usuarios SET nome = NULL WHERE whatsapp_id = %s;",
                     (whatsapp_id,)
                 )
                 conn.commit()
@@ -504,7 +506,6 @@ class ActionSalvarRisco(Action):
         return "action_solicitar_compartilhar_risco"
 
     def run(self, dispatcher, tracker, domain):
-        logger.error(f"entrou")
         try:
             conn = get_db_connection()
             if not conn:
@@ -530,7 +531,6 @@ class ActionSalvarRisco(Action):
             else:
                 cursor.execute("INSERT INTO usuarios (whatsapp_id, nome) VALUES (%s, %s) RETURNING id", (whatsapp_id, nome))
                 usuario_id = cursor.fetchone()[0]
-            logger.error(f"usuário:{usuario_id}")
 
             # Inserir mídias e coletar ids
             id_midias = []
@@ -542,7 +542,6 @@ class ActionSalvarRisco(Action):
                 """, (midia_path, None))  # ou extraia o tipo se quiser
                 midia_id = cursor.fetchone()[0]
                 id_midias.append(midia_id)
-            logger.error(f"midias:{id_midias}")
 
             # Inserir risco
             cursor.execute("""
