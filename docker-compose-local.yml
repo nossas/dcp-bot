@@ -29,6 +29,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile    
+    environment:
+      WORDPRESS_URL: http://wordpress
     volumes:
       - .:/app
     command:
@@ -41,7 +43,6 @@ services:
     networks:
       - wordpress-bot
       - interna
-
 
 
   postgres:
