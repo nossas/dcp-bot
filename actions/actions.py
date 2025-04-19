@@ -607,44 +607,55 @@ class ActionFinalizaRisco(Action):
         SlotSet("midias", []),
         SlotSet("identificar", None)]
         
+from rasa_sdk import Action
+from rasa_sdk.events import SlotSet
+import requests
+import os
+
 class ActionListarRiscos(Action):
     def name(self) -> str:
         return "action_listar_riscos"
 
-    def run(self, dispatcher,
-            tracker,
-            domain):
-
-        wordpress_url = os.getenv("WORDPRESS_URL")  # Pega a URL da variável de ambiente
-        endpoint = f"{wordpress_url}/wp-json/dcp/riscos/v1/list"
-
+    def run(self, dispatcher, tracker, domain):
+        pagina = tracker.get_slot("pagina_risco") or 1
+        wordpress_url = os.getenv("WORDPRESS_URL")
+        endpoint = f"{wordpress_url}/wp-json/dcp/v1/riscos?per_page=3&page={pagina}"
         try:
             response = requests.get(endpoint)
-            response.raise_for_status()  # levanta erro se a resposta for inválida
-
+            response.raise_for_status()
             riscos = response.json()
 
             if not riscos:
-                dispatcher.utter_message(text="Nenhum risco foi encontrado no momento.")
-                return []
-
+                dispatcher.utter_message(text="Não temos mais relatos na sua região.")
+                return [SlotSet("pagina_risco",1),FollowupAction("utter_sair")]
+            logger.error(f"Riscos: {riscos}")
+            mensagem = ''
             for risco in riscos:
+                
                 mensagem = (
                     "-------------------------------------------------\n"
                     f"📍 Local: {risco['endereco']}\n"
                     f"📅 Data/Hora: {risco['timestamp']}\n"
                     f"📊 Classificação: *{risco['classificacao']}*\n"
                     f"📝 Descrição: {risco['descricao']}\n"
-                    "-------------------------------------------------\n"
-
                 )
-                dispatcher.utter_message(text=mensagem)
+                dispatcher.utter_message(text=mensagem,)
+                for url in risco['url_midias']:     
+                    dispatcher.utter_message(image=url,)
+                dispatcher.utter_message(text="-------------------------------------------------\n",)
+            dispatcher.utter_message(
+                    text="Você quer ver outras?",
+                    buttons=[
+                        {"title": "Mostrar outras", "payload": "/mais_riscos"},
+                        {"title": "Sair", "payload": "/sair"}
+                    ]
+            )
+            return [SlotSet("pagina_risco", pagina + 1)]
 
         except requests.RequestException as e:
             dispatcher.utter_message(text="Ocorreu um erro ao buscar os riscos.")
             print(f"[ERRO] Falha na requisição: {e}")
-
-        return []
+            return []
 
 
 class ActionNivelDeRisco(Action):
@@ -654,17 +665,18 @@ class ActionNivelDeRisco(Action):
     def run(self, dispatcher, tracker, domain):
         wordpress_url = os.getenv("WORDPRESS_URL")
         endpoint = f"{wordpress_url}/wp-json/dcp/v1/risco-regiao"
+        SlotSet("pagina_risco",1)
 
         try:
             response = requests.get(endpoint, timeout=10)
             response.raise_for_status()
             data = response.json()
 
-            if not data or "nivel" not in data:
+            if not data or "grau_risco" not in data:
                 dispatcher.utter_message(text="⚠️ Não consegui obter o nível de risco no momento.")
                 return []
 
-            nivel = data["nivel"]
+            nivel = data["grau_risco"]
             mensagem = f"🚨 O nível de risco atual da sua região é: *{nivel.upper()}*."
             dispatcher.utter_message(text=mensagem)
 
@@ -836,7 +848,7 @@ class ActionPararNotificacoes(Action):
             """, (telefone,))
             conn.commit()
 
-            dispatcher.utter_message(text='✅ Vocẽ não receberá mais notificações!')
+            dispatcher.utter_message(text='✅ Vocẽ não receberá notificações!')
         except Exception as e:
             logger.error(f"Erro ao atualizar notificações: {e}")
             dispatcher.utter_message(text="❌ Ocorreu um erro ao remover as notificações.")

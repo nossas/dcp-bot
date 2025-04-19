@@ -203,7 +203,13 @@ rules:
   - rule: situação na região
     steps:
       - intent: situacao_regiao
-      - action: action_request_location
+      - action: action_nivel_de_risco
+      - action: action_listar_riscos
+
+  - rule: situação na região
+    steps:
+      - intent: mais_riscos
+      - action: action_listar_riscos
 
   - rule: O que fazer
     steps:

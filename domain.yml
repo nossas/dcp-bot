@@ -42,6 +42,7 @@ intents:
 - encontrar_abrigo
 - nao_receber_notificacoes
 - parar_notificacoes
+- mais_riscos
 
 actions:
 - action_request_location
@@ -83,6 +84,8 @@ actions:
 - utter_sair
 - utter_ate_logo
 - action_remover_notificacoes
+- action_nivel_de_risco
+- action_parar_notificacoes
 
 
 slots:
@@ -101,6 +104,13 @@ slots:
     influence_conversation: false
     mappings:
     - type: custom
+  pagina_risco:
+    type: float
+    influence_conversation: false
+    initial_value: 1
+    mappings:
+      - type: custom
+
   nome:
     type: text
     influence_conversation: false

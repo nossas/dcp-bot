@@ -407,8 +407,16 @@ nlu:
 - intent: parar_notificacoes
   examples: |
     - parar de receber notificações
+    - parar de receber notificacoes
     - Não quero mais receber notificações
     - pare de me mandar mensagens
     - Pare de enviar mensagens
     - não quero mais receber
+    - nao quero mais receber
 
+- intent: mais_riscos
+  examples: |
+    - mais_riscos
+    - /mais_riscos
+    - quer ver mais riscos
+    - me mostre mais riscos
