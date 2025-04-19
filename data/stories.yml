@@ -55,3 +55,19 @@ stories:
       - intent: deny
       - intent: deny_address
     - action: action_request_location 
+
+
+# - story: Responder ver situação com texto e affirm
+#   steps:
+#     - action: utter_menu_inicial
+#     - intent: menu_inicial_2
+#     - action: utter_menu_inicial_2
+#     - intent: situacao_regiao
+#     - action: action_request_location
+#     - intent: informar_endereco_texto
+#     - action: action_buscar_endereco_texto_openstreet
+#     - or:
+#       - intent: affirm
+#       - intent: affirm_address    
+#     - action: action_listar_riscos 
+

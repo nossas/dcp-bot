@@ -30,6 +30,19 @@ intents:
 - compartilhar_mensagem_risco
 - nao_compartilhar_mensagem_risco
 - menu_inicial
+- menu_inicial_2
+- situacao_regiao
+- o_que_fazer
+- contatos_emergencia
+- ajuda
+- dicas_de
+- menu_dicas
+- sair
+- receber_notificacoes
+- encontrar_abrigo
+- nao_receber_notificacoes
+- parar_notificacoes
+
 actions:
 - action_request_location
 - action_apagar_nome
@@ -37,6 +50,7 @@ actions:
 - action_salvar_nome
 - action_apagar_risco
 - utter_menu_inicial
+- utter_menu_inicial_2
 - action_buscar_endereco_texto_openstreet
 - descrever_risco
 - utter_classificar_risco
@@ -57,6 +71,18 @@ actions:
 - action_finaliza_risco
 - action_retoma_risco
 - utter_agradecimento
+- action_listar_riscos
+- utter_o_que_fazer
+- action_listar_abrigos
+- action_listar_contatos_emergencia
+- utter_menu_dicas
+- action_buscar_dicas
+- utter_ajuda
+- utter_pos_ajuda
+- action_receber_notificacoes
+- utter_sair
+- utter_ate_logo
+- action_remover_notificacoes
 
 
 slots:
@@ -95,7 +121,11 @@ slots:
     mappings:
       - type: from_entity
         entity: classificacao_risco
-
+  dicas:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: dicas
   descricao_risco:
     type: text
     influence_conversation: false
@@ -111,6 +141,7 @@ slots:
 entities:
 - nome
 - classificacao_risco
+- dicas
 responses:
   utter_menu_inicial:
   - text: Como posso te ajudar?
@@ -118,9 +149,20 @@ responses:
     - title: Compartilhar Risco
       payload: /compartilhar_risco
     - title: Situação na Região
-      payload: /opcao_2
-    - title: Outros
-      payload: /utter_menu_inicial_2
+      payload: /situacao_regiao
+    - title: O que fazer agora?
+      payload: /o_que_fazer
+
+  utter_menu_inicial_2:
+  - text: Como posso te ajudar?
+    buttons:
+    - title: Preciso de Ajuda
+      payload: /ajuda
+    - title: Ver recomendações
+      payload: /recomendacoes
+    - title: Ver locais Seguros
+      payload: /locais_seguros
+
   utter_classificar_risco:
   - text: Perfeito {nome}. Escolha a opção que descreva melhor o que está ocorrendo.
     buttons:
@@ -171,4 +213,60 @@ responses:
     buttons:
     - title: Mais informações
       payload: '/menu_inicial'
+  
+  utter_o_que_fazer:
+  - text: |
+      ⚠️ Recomendamos que você:
+        • Tenha separado seu kit de sobrevivência com documentos, remédios e itens essenciais.
+        • Tenha cuidado com fios caídos ou locais com risco de choque elétrico.
+        • Evite contato com a água de enchentes, pois pode estar contaminada.
+
+
+        ⛑️ Se precisar de ajuda urgente, entre em contato com a Defesa Civil – tel:199. Basta tocar no número para fazer a ligação automaticamente.
+        
+  utter_ajuda:
+  - text: |
+      Como podemos te ajudar agora?
+    buttons:
+    - title: Encontrar um abrigo
+      payload: '/encontrar_abrigo'
+    - title: Contatos emergência
+      payload: '/contatos_emergencia'
+    - title: Dicas de segurança
+      payload: '/dicas_segurança'
+
+  utter_menu_dicas:
+  - text: |
+      Você quer dicas para qual tipo de situação?
+    buttons:
+    - title: Enchente
+      payload: '/dicas_de{"dicas": "enchente"}'    
+    - title: Focos de lixo
+      payload: '/dicas_de{"dicas": "lixo"}'
+    - title: Calor extremo
+      payload: '/dicas_de{"dicas": "calor"}'
     
+  utter_pos_ajuda:
+  - text: |
+       Como podemos te ajudar agora?
+    buttons:
+    - title: Preciso de ajuda
+      payload: '/o_que_fazer'
+    - title: Menu inicial
+      payload: '/menu_inicial'
+    - title: Sair
+      payload: '/sair'
+
+
+  utter_sair:
+  - text: |
+       Quer receber notificações futuras sobre mudanças na sua região?
+    buttons:
+    - title: Quero receber
+      payload: '/receber_notificacoes'
+    - title: Não quero
+      payload: '/nao_receber_notificacoes'
+
+  utter_ate_logo:
+    - text: |
+       Ok! até logo. Você pode nos chamar a qualquer momento dando um oi por aqui ou escrevendo "menu inicial"

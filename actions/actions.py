@@ -5,8 +5,8 @@ import json
 import logging
 from rasa_sdk.events import FollowupAction
 from rasa_sdk.executor import CollectingDispatcher
-import yaml
 from .db_utils import get_db_connection
+import os
 
 logging.basicConfig(level=logging.DEBUG)  # Força o nível global de debug
 logger = logging.getLogger(__name__)
@@ -389,7 +389,7 @@ class ActionSalvarClassificacaoRisco(Action):
     def name(self) -> str:
         return "action_salvar_classificacao_risco"
 
-    def run(self, dispatcher: CollectingDispatcher,
+    def run(self, dispatcher,
             tracker,
             domain):
         
@@ -606,3 +606,245 @@ class ActionFinalizaRisco(Action):
         SlotSet("longitude", None),
         SlotSet("midias", []),
         SlotSet("identificar", None)]
+        
+class ActionListarRiscos(Action):
+    def name(self) -> str:
+        return "action_listar_riscos"
+
+    def run(self, dispatcher,
+            tracker,
+            domain):
+
+        wordpress_url = os.getenv("WORDPRESS_URL")  # Pega a URL da variável de ambiente
+        endpoint = f"{wordpress_url}/wp-json/dcp/riscos/v1/list"
+
+        try:
+            response = requests.get(endpoint)
+            response.raise_for_status()  # levanta erro se a resposta for inválida
+
+            riscos = response.json()
+
+            if not riscos:
+                dispatcher.utter_message(text="Nenhum risco foi encontrado no momento.")
+                return []
+
+            for risco in riscos:
+                mensagem = (
+                    "-------------------------------------------------\n"
+                    f"📍 Local: {risco['endereco']}\n"
+                    f"📅 Data/Hora: {risco['timestamp']}\n"
+                    f"📊 Classificação: *{risco['classificacao']}*\n"
+                    f"📝 Descrição: {risco['descricao']}\n"
+                    "-------------------------------------------------\n"
+
+                )
+                dispatcher.utter_message(text=mensagem)
+
+        except requests.RequestException as e:
+            dispatcher.utter_message(text="Ocorreu um erro ao buscar os riscos.")
+            print(f"[ERRO] Falha na requisição: {e}")
+
+        return []
+
+
+class ActionNivelDeRisco(Action):
+    def name(self):
+        return "action_nivel_de_risco"
+
+    def run(self, dispatcher, tracker, domain):
+        wordpress_url = os.getenv("WORDPRESS_URL")
+        endpoint = f"{wordpress_url}/wp-json/dcp/v1/risco-regiao"
+
+        try:
+            response = requests.get(endpoint, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+
+            if not data or "nivel" not in data:
+                dispatcher.utter_message(text="⚠️ Não consegui obter o nível de risco no momento.")
+                return []
+
+            nivel = data["nivel"]
+            mensagem = f"🚨 O nível de risco atual da sua região é: *{nivel.upper()}*."
+            dispatcher.utter_message(text=mensagem)
+
+        except Exception as e:
+            logger.error(f"Erro ao consultar o nível de risco: {e}")
+            dispatcher.utter_message(text="❌ Ocorreu um erro ao buscar o nível de risco.")
+        
+        return []
+
+class ActionListarAbrigos(Action):
+    def name(self):
+        return "action_listar_abrigos"
+
+    def run(self, dispatcher, tracker, domain):
+        try:
+            wordpress_url = os.getenv("WORDPRESS_URL")
+            endpoint = f"{wordpress_url}/wp-json/dcp/v1/abrigos"
+
+            response = requests.get(endpoint)
+            response.raise_for_status()
+            abrigos = response.json()
+
+            if not abrigos:
+                dispatcher.utter_message(text="Não encontrei nenhum abrigo no momento.")
+                return []
+
+            mensagem = "📍 Aqui estão alguns abrigos disponíveis:\n\n"
+            for abrigo in abrigos:
+                mensagem += f"🏠 *{abrigo['nome']}*\n📍 {abrigo['endereco']}\n\n"
+
+            dispatcher.utter_message(text=mensagem)
+
+        except Exception as e:
+            logger.error(f"Erro ao buscar abrigos: {e}")
+            dispatcher.utter_message(text="Desculpe, houve um erro ao buscar os abrigos.")
+        
+        return []
+    
+class ActionListarContatosEmergencia(Action):
+    def name(self):
+        return "action_listar_contatos_emergencia"
+
+    def run(self, dispatcher,
+            tracker,
+            domain) :
+
+        wordpress_url = os.getenv("WORDPRESS_URL")
+        if not wordpress_url:
+            dispatcher.utter_message(text="A URL do WordPress não está configurada.")
+            return []
+
+        endpoint = f"{wordpress_url}/wp-json/dcp/v1/contatos"
+
+        try:
+            response = requests.get(endpoint, timeout=10)
+            response.raise_for_status()
+            contatos = response.json()
+
+            if not contatos:
+                dispatcher.utter_message(text="Nenhum contato de emergência encontrado.")
+                return []
+
+            mensagens = []
+            for contato in contatos:
+                nome = contato.get("nome", "Nome não disponível")
+                telefone = contato.get("telefone", "Telefone não disponível")
+                mensagens.append(f"📞 {nome}: {telefone}")
+
+            mensagem_final = "Contatos de emergência disponíveis:\n" + "\n".join(mensagens)
+            dispatcher.utter_message(text=mensagem_final)
+
+        except requests.exceptions.RequestException as e:
+            dispatcher.utter_message(text="Não foi possível obter os contatos de emergência no momento.")
+            print(f"Erro ao acessar o endpoint: {e}")
+
+        return []
+
+
+class ActionBuscarDicas(Action):
+    def name(self):
+        return "action_buscar_dicas"
+
+    def run(self, dispatcher,
+            tracker,
+            domain):
+        tipo_dica = tracker.get_slot("dicas")
+        if not tipo_dica:
+            dispatcher.utter_message(text="Desculpe, não entendi o tipo de dica que você deseja.")
+            return []
+
+        wordpress_url = os.getenv("WORDPRESS_URL")
+        if not wordpress_url:
+            dispatcher.utter_message(text="Erro: URL do WordPress não configurada.")
+            return []
+
+        endpoint = f"{wordpress_url}/wp-json/dcp/v1/dicas?tipo={tipo_dica}"
+        try:
+            response = requests.get(endpoint, timeout=5)
+            response.raise_for_status()
+            dicas = response.json()
+
+            if not dicas:
+                dispatcher.utter_message(text=f"Não encontrei dicas para '{tipo_dica}'.")
+                return []
+
+            mensagem = f"Dicas para {tipo_dica}:\n"
+            for dica in dicas:
+                mensagem += f"- {dica}\n"
+
+            dispatcher.utter_message(text=mensagem)
+        except requests.RequestException as e:
+            dispatcher.utter_message(text="Desculpe, ocorreu um erro ao buscar as dicas.")
+            # Aqui você pode adicionar um log do erro, se desejar
+        return []
+    
+    
+
+class ActionReceberNotificacoes(Action):
+    def name(self) -> str:
+        return "action_receber_notificacoes"
+
+    def run(self, dispatcher, tracker, domain):
+        # Obtém o número de telefone do usuário (ID da conversa)
+        telefone = tracker.sender_id
+        try:
+            # Conecta ao banco de dados
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Atualiza o campo 'notificacoes' para True
+            cursor.execute("""
+                UPDATE usuarios
+                SET notificacoes = TRUE
+                WHERE whatsapp_id = %s;
+            """, (telefone,))
+            conn.commit()
+
+            dispatcher.utter_message(text='✅ Você agora receberá notificações de emergência. Para não receber mais você pode escrever a qualquer momento "parar de receber notificações"')
+        except Exception as e:
+            logger.error(f"Erro ao atualizar notificações: {e}")
+            dispatcher.utter_message(text="❌ Ocorreu um erro ao ativar as notificações.")
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
+        return []
+    
+
+
+class ActionPararNotificacoes(Action):
+    def name(self) -> str:
+        return "action_parar_notificacoes"
+
+    def run(self, dispatcher, tracker, domain):
+        # Obtém o número de telefone do usuário (ID da conversa)
+        telefone = tracker.sender_id
+        try:
+            # Conecta ao banco de dados
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Atualiza o campo 'notificacoes' para True
+            cursor.execute("""
+                UPDATE usuarios
+                SET notificacoes = FALSE
+                WHERE whatsapp_id = %s;
+            """, (telefone,))
+            conn.commit()
+
+            dispatcher.utter_message(text='✅ Vocẽ não receberá mais notificações!')
+        except Exception as e:
+            logger.error(f"Erro ao atualizar notificações: {e}")
+            dispatcher.utter_message(text="❌ Ocorreu um erro ao remover as notificações.")
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
+        return []
+    

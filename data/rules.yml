@@ -11,6 +11,11 @@ rules:
     - intent: menu_inicial
     - action: utter_menu_inicial
   
+  - rule: menu inicial outrs opções
+    steps:
+    - intent: menu_inicial_2
+    - action: utter_menu_inicial_2
+  
   - rule: perguntar nome - salvar com intent
     steps:
     - action: action_perguntar_nome
@@ -75,6 +80,7 @@ rules:
     steps:
       - intent: compartilhar_risco
       - action: action_request_location
+
   - rule: Processar endereço texto e confirmar
     steps:
       - intent: informar_endereco_texto
@@ -188,33 +194,65 @@ rules:
     steps:
       - intent: continuar_risco
       - action: action_retoma_risco
+  
+  - rule: pedido de ajuda
+    steps: 
+      - intent: ajuda
+      - action: utter_ajuda
 
-  # - rule: Risco com descrição
-  #   steps:
-  #     - intent: pular_descricao_risco
-  #     - action: action_confirmar_relato
-    
-  # - rule: Confirmar endereço texto e classificar risco
-  #   steps:
-  #   - action: action_buscar_endereco_texto_openstreet
-  #   - intent: affirm
-  #   - action: utter_classificar_risco
+  - rule: situação na região
+    steps:
+      - intent: situacao_regiao
+      - action: action_request_location
 
-  # - rule: recusar endereço texto
-  #   steps:
-  #   - action: action_buscar_endereco_texto_openstreet
-  #   - intent: deny
-  #   - action: action_request_location
+  - rule: O que fazer
+    steps:
+      - intent: o_que_fazer
+      - action: utter_o_que_fazer
+      - action: utter_ajuda
+
+  - rule: Encontrar Abrigo
+    steps:
+      - intent: encontrar_abrigo
+      - action: action_listar_abrigos
+      - action: utter_pos_ajuda
+
+  - rule: Contatos de emergência
+    steps:
+      - intent: contatos_emergencia
+      - action: action_listar_contatos_emergencia
+      - action: utter_pos_ajuda
+
+  - rule: Menu dicas
+    steps:
+      - intent: menu_dicas
+      - action: utter_menu_dicas
+
+  - rule: Menu dicas
+    steps:
+      - intent: dicas_de
+      - action: action_buscar_dicas
+      - action: utter_pos_ajuda
+
+  - rule: Sair
+    steps:
+      - intent: sair
+      - action: utter_sair
 
 
+  - rule: Receber notificações
+    steps:
+      - intent: receber_notificacoes
+      - action: action_receber_notificacoes
 
+  - rule: não receber notificacoes
+    steps:
+      - intent: nao_receber_notificacoes
+      - action: action_parar_notificacoes
+      - action: utter_ate_logo
 
-  # - rule: Boas-vindas ao iniciar sessão
-  #   steps:
-  #     - intent: saudacao
-  #     - action: action_perguntar_nome
+  - rule: interromper notificações
+    steps:
+      - intent: parar_notificacoes
+      - action: action_parar_notificacoes
 
-  # - rule: Retornar ao menu
-  #   steps:
-  #     - intent: menu_inicial
-  #     - action: utter_menu_inicial

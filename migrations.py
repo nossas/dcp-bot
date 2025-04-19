@@ -9,7 +9,9 @@ def create_tables():
         CREATE TABLE IF NOT EXISTS usuarios (
             id SERIAL PRIMARY KEY,
             nome TEXT,
-            whatsapp_id TEXT UNIQUE
+            whatsapp_id TEXT UNIQUE,
+            notificacoes BOOLEAN,
+
         );
     """)
 

@@ -231,7 +231,7 @@ nlu:
     - {"classificacao_risco": "Lixo"}
     - /informar_classificacao_risco{"classificacao_risco": "Outros"}
     - {"classificacao_risco": "Outros"}
-
+    
 - intent: informar_descricao_risco
   examples: |
     - Está alagando tudo aqui.
@@ -314,12 +314,101 @@ nlu:
     - Não quero compartlhar o risco
     - Não posso compartilhar 
     - Não compartilhar
-
-
 - intent: menu_inicial
   examples: |
     - menu
     - menu inicial
     - /menu_inicial
     - começar
+
+- intent: menu_inicial_2
+  examples: |
+    - menu_inicial_2
+    - /menu_inicial_2
+    - outras opções
+
+- intent: situacao_regiao
+  examples: |
+    - /situacao_regiao
+    - situacao_regiao
+    - situação na minha região
+    - situação na região
+    - como está a região
+
+- intent: ajuda
+  examples: |
+    - Preciso de ajuda
+    - socorro
+    - não sei o que fazer
+    - /ajuda
+
+- intent: o_que_fazer
+  examples: |
+    - o_que_fazer
+    - /o_que_fazer
+    - o que fazer agora?
+    - o que faço?
+
+- intent: contatos_emergencia
+  examples: |
+    - contatos_emergencia
+    - /contatos_emergencia
+    - contatos de emergência
+
+- intent: encontrar_abrigo
+  examples: |
+    - /encontrar_abrigo
+    - encontrar_abrigo
+    - encontrar abrigo
+    - preciso me abrigar
+    - para onde ir
+
+- intent: menu_dicas
+  examples: |
+    - dicas_de_seguranca
+    - /dicas_de_seguranca
+    - dicas de segurança
+
+- intent: dicas_de
+  examples: |
+    - /dicas{"dicas": "enchente"}    
+    - /dicas{"dicas": "lixo"}
+    - /dicas{"dicas": "calor"}
+    - {"dicas": "enchente"}    
+    - {"dicas": "lixo"}
+    - {"dicas": "calor"}
+    - dicas de Calor
+    - dicas de lixo
+    - dicas de enchente
+
+- intent: sair
+  examples: |
+    - /sair
+    - sair
+    - quero Sair
+    - terminar
+    - fechar
+
+- intent: receber_notificacoes
+  examples: |
+    - /receber_notificacoes
+    - receber_notificacoes
+    - quero receber notificações
+    - Receber informações
+    - Quero notificações
+
+- intent: nao_receber_notificacoes
+  examples: |
+    - /nao_receber_notificacoes
+    - nao_receber
+    - nao_receber_notificacoes
+    - não receber notificações
+
+- intent: parar_notificacoes
+  examples: |
+    - parar de receber notificações
+    - Não quero mais receber notificações
+    - pare de me mandar mensagens
+    - Pare de enviar mensagens
+    - não quero mais receber
 

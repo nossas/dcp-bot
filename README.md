@@ -61,6 +61,7 @@ Para rodar localmente você deve alterar as permissões das pastas:
 chown -R 1001: .rasa
 chown -R 1001: .tensorboard_diet
 chown -R 1001: models
+chown -R 1001: media
 ```
 
 Ou melhor: certifique-se que o usuário dentro do container tem permissão para escrita no volume montado.
