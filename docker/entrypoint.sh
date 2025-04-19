@@ -49,7 +49,7 @@ if should_run_migrations; then
   >&2 echo "Rodando migrations.py porque a tabela 'usuarios' não existe."
   python migrations.py
 else
-  >&2 echo "Tabela 'users' já existe. Pulando migrations."
+  >&2 echo "Tabela 'usuarios' já existe. Pulando migrations."
 fi
 
 rasa train
