@@ -158,37 +158,23 @@ rules:
     steps:
       - slot_was_set:
           - identificar: true
-      - action: action_solicitar_compartilhar_risco
+      - action: action_salvar_risco
   
   - rule: Rule Usuário deseja se identificar
     steps:
       - intent: indentificar_no_risco
-      - action: action_solicitar_compartilhar_risco
+      - action: action_salvar_risco
 
   - rule: Rule Usuário não deseja se identificar
     steps:
       - intent: nao_indentificar_no_risco
-      - action: action_solicitar_compartilhar_risco
+      - action: action_salvar_risco
 
   - rule: Usuário não deseja se identificar
     steps:
       - slot_was_set:
           - identificar: false
-      - action: action_solicitar_compartilhar_risco
-
-  - rule: Compartilhar o risco
-    steps:
-      - intent: compartilhar_mensagem_risco
-      - action: utter_compartilhar_risco_message
-      - action: utter_imprime_risco
-      - action: action_finaliza_risco
-      - action: utter_agradecimento
-
-  - rule: Não compartilhar o risco
-    steps:
-      - intent: nao_compartilhar_mensagem_risco
-      - action: action_finaliza_risco
-      - action: utter_agradecimento
+      - action: action_salvar_risco
 
   - rule: Continuar o risco iniciado
     steps:
@@ -244,6 +230,7 @@ rules:
     steps:
       - intent: sair
       - action: utter_sair
+      - action: action_listen
 
 
   - rule: Receber notificações

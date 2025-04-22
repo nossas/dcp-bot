@@ -171,6 +171,7 @@ class ActionPerguntarNome(Action):
     def run(self, dispatcher, tracker, domain):
         sender_id = tracker.sender_id
         nome = tracker.get_slot("nome")
+
         if nome:
 
             dispatcher.utter_message(
@@ -180,7 +181,7 @@ class ActionPerguntarNome(Action):
                     {"title": "Não", "payload": "/deny_name"}
                 ]
             )
-            return []
+            return [SlotSet("pagina_risco",1)]
 
         try:
             
@@ -206,7 +207,7 @@ class ActionPerguntarNome(Action):
                             {"title": "Não", "payload": "/deny_name"}
                         ]
                     )
-                    return [SlotSet("nome", nome)]
+                    return [SlotSet("nome", nome),SlotSet("pagina_risco",1)]
 
         except Exception as e:
             logger.error(f"Erro ao buscar nome no banco: {e}")
@@ -214,7 +215,7 @@ class ActionPerguntarNome(Action):
         dispatcher.utter_message(
             text="Olá! Aqui é o chatbot da Defesa Climática Popular. Como posso te chamar?\nNão se preocupe Seu nome não será divulgado."
         )
-        return []
+        return [SlotSet("pagina_risco",1)]
 
 class ActionSalvarNome(Action):
     def name(self):
@@ -503,7 +504,7 @@ class ActionConfirmarRisco(Action):
 
 class ActionSalvarRisco(Action):
     def name(self) -> str:
-        return "action_solicitar_compartilhar_risco"
+        return "action_salvar_risco"
 
     def run(self, dispatcher, tracker, domain):
         try:
@@ -579,47 +580,43 @@ class ActionSalvarRisco(Action):
             return []
 
         dispatcher.utter_message(
-            text='Se precisar de ajuda urgente, entre em contato com a Defesa Civil – 199.'
+            text='Se precisar de ajuda urgente, entre em contato com a Defesa Civil – 199. Basta tocar no número para fazer a ligação automaticamente.'
         )
         dispatcher.utter_message(
-            text='Obrigado, seu alerta foi registrado mas ainda não foi validado e não aparece no mapa oficial, mas você pode encaminhá-lo para outras pessoas para alertá-las sobre a situação. Você gostaria de compartilhar?',
+            text='Obrigado,seu relato está sendo validado. Após essa etapa encaminharemos um mensagem avisando sobre sua publicação.'
+        )
+        dispatcher.utter_message(
+            text='Precisa de mais alguma informação? Você pode acessar os últimos relatos, verificar locais e rotas seguras, obter contatos de emergência ou acessar recomendações para se proteger.',
             buttons=[
-                {"title": "Sim", "payload": "/compartilhar_mensagem_risco"},
-                {"title": "Não", "payload": "/nao_compartilhar_mensagem_risco"}
+                {"title": "Voltar ao menu", "payload": "/menu_inicial"},
+                {"title": "Sair", "payload": "/sair"}
             ]
         )
 
-        return []
-
-class ActionFinalizaRisco(Action):
-    def name(self) -> str:
-        return "action_finaliza_risco"
-
-    def run(self, dispatcher,
-            tracker,
-            domain):
-
         return [SlotSet("classificacao_risco", None),
-        SlotSet("descricao_risco", None),
-        SlotSet("endereco", None),
-        SlotSet("latitude", None),
-        SlotSet("longitude", None),
-        SlotSet("midias", []),
-        SlotSet("identificar", None)]
-        
-from rasa_sdk import Action
-from rasa_sdk.events import SlotSet
-import requests
-import os
+            SlotSet("descricao_risco", None),
+            SlotSet("endereco", None),
+            SlotSet("latitude", None),
+            SlotSet("longitude", None),
+            SlotSet("midias", []),
+            SlotSet("identificar", None)]
 
 class ActionListarRiscos(Action):
     def name(self) -> str:
         return "action_listar_riscos"
 
     def run(self, dispatcher, tracker, domain):
+        last_action = None
+        for event in reversed(tracker.events):
+            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons"]:
+                last_action = event.get("name")
+                break
+        logger.debug(f"Last action:{last_action}")
         pagina = tracker.get_slot("pagina_risco") or 1
+        if last_action != "action_listar_riscos":
+            pagina = 1
         wordpress_url = os.getenv("WORDPRESS_URL")
-        endpoint = f"{wordpress_url}/wp-json/dcp/v1/riscos?per_page=3&page={pagina}"
+        endpoint = f"{wordpress_url}/wp-json/dcp/v1/riscos?per_page=1&page={pagina}"
         try:
             response = requests.get(endpoint)
             response.raise_for_status()
@@ -628,7 +625,6 @@ class ActionListarRiscos(Action):
             if not riscos:
                 dispatcher.utter_message(text="Não temos mais relatos na sua região.")
                 return [SlotSet("pagina_risco",1),FollowupAction("utter_sair")]
-            logger.error(f"Riscos: {riscos}")
             mensagem = ''
             for risco in riscos:
                 
@@ -640,8 +636,12 @@ class ActionListarRiscos(Action):
                     f"📝 Descrição: {risco['descricao']}\n"
                 )
                 dispatcher.utter_message(text=mensagem,)
-                for url in risco['url_midias']:     
-                    dispatcher.utter_message(image=url,)
+                for image in risco['url_imagens']:     
+                    dispatcher.utter_message(image=image,)
+                for video in risco['url_videos']:     
+                    logger.error(f"video: {video}")
+                    dispatcher.utter_message(text="",custom={"type": "video","url":video})
+
                 dispatcher.utter_message(text="-------------------------------------------------\n",)
             dispatcher.utter_message(
                     text="Você quer ver outras?",
@@ -814,7 +814,8 @@ class ActionReceberNotificacoes(Action):
             """, (telefone,))
             conn.commit()
 
-            dispatcher.utter_message(text='✅ Você agora receberá notificações de emergência. Para não receber mais você pode escrever a qualquer momento "parar de receber notificações"')
+            dispatcher.utter_message(text='✅ Você agora receberá notificações de emergência. Para não receber mais você pode escrever a qualquer momento "parar de receber notificações".')
+            dispatcher.utter_message(text='Para retornar ao menu você pode nos mandar um "oi" ou escrever "menu inicial".')
         except Exception as e:
             logger.error(f"Erro ao atualizar notificações: {e}")
             dispatcher.utter_message(text="❌ Ocorreu um erro ao ativar as notificações.")
@@ -849,6 +850,7 @@ class ActionPararNotificacoes(Action):
             conn.commit()
 
             dispatcher.utter_message(text='✅ Vocẽ não receberá notificações!')
+            dispatcher.utter_message(text='Para retornar ao menu você pode nos mandar um "oi" ou escrever "menu inicial".')
         except Exception as e:
             logger.error(f"Erro ao atualizar notificações: {e}")
             dispatcher.utter_message(text="❌ Ocorreu um erro ao remover as notificações.")

@@ -45,6 +45,11 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
                }
             }
             WhatsApp.send_custom_json(self,data=json, recipient_id=recipient_id)
+        elif custom.get('type') == "video":
+            logger.error(f"Video usando custom recipient: {recipient_id} aaa")
+            self.send_video(custom.get('url'),recipient_id)
+            await asyncio.sleep(2)
+            
             
 
     async def send_text_with_buttons(
