@@ -1,6 +1,6 @@
 services:
   bot:
-    image: ${RASA_DOCKER_IMAGE:-nossas/dcp-bot:feature-ci-portainer}
+    image: ${RASA_DOCKER_IMAGE:-nossas/dcp-bot:v0.0.1}
     depends_on:
       - postgres
       - action_server
@@ -17,7 +17,7 @@ services:
       - '5005:5005'
 
   action_server:
-    image: ${RASA_DOCKER_IMAGE:-nossas/dcp-bot:feature-ci-portainer}
+    image: ${RASA_DOCKER_IMAGE:-nossas/dcp-bot:v0.0.1}
     command:
       - 'run'
       - 'actions'
