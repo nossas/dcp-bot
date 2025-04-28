@@ -1,0 +1,52 @@
+services:
+  bot:
+    image: ${RASA_DOCKER_IMAGE:-nossas/dcp-bot:feature-ci-portainer}
+    depends_on:
+      - postgres
+      - action_server
+    volumes:
+      - bot_appdata:/app
+    command:
+      - 'run'
+      - '--connector' 
+      - 'whatsapp_connector.WhatsAppInput'
+      - '--debug'
+    environment:
+      WORDPRESS_URL: wordpress
+    ports:
+      - '5005:5005'
+
+  action_server:
+    image: ${RASA_DOCKER_IMAGE:-nossas/dcp-bot:feature-ci-portainer}
+    command:
+      - 'run'
+      - 'actions'
+      - '--debug'
+    ports: 
+      - '5055:5055'
+    user: root
+  
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_INITDB_ARGS: "--locale-provider=libc"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  bot_appdata:
+
+# Todos os serviços devem pertencer a mesma rede para serem descobertos pelo Traefik
+networks:
+  default:
+    # Padronizar o nome da rede com o nome do domínio
+    name: web
+    external: true
