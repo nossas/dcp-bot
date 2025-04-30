@@ -18,7 +18,7 @@ services:
       - 'whatsapp_connector.WhatsAppInput'
       - '--debug'
     environment:
-      WORDPRESS_URL: wordpress
+      WORDPRESS_URL: https://wp.defesaclimaticapopular.org/
     ports:
       - '5005:5005'
 

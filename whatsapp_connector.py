@@ -48,7 +48,8 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
         elif custom.get('type') == "video":
             logger.error(f"Video usando custom recipient: {recipient_id} aaa")
             self.send_video(custom.get('url'),recipient_id)
-            await asyncio.sleep(2)
+            if custom.get('is_last'):
+                await asyncio.sleep(3)
             
             
 

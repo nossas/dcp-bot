@@ -55,6 +55,7 @@ nlu:
     - MIRLA MOREIRA DE PAULA
     - MONALIZA LIMONGI ZIMBRAO
     - PABLO VINICIUS DOMINGOS PORTILHO
+    - Alteia
    
 - intent: compartilhar_risco
   examples: |
@@ -301,19 +302,6 @@ nlu:
     - Não pode me identificar
     - Não me identificar no alerta
 
-- intent: compartilhar_mensagem_risco
-  examples: |
-    - /compartilhar_mensagem_risco
-    - Quero compartlhar o risco
-    - posso compartilhar 
-    - compartilhar
-
-- intent: nao_compartilhar_mensagem_risco
-  examples: |
-    - /nao_compartilhar_mensagem_risco
-    - Não quero compartlhar o risco
-    - Não posso compartilhar 
-    - Não compartilhar
 - intent: menu_inicial
   examples: |
     - menu

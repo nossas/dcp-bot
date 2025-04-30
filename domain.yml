@@ -27,8 +27,6 @@ intents:
 - recusar_confirmacao_risco
 - indentificar_no_risco
 - nao_indentificar_no_risco
-- compartilhar_mensagem_risco
-- nao_compartilhar_mensagem_risco
 - menu_inicial
 - menu_inicial_2
 - situacao_regiao
@@ -66,10 +64,7 @@ actions:
 - utter_perguntar_por_nova_midia
 - action_confirmar_relato
 - action_salvar_risco
-- utter_compartilhar_risco_message
-- utter_imprime_risco
 - action_retoma_risco
-- utter_agradecimento
 - action_listar_riscos
 - utter_o_que_fazer
 - action_listar_abrigos
@@ -79,11 +74,11 @@ actions:
 - utter_ajuda
 - utter_pos_ajuda
 - action_receber_notificacoes
-- utter_sair
-- utter_ate_logo
+- utter_finalizar
 - action_remover_notificacoes
 - action_nivel_de_risco
 - action_parar_notificacoes
+- action_pergunta_notificacoes
 
 
 slots:
@@ -196,31 +191,12 @@ responses:
 
 
   utter_perguntar_se_identificar:
-  - text: Podemos registrar seu nome internamente, sem publicar?
+  - text: Podemos registrar seu nome no Alerta? Não se preocupe, seu nome não será publicado.
     buttons:
     - title: Me identificar
       payload: '/indentificar_no_risco'
     - title: Não me identificar
       payload: '/nao_indentificar_no_risco'
-
-
-  utter_compartilhar_risco_message:
-  - text:  Basta tocar e segurar na mensagem a seguir para compartilhar.
-    
-  utter_imprime_risco:
-    - text: |
-        📍 Endereço: {endereco}
-        ⚠️ Classificação do risco: {classificacao_risco}
-        ⚠️ Descrição do risco: {descricao_risco}
-
-  utter_agradecimento:
-  - text: | 
-      Muito obrigado pelo seu relato!
-      Você precisa de mais alguma informação? Você pode acessar os últimos relatos, verificar locais e rotas seguras, obter contatos de emergência ou acessar recomendações para se proteger.
-      Se precisar clique no botão.
-    buttons:
-    - title: Mais informações
-      payload: '/menu_inicial'
   
   utter_o_que_fazer:
   - text: |
@@ -258,7 +234,7 @@ responses:
   - text: |
        Como podemos te ajudar agora?
     buttons:
-    - title: Preciso de ajuda
+    - title: Mais ajuda
       payload: '/o_que_fazer'
     - title: Menu inicial
       payload: '/menu_inicial'
@@ -266,15 +242,6 @@ responses:
       payload: '/sair'
 
 
-  utter_sair:
+  utter_finalizar:
   - text: |
-       Quer receber notificações futuras sobre mudanças na sua região?
-    buttons:
-    - title: Quero receber
-      payload: '/receber_notificacoes'
-    - title: Não quero
-      payload: '/nao_receber_notificacoes'
-
-  utter_ate_logo:
-    - text: |
-       Ok! até logo. Você pode nos chamar a qualquer momento dando um oi por aqui ou escrevendo "menu inicial"
+       Até logo. Você pode ver mais relatos, compartilhar um risco ou ver abrigos e caminhos seguros a qualquer momento enviando um oi por aqui ou escrevendo "menu inicial".

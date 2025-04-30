@@ -10,8 +10,7 @@ def create_tables():
             id SERIAL PRIMARY KEY,
             nome TEXT,
             whatsapp_id TEXT UNIQUE,
-            notificacoes BOOLEAN,
-
+            notificacoes BOOLEAN DEFAULT NULL
         );
     """)
 

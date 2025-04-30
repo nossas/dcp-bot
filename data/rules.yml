@@ -229,7 +229,7 @@ rules:
   - rule: Sair
     steps:
       - intent: sair
-      - action: utter_sair
+      - action: action_pergunta_notificacoes
       - action: action_listen
 
 
@@ -242,10 +242,15 @@ rules:
     steps:
       - intent: nao_receber_notificacoes
       - action: action_parar_notificacoes
-      - action: utter_ate_logo
 
   - rule: interromper notificações
     steps:
       - intent: parar_notificacoes
       - action: action_parar_notificacoes
+
+
+  - rule: interromper notificações
+    steps:
+      - action: utter_finalizar
+      - action: action_listen
 

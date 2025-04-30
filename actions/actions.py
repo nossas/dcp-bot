@@ -583,7 +583,7 @@ class ActionSalvarRisco(Action):
             text='Se precisar de ajuda urgente, entre em contato com a Defesa Civil – 199. Basta tocar no número para fazer a ligação automaticamente.'
         )
         dispatcher.utter_message(
-            text='Obrigado,seu relato está sendo validado. Após essa etapa encaminharemos um mensagem avisando sobre sua publicação.'
+            text='Obrigado, seu relato está sendo validado. Após essa etapa encaminharemos um mensagem avisando sobre sua publicação.'
         )
         dispatcher.utter_message(
             text='Precisa de mais alguma informação? Você pode acessar os últimos relatos, verificar locais e rotas seguras, obter contatos de emergência ou acessar recomendações para se proteger.',
@@ -624,7 +624,7 @@ class ActionListarRiscos(Action):
 
             if not riscos:
                 dispatcher.utter_message(text="Não temos mais relatos na sua região.")
-                return [SlotSet("pagina_risco",1),FollowupAction("utter_sair")]
+                return [SlotSet("pagina_risco",1),FollowupAction("action_sair")]
             mensagem = ''
             for risco in riscos:
                 
@@ -638,9 +638,13 @@ class ActionListarRiscos(Action):
                 dispatcher.utter_message(text=mensagem,)
                 for image in risco['url_imagens']:     
                     dispatcher.utter_message(image=image,)
-                for video in risco['url_videos']:     
+                videos = risco['url_videos']
+
+                for idx, video in enumerate(videos):
+                    is_last = idx == len(videos) - 1
+
                     logger.error(f"video: {video}")
-                    dispatcher.utter_message(text="",custom={"type": "video","url":video})
+                    dispatcher.utter_message(text="", custom={"type": "video", "url": video, 'is_last': is_last})   
 
                 dispatcher.utter_message(text="-------------------------------------------------\n",)
             dispatcher.utter_message(
@@ -656,7 +660,6 @@ class ActionListarRiscos(Action):
             dispatcher.utter_message(text="Ocorreu um erro ao buscar os riscos.")
             print(f"[ERRO] Falha na requisição: {e}")
             return []
-
 
 class ActionNivelDeRisco(Action):
     def name(self):
@@ -754,7 +757,6 @@ class ActionListarContatosEmergencia(Action):
 
         return []
 
-
 class ActionBuscarDicas(Action):
     def name(self):
         return "action_buscar_dicas"
@@ -793,7 +795,58 @@ class ActionBuscarDicas(Action):
         return []
     
     
+    from rasa_sdk import Action
 
+class ActionPerguntaNotificacoes(Action):
+    def name(self) -> str:
+        return "action_pergunta_notificacoes"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker, domain):
+        whatsapp_id = tracker.sender_id
+
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Busca o campo 'notificacoes' do usuário
+            cursor.execute("SELECT notificacoes FROM usuarios WHERE whatsapp_id = %s", (whatsapp_id,))
+            result = cursor.fetchone()
+
+            if result is not None:
+                notificacoes = result[0]
+
+                if notificacoes:  # Se for True
+                    return [FollowupAction("utter_finalizar")]
+                elif notificacoes == False:  # Se for False
+                    dispatcher.utter_message(
+                        text='No momento você optou por não receber notificações. Você deseja alterar?',
+                        buttons=[
+                            {"title": "Sim", "payload": "/receber_notificacoes"},
+                            {"title": "Não", "payload": "/nao_receber_notificacoes"}
+                        ]
+                    )
+                else:
+                    # Usuário não encontrado no banco
+                    dispatcher.utter_message(
+                        text='Quer receber notificações futuras sobre mudanças na sua região?',
+                        buttons=[
+                            {"title": "Sim", "payload": "/receber_notificacoes"},
+                            {"title": "Não", "payload": "/nao_receber_notificacoes"}
+                        ]
+                    )
+
+            cursor.close()
+            conn.close()
+
+        except Exception as e:
+            logger.error(f"Erro ao verificar notificações: {e}")
+            dispatcher.utter_message(
+                text="Houve um problema ao acessar seu cadastro. Por favor, tente novamente mais tarde."
+            )
+
+        return []
+
+    
 class ActionReceberNotificacoes(Action):
     def name(self) -> str:
         return "action_receber_notificacoes"
@@ -813,9 +866,9 @@ class ActionReceberNotificacoes(Action):
                 WHERE whatsapp_id = %s;
             """, (telefone,))
             conn.commit()
-
+            dispatcher.utter_message(text='Para garantir que as mensagens cheguem corretamente adicione o contato da Defesa Climática Popular na sua agenda.')
+            dispatcher.utter_message(text='Toque no número e selecione "Adicionar aos contatos".\n Escolha "Criar novo contato" ou "Atualizar contato existente".\n Salve com um nome fácil de lembrar.')
             dispatcher.utter_message(text='✅ Você agora receberá notificações de emergência. Para não receber mais você pode escrever a qualquer momento "parar de receber notificações".')
-            dispatcher.utter_message(text='Para retornar ao menu você pode nos mandar um "oi" ou escrever "menu inicial".')
         except Exception as e:
             logger.error(f"Erro ao atualizar notificações: {e}")
             dispatcher.utter_message(text="❌ Ocorreu um erro ao ativar as notificações.")
@@ -825,7 +878,7 @@ class ActionReceberNotificacoes(Action):
             if conn:
                 conn.close()
 
-        return []
+        return [FollowupAction("utter_finalizar")]
     
 
 
@@ -850,7 +903,6 @@ class ActionPararNotificacoes(Action):
             conn.commit()
 
             dispatcher.utter_message(text='✅ Vocẽ não receberá notificações!')
-            dispatcher.utter_message(text='Para retornar ao menu você pode nos mandar um "oi" ou escrever "menu inicial".')
         except Exception as e:
             logger.error(f"Erro ao atualizar notificações: {e}")
             dispatcher.utter_message(text="❌ Ocorreu um erro ao remover as notificações.")
@@ -860,5 +912,6 @@ class ActionPararNotificacoes(Action):
             if conn:
                 conn.close()
 
-        return []
+        return [FollowupAction("utter_finalizar")]
+
     

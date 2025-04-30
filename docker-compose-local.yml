@@ -18,7 +18,7 @@ services:
       POSTGRES_DB: banco
       POSTGRES_HOST: postgres
       RASA_CACHE: disabled
-      WORDPRESS_URL: wordpress
+      WORDPRESS_URL: https://wp.defesaclimaticapopular.org/
     networks:
       - interna
  
@@ -30,7 +30,7 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile    
     environment:
-      WORDPRESS_URL: http://wordpress
+      WORDPRESS_URL: https://wp.defesaclimaticapopular.org/
     volumes:
       - .:/app
     command:
