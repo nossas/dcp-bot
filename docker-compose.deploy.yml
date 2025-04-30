@@ -12,7 +12,7 @@ services:
       - 'whatsapp_connector.WhatsAppInput'
       - '--debug'
     environment:
-      WORDPRESS_URL: wordpress
+      WORDPRESS_URL: ${RASA_WORDPRESS_URL:-http://wordpress}
     ports:
       - '5005:5005'
 
@@ -22,6 +22,8 @@ services:
       - 'run'
       - 'actions'
       - '--debug'
+    environment:
+      WORDPRESS_URL: ${RASA_WORDPRESS_URL:-http://wordpress}
     volumes:
       - bot_appdata:/app
     ports: 
