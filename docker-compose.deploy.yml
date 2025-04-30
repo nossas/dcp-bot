@@ -22,6 +22,8 @@ services:
       - 'run'
       - 'actions'
       - '--debug'
+    volumes:
+      - bot_appdata:/app
     ports: 
       - '5055:5055'
     user: root
