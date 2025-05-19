@@ -5,7 +5,8 @@ services:
       - postgres
       - action_server
     volumes:
-      - bot_appdata:/app
+      - /home/ubuntu/config_rasa/credentials.yml:/app/credentials.yml
+      - /home/ubuntu/config_rasa/endpoints.yml:/app/endpoints.yml
     command:
       - 'run'
       - '--connector' 
@@ -25,7 +26,8 @@ services:
     environment:
       WORDPRESS_URL: ${RASA_WORDPRESS_URL:-http://wordpress}
     volumes:
-      - bot_appdata:/app
+      - /home/ubuntu/config_rasa/credentials.yml:/app/credentials.yml
+      - /home/ubuntu/config_rasa/endpoints.yml:/app/endpoints.yml
     ports: 
       - '5055:5055'
     user: root
