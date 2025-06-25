@@ -37,7 +37,7 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
                "interactive": {
                    "type": "location_request_message",
                    "body": {
-                   "text": "Envie a localização"
+                   "text": "Envie a localização:"
                    },
                    "action": {
                    "name": "send_location"

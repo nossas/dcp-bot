@@ -147,13 +147,13 @@ entities:
 - dicas
 responses:
   utter_menu_inicial:
-  - text: Como posso te ajudar?
+  - text: "Certo, {nome}!Escolha uma opção pra começar:"
     buttons:
-    - title: Compartilhar Risco
+    - title: Adicionar um risco
       payload: /compartilhar_risco
-    - title: Situação na Região
+    - title: Situação atual
       payload: /situacao_regiao
-    - title: O que fazer agora?
+    - title: Saber o que fazer
       payload: /o_que_fazer
 
   utter_menu_inicial_2:
@@ -167,7 +167,7 @@ responses:
       payload: /locais_seguros
 
   utter_classificar_risco:
-  - text: Perfeito {nome}. Escolha a opção que descreva melhor o que está ocorrendo.
+  - text: "Perfeito {nome}. Escolha a opção que descreva melhor o que está ocorrendo:" 
     buttons:
     - title: Alagamento
       payload: '/informar_classificacao_risco{"classificacao_risco": "Alagamento"}'
@@ -177,14 +177,14 @@ responses:
       payload: '/informar_classificacao_risco{"classificacao_risco": "Outros"}'
   
   utter_perguntar_por_midia:
-  - text: Se você quiser pode enviar fotos ou vídeos, caso contrário clique em Não Enviar. Esta etapa pode demorar
+  - text: Gostaria de enviar uma foto ou vídeo? 📸\nIsso pode ajudar a entender melhor a situação.
     buttons:
     - title: Não Enviar
       payload: '/nao_enviar_midia_risco'
 
 
   utter_perguntar_por_nova_midia:
-  - text: Quer enviar mais fotos ou vídeos?
+  - text: Você pode mandar mais mídias ou clicar em Não enviar mais para seguir.
     buttons:
     - title: Não Enviar mais
       payload: '/nao_enviar_midia_risco'
@@ -204,9 +204,7 @@ responses:
         • Tenha separado seu kit de sobrevivência com documentos, remédios e itens essenciais.
         • Tenha cuidado com fios caídos ou locais com risco de choque elétrico.
         • Evite contato com a água de enchentes, pois pode estar contaminada.
-
-
-        ⛑️ Se precisar de ajuda urgente, entre em contato com a Defesa Civil – 199. Basta tocar no número para fazer a ligação automaticamente.
+        ⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil – 199*.\nÉ só clicar no número para fazer a ligação automaticamente
         
   utter_ajuda:
   - text: |
@@ -234,14 +232,15 @@ responses:
   - text: |
        Como podemos te ajudar agora?
     buttons:
-    - title: Mais ajuda
-      payload: '/o_que_fazer'
+    - title: Dicas de segurança
+      payload: '/dicas_segurança'
+    - title: Saber o que fazer
+      payload: /o_que_fazer
     - title: Menu inicial
       payload: '/menu_inicial'
-    - title: Sair
-      payload: '/sair'
 
 
   utter_finalizar:
   - text: |
-       Até logo. Você pode ver mais relatos, compartilhar um risco ou ver abrigos e caminhos seguros a qualquer momento enviando um oi por aqui ou escrevendo "menu inicial".
+       Certo! Se precisar de mais informações no futuro ou quiser compartilhar um novo risco, é só voltar nessa conversa e mandar um “oi”.\nEstamos por aqui pra ajudar no que for possível! 🫂
+
