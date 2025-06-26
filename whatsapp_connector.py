@@ -3,14 +3,23 @@ from sanic import Blueprint, response
 from sanic.request import Request
 from sanic.response import HTTPResponse
 from typing import Dict, Text, Any, Callable, Awaitable, Optional, List
-
 from rasa.core.channels.channel import InputChannel, UserMessage, OutputChannel
 from heyoo import WhatsApp
 import json
-
+import aiohttp
 from collections import defaultdict
 import asyncio
 logger = logging.getLogger(__name__)
+
+
+async def agendar_inatividade(sender_id: str):
+    async with aiohttp.ClientSession() as session:
+        logger.error(f"----------------------------------fazendo chamada schedule")
+
+        await session.post(
+            f"http://localhost:5005/conversations/{sender_id}/trigger_intent",
+            json={"name": "inatividade_monitoramento", "entities": []}
+        )
 
 class WhatsAppOutput(WhatsApp, OutputChannel):
     """Output channel for WhatsApp Cloud API"""
@@ -24,6 +33,7 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
     
     async def send_text_message(self, recipient_id: Text, text: Text, **kwargs: Any) -> None:
         """Sends text message"""
+        logger.debug(f"➡️ Enviando mensagem para {recipient_id}: {text}")
         for message_part in text.strip().split("\n\n"):
             self.send_message(message_part, recipient_id=recipient_id)
     
@@ -217,6 +227,7 @@ class WhatsAppInput(InputChannel):
                     await on_new_message(
                         UserMessage(text, out_channel, sender, input_channel=self.name(), metadata=metadata)
                     )
+                    await agendar_inatividade(sender)
                 except Exception as e:
                     logger.error(f"Exception when handling message: {e}", exc_info=True)
                     if self.debug_mode:

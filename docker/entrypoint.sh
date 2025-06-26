@@ -53,4 +53,4 @@ else
 fi
 
 rasa train
-rasa run --connector whatsapp_connector.WhatsAppInput --debug
+rasa run --connector whatsapp_connector.WhatsAppInput --debug --enable-api

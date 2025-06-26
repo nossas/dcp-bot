@@ -56,6 +56,57 @@ nlu:
     - MONALIZA LIMONGI ZIMBRAO
     - PABLO VINICIUS DOMINGOS PORTILHO
     - Alteia
+    - Ana
+    - Lucas
+    - Maria
+    - João
+    - Pedro
+    - Júlia
+    - Beatriz
+    - Rafael
+    - Camila
+    - Mariana
+    - Gabriel
+    - Letícia
+    - Felipe
+    - Lara
+    - Rodrigo
+    - Fernanda
+    - Alexandre
+    - Vanessa
+    - Diego
+    - Natália
+    - André
+    - Carolina
+    - Caio
+    - Priscila
+    - Gustavo
+    - Bianca
+    - Henrique
+    - Aline
+    - Victor
+    - Simone
+    - Daniel
+    - Tatiane
+    - Igor
+    - Juliana
+    - Leonardo
+    - Daniela
+    - Eduardo
+    - Carla
+    - William
+    - Isabela
+    - Marcelo
+    - Sabrina
+    - Thiago
+    - Renata
+    - Jorge
+    - Graziella
+    - Fábio
+    - Tamires
+    - Roberto
+    - Michele
+
    
 - intent: compartilhar_risco
   examples: |
@@ -244,6 +295,9 @@ nlu:
     - muito perigoso
     - caiu o poste
     - tem um fio na rua
+    - descrição do Alagamento
+    - descrição de lixo
+    - descrição de outros
 
 - intent: pular_descricao_risco
   examples: |
@@ -290,18 +344,6 @@ nlu:
     - afirmar_confirmacao_risco
     - as informações estão corretas
     
-- intent: indentificar_no_risco
-  examples: |
-    - /indentificar_no_risco
-    - pode me identificar
-    - me identificar no alerta
-
-- intent: nao_indentificar_no_risco
-  examples: |
-    - /nao_indentificar_no_risco
-    - Não pode me identificar
-    - Não me identificar no alerta
-
 - intent: menu_inicial
   examples: |
     - menu

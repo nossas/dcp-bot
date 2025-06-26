@@ -3,11 +3,16 @@ from rasa_sdk.events import UserUtteranceReverted, SlotSet
 import requests
 import json
 import logging
-from rasa_sdk.events import FollowupAction
+from rasa_sdk.events import FollowupAction, ReminderScheduled, AllSlotsReset, ReminderCancelled, Restarted
 from rasa_sdk.executor import CollectingDispatcher
 from .db_utils import get_db_connection
 import os
-
+from datetime import datetime, timedelta,timezone
+import sys
+from whatsapp_connector import WhatsAppOutput
+import pytz
+from typing import Any, Text, Dict, List
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 logging.basicConfig(level=logging.DEBUG)  # Força o nível global de debug
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
@@ -21,7 +26,7 @@ class ActionFallbackButtons(Action):
 
         last_action = None
         for event in reversed(tracker.events):
-            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons"]:
+            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons","action_agendar_inatividade"]:
                 last_action = event.get("name")
                 break
         logger.debug(f"Last action:{last_action}")
@@ -60,6 +65,47 @@ class ActionFallbackButtons(Action):
         dispatcher.utter_message(text="Desculpe, não consegui entender.\nVocê pode continuar escolhendo uma das opções abaixo:", buttons=buttons)
         return [UserUtteranceReverted()]
 
+
+class ActionAgendarInatividade(Action):
+    def name(self):
+        return "action_agendar_inatividade"
+
+    def run(self, dispatcher, tracker, domain):
+        trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) + timedelta(minutes=5)
+        logger.debug(f"agendando timeout para: {trigger_date_time}")
+        
+        return [
+            ReminderScheduled(
+                "inatividade_timeout",
+                trigger_date_time = trigger_date_time,
+                name="lembrete_inatividade",
+                kill_on_user_message=True
+            )
+        ]
+
+        
+class ActionInatividadeTimeout(Action):
+    def name(self) -> Text:
+        return "action_inatividade_timeout"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        recipient_id = tracker.sender_id
+        message = "Percebi que você se afastou. Se precisar de ajuda, é só me chamar! 😊"
+
+        # Forçar envio direto usando a API do WhatsApp
+        output_channel = WhatsAppOutput(auth_token=os.getenv("WHATSAPP_AUTH_TOKEN"),phone_number_id=os.getenv("WHATSAPP_PHONE_NUMBER_ID"))
+        logger.debug(os.getenv("WHATSAPP_AUTH_TOKEN"))
+
+        output_channel.send_message(message, recipient_id)
+
+        # Para compatibilidade com o tracker
+        dispatcher.utter_message(text=message)
+
+        return [ AllSlotsReset(),
+            Restarted()]
+
+
 class ActionRequestLocation(Action):
     def name(self):
         return "action_request_location"
@@ -86,7 +132,6 @@ class ActionRequestLocation(Action):
         SlotSet("latitude", None),
         SlotSet("longitude", None),
         SlotSet("midias", None),
-        SlotSet("identificar", None),                  
         logger.debug(f"solicitando localização")
         dispatcher.utter_message(text="Agora precisamos saber onde está o risco que você quer compartilhar.\n👉 Se clicar no botão, o WhatsApp vai pedir permissão para usar sua localização - é só aceitar.\nOu, se preferir, você pode digitar o endereço (ex: “Rua Senador Nabuco, perto da praça”).",custom={"type": "location_request"})
         return []
@@ -104,7 +149,6 @@ class ActionApagarRisco(Action):
             SlotSet("latitude", None),
             SlotSet("longitude", None),
             SlotSet("midias", []),
-            SlotSet("identificar", None),
         ]
 
 class ActionRetomarRisco(Action):
@@ -156,7 +200,6 @@ class ActionRetomaRisco(Action):
             "descricao_risco": tracker.get_slot("descricao_risco"),
             "endereco": tracker.get_slot("endereco"),
             "midias": tracker.get_slot("midias"),
-            "identificar": tracker.get_slot("identificar"),
         }
         if slots['endereco']:
             if slots['classificacao_risco']:
@@ -173,18 +216,9 @@ class ActionPerguntarNome(Action):
         nome = tracker.get_slot("nome")
 
         if nome:
-
-            dispatcher.utter_message(
-                text=f"O nome {nome} está correto?",
-                buttons=[
-                    {"title": "Sim", "payload": "/affirm_name"},
-                    {"title": "Não", "payload": "/deny_name"}
-                ]
-            )
-            return [SlotSet("pagina_risco",1)]
+            return [SlotSet("pagina_risco",1), FollowupAction("utter_menu_inicial")]
 
         try:
-            
             conn = get_db_connection()
             if conn:
                 cursor = conn.cursor()
@@ -199,15 +233,7 @@ class ActionPerguntarNome(Action):
                 if row:
                     nome = row[0]
                     logger.debug(f"Nome encontrado no banco: {nome}")
-
-                    dispatcher.utter_message(
-                        text=f"O nome {nome} está correto?",
-                        buttons=[
-                            {"title": "Sim", "payload": "/affirm_name"},
-                            {"title": "Não", "payload": "/deny_name"}
-                        ]
-                    )
-                    return [SlotSet("nome", nome),SlotSet("pagina_risco",1)]
+                    return [SlotSet("nome", nome),SlotSet("pagina_risco",1),FollowupAction("utter_menu_inicial")]
 
         except Exception as e:
             logger.error(f"Erro ao buscar nome no banco: {e}")
@@ -247,7 +273,7 @@ class ActionSalvarNome(Action):
         else:
             dispatcher.utter_message(text="Não consegui entender seu nome.")
 
-        return [SlotSet("nome", nome)]
+        return [SlotSet("nome", nome),FollowupAction("utter_menu_inicial")]
 
 class ActionApagarNome(Action):
     def name(self):
@@ -521,7 +547,6 @@ class ActionSalvarRisco(Action):
             endereco = tracker.get_slot("endereco")
             classificacao = tracker.get_slot("classificacao_risco")
             descricao = tracker.get_slot("descricao_risco")
-            identificar = tracker.get_slot("identificar")
             latitude = tracker.get_slot("latitude")
             longitude = tracker.get_slot("longitude")
             midias = tracker.get_slot("midias") or []
@@ -557,7 +582,6 @@ class ActionSalvarRisco(Action):
                     classificacao,
                     descricao,
                     id_midias,
-                    identificar
                 )
                 VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s
@@ -570,7 +594,6 @@ class ActionSalvarRisco(Action):
                 classificacao,
                 descricao,
                 id_midias if id_midias else None,
-                identificar
             ))
 
             conn.commit()
@@ -603,7 +626,7 @@ class ActionSalvarRisco(Action):
             SlotSet("latitude", None),
             SlotSet("longitude", None),
             SlotSet("midias", []),
-            SlotSet("identificar", None)]
+            ]
 
 class ActionListarRiscos(Action):
     def name(self) -> str:

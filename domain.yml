@@ -4,6 +4,8 @@ session_config:
   carry_over_slots_to_new_session: false
 
 intents:
+- inatividade_timeout
+- inatividade_monitoramento
 - saudacao
 - informar_nome
 - affirm
@@ -43,6 +45,8 @@ intents:
 - mais_riscos
 
 actions:
+- action_agendar_inatividade
+- action_inatividade_timeout
 - action_request_location
 - action_apagar_nome
 - action_perguntar_nome
@@ -109,16 +113,7 @@ slots:
     influence_conversation: false
     mappings:
     - type: custom
-  identificar:
-    type: bool
-    influence_conversation: true
-    mappings:
-      - type: from_intent
-        intent: indentificar_no_risco
-        value: true
-      - type: from_intent
-        intent: nao_indentificar_no_risco
-        value: false
+ 
   classificacao_risco:
     type: text
     mappings:
@@ -147,7 +142,7 @@ entities:
 - dicas
 responses:
   utter_menu_inicial:
-  - text: "Certo, {nome}!Escolha uma opção pra começar:"
+  - text: "Certo, {nome}! Escolha uma opção pra começar:"
     buttons:
     - title: Adicionar um risco
       payload: /compartilhar_risco
@@ -177,7 +172,9 @@ responses:
       payload: '/informar_classificacao_risco{"classificacao_risco": "Outros"}'
   
   utter_perguntar_por_midia:
-  - text: Gostaria de enviar uma foto ou vídeo? 📸\nIsso pode ajudar a entender melhor a situação.
+  - text: | 
+      Gostaria de enviar uma foto ou vídeo? 📸
+      Isso pode ajudar a entender melhor a situação.
     buttons:
     - title: Não Enviar
       payload: '/nao_enviar_midia_risco'
@@ -189,22 +186,14 @@ responses:
     - title: Não Enviar mais
       payload: '/nao_enviar_midia_risco'
 
-
-  utter_perguntar_se_identificar:
-  - text: Podemos registrar seu nome no Alerta? Não se preocupe, seu nome não será publicado.
-    buttons:
-    - title: Me identificar
-      payload: '/indentificar_no_risco'
-    - title: Não me identificar
-      payload: '/nao_indentificar_no_risco'
-  
   utter_o_que_fazer:
   - text: |
       ⚠️ Recomendamos que você:
         • Tenha separado seu kit de sobrevivência com documentos, remédios e itens essenciais.
         • Tenha cuidado com fios caídos ou locais com risco de choque elétrico.
         • Evite contato com a água de enchentes, pois pode estar contaminada.
-        ⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil – 199*.\nÉ só clicar no número para fazer a ligação automaticamente
+        ⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil* – 199.
+        É só clicar no número para fazer a ligação automaticamente
         
   utter_ajuda:
   - text: |
@@ -242,5 +231,6 @@ responses:
 
   utter_finalizar:
   - text: |
-       Certo! Se precisar de mais informações no futuro ou quiser compartilhar um novo risco, é só voltar nessa conversa e mandar um “oi”.\nEstamos por aqui pra ajudar no que for possível! 🫂
+       Certo! Se precisar de mais informações no futuro ou quiser compartilhar um novo risco, é só voltar nessa conversa e mandar um “oi”.
+       Estamos por aqui pra ajudar no que for possível! 🫂
 

@@ -11,16 +11,16 @@ rules:
     - intent: menu_inicial
     - action: utter_menu_inicial
   
-  - rule: menu inicial outrs opções
+  - rule: menu inicial outras opções
     steps:
     - intent: menu_inicial_2
     - action: utter_menu_inicial_2
   
-  - rule: perguntar nome - salvar com intent
-    steps:
-    - action: action_perguntar_nome
-    - intent: informar_nome
-    - action: action_salvar_nome
+  # - rule: perguntar nome - salvar com intent
+  #   steps:
+  #   - action: action_perguntar_nome
+  #   - intent: informar_nome
+  #   - action: action_salvar_nome
 
   - rule: perguntar nome - affirm
     steps:
@@ -147,35 +147,13 @@ rules:
   - rule: Confirmação positiva de risco
     steps:
       - intent: afirmar_confirmacao_risco
-      - action: utter_perguntar_se_identificar
+      - action: action_salvar_risco
   
   - rule: Confirmação negativa de risco
     steps:
       - intent: recusar_confirmacao_risco
       - action: utter_menu_inicial
-
-  - rule: Usuário deseja se identificar
-    steps:
-      - slot_was_set:
-          - identificar: true
-      - action: action_salvar_risco
-  
-  - rule: Rule Usuário deseja se identificar
-    steps:
-      - intent: indentificar_no_risco
-      - action: action_salvar_risco
-
-  - rule: Rule Usuário não deseja se identificar
-    steps:
-      - intent: nao_indentificar_no_risco
-      - action: action_salvar_risco
-
-  - rule: Usuário não deseja se identificar
-    steps:
-      - slot_was_set:
-          - identificar: false
-      - action: action_salvar_risco
-
+      
   - rule: Continuar o risco iniciado
     steps:
       - intent: continuar_risco
@@ -248,9 +226,18 @@ rules:
       - intent: parar_notificacoes
       - action: action_parar_notificacoes
 
-
   - rule: interromper notificações
     steps:
       - action: utter_finalizar
       - action: action_listen
+
+  - rule: Agendar verificação de inatividade (via conector)
+    steps:
+      - intent: inatividade_monitoramento
+      - action: action_agendar_inatividade
+
+  - rule: Mensagem após inatividade
+    steps:
+      - intent: inatividade_timeout
+      - action: action_inatividade_timeout
 

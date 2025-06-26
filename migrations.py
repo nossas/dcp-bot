@@ -33,7 +33,6 @@ def create_tables():
             classificacao TEXT,
             descricao TEXT,
             id_midias INTEGER[],
-            identificar BOOLEAN,
             CONSTRAINT fk_usuario
                 FOREIGN KEY (id_usuario)
                 REFERENCES usuarios(id)

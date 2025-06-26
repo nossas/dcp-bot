@@ -7,6 +7,9 @@ stories:
       - intent: saudacao
       - intent: session_start
     - action: action_perguntar_nome
+    - intent: informar_nome
+    - action: action_salvar_nome
+    - action: utter_menu_inicial
 
 - story: Responder compartilhar risco com texto e affirm
   steps:
