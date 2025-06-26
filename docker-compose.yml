@@ -30,6 +30,10 @@ services:
       - 'run'
       - 'actions'
       - '--debug'
+    environment:
+      GOOGLE_MAPS_API_KEY: key
+      WHATSAPP_AUTH_TOKEN: key
+      WHATSAPP_PHONE_NUMBER_ID: id
     ports: 
       - '5055:5055'
     user: root

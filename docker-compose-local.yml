@@ -30,6 +30,9 @@ services:
       context: .
       dockerfile: ./docker/Dockerfile    
     environment:
+      GOOGLE_MAPS_API_KEY: key
+      WHATSAPP_AUTH_TOKEN: key
+      WHATSAPP_PHONE_NUMBER_ID: id
       WORDPRESS_URL: https://wp.defesaclimaticapopular.org/
     volumes:
       - .:/app
