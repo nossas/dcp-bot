@@ -318,27 +318,40 @@ class ActionBuscarEnderecoOpenStreet(Action):
             if not location_data.get('address'):
                 logger.debug(f"latitude: {latitude}")
                 logger.debug(f"longitude: {longitude}")
-                logger.debug(f"não tem endereço")                
-                url = f"https://nominatim.openstreetmap.org/reverse?lat={latitude}&lon={longitude}&format=json"
-                headers = {"User-Agent": "MeuBot/0.1 (email@exemplo.com)"}
-                response = requests.get(url, headers=headers)
+                logger.debug(f"não tem endereço")
+
+                api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
+                url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={latitude},{longitude}&key={api_key}"
+
+                response = requests.get(url)
                 logger.debug(f"Received response: {response}")
                 if response.status_code == 200:
                     data = response.json()
                     logger.debug(f"Received data: {data}")
 
-                    endereco = data.get("display_name", "Endereço não encontrado.")
-                    dispatcher.utter_message(
-                        text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
-                        buttons=[
-                            {"title": "Sim", "payload": "/affirm_address"},
-                            {"title": "Não", "payload": "/deny_address"}
+                    if data["status"] == "OK":
+                        resultado = data["results"][0]
+                        endereco = resultado.get("formatted_address", "Endereço não encontrado.")
+
+                        dispatcher.utter_message(
+                            text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
+                            buttons=[
+                                {"title": "Sim", "payload": "/affirm_address"},
+                                {"title": "Não", "payload": "/deny_address"}
+                            ]
+                        )
+
+                        return [
+                            SlotSet("latitude", latitude),
+                            SlotSet("longitude", longitude),
+                            SlotSet("endereco", endereco)
                         ]
-                    )
-                    return [SlotSet("latitude", latitude), SlotSet("longitude", longitude), SlotSet("endereco", endereco)]
+                    else:
+                        logger.error(f"Erro na API do Google Maps: {data.get('status')}")
                 else:
-                    dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo, de preferência com o nome da rua e um ponto de referência.\nOu, se preferir, toque no botão abaixo para enviar sua localização pelo WhatsApp:")
-                    return [FollowupAction("action_request_location")]
+                    logger.error("Erro HTTP na chamada à API do Google Maps")
+                dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo, de preferência com o nome da rua e um ponto de referência.\nOu, se preferir, toque no botão abaixo para enviar sua localização pelo WhatsApp:")
+                return [FollowupAction("action_request_location")]
             else:
                 logger.debug(f"tem endereço")
                 endereco = location_data['address']
@@ -385,18 +398,20 @@ class ActionBuscarEnderecoTextoOpenStreet(Action):
         endereco_texto = tracker.latest_message.get("text")
         logger.debug(f"Buscando endereço pelo texto: {endereco_texto}")
         
-        url = f"https://nominatim.openstreetmap.org/search?q={endereco_texto}&format=json&limit=1"
-        headers = {"User-Agent": "MeuBot/0.1 (email@exemplo.com)"}
-        
-        response = requests.get(url, headers=headers)
-        logger.debug(f"Resposta do Nominatim (texto): {response.status_code} - {response.text}")
+                
+        api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={endereco_texto}&key={api_key}"
+
+        response = requests.get(url)
+        logger.debug(f"Resposta do Google Maps (texto): {response.status_code} - {response.text}")
 
         if response.status_code == 200:
             data = response.json()
-            if data:
-                endereco = data[0].get("display_name", "Endereço não encontrado.")
-                latitude = data[0].get("lat")
-                longitude = data[0].get("lon")
+            if data["status"] == "OK" and data["results"]:
+                resultado = data["results"][0]
+                endereco = resultado.get("formatted_address", "Endereço não encontrado.")
+                latitude = resultado["geometry"]["location"]["lat"]
+                longitude = resultado["geometry"]["location"]["lng"]
 
                 dispatcher.utter_message(
                     text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
@@ -405,10 +420,13 @@ class ActionBuscarEnderecoTextoOpenStreet(Action):
                         {"title": "Não", "payload": "/deny_address"}
                     ]
                 )
-                return [SlotSet("latitude", latitude), SlotSet("longitude", longitude), SlotSet("endereco", endereco)]
+                return [
+                    SlotSet("latitude", latitude),
+                    SlotSet("longitude", longitude),
+                    SlotSet("endereco", endereco)
+                ]
             else:
-                dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo, de preferência com o nome da rua e um ponto de referência.\nOu, se preferir, toque no botão abaixo para enviar sua localização pelo WhatsApp:")
-                return [FollowupAction("action_request_location")]
+                logger.error(f"Erro na API do Google Maps: {data.get('status')} - {data.get('error_message')}")
         else:
             dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo, de preferência com o nome da rua e um ponto de referência.\nOu, se preferir, toque no botão abaixo para enviar sua localização pelo WhatsApp:")
             return [FollowupAction("action_request_location")]
