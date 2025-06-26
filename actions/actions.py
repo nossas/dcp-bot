@@ -555,6 +555,7 @@ class ActionSalvarRisco(Action):
             # Buscar ou criar usuário
             cursor.execute("SELECT id FROM usuarios WHERE whatsapp_id = %s", (whatsapp_id,))
             usuario = cursor.fetchone()
+
             if usuario:
                 usuario_id = usuario[0]
             else:
@@ -563,6 +564,7 @@ class ActionSalvarRisco(Action):
 
             # Inserir mídias e coletar ids
             id_midias = []
+            logger.error(f"Erro no usuário:::: {midias}")
             for midia_path in midias:
                 # Aqui mime_type é opcional — você pode adaptar para pegar do nome do arquivo ou outro slot
                 cursor.execute("""
@@ -581,10 +583,10 @@ class ActionSalvarRisco(Action):
                     endereco,
                     classificacao,
                     descricao,
-                    id_midias,
+                    id_midias
                 )
                 VALUES (
-                    %s, %s, %s, %s, %s, %s, %s, %s
+                    %s, %s, %s, %s, %s, %s, %s
                 )
             """, (
                 usuario_id,
