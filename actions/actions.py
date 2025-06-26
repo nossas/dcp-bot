@@ -133,7 +133,7 @@ class ActionRequestLocation(Action):
         SlotSet("longitude", None),
         SlotSet("midias", None),
         logger.debug(f"solicitando localização")
-        dispatcher.utter_message(text="Agora precisamos saber onde está o risco que você quer compartilhar.\n👉 Se clicar no botão, o WhatsApp vai pedir permissão para usar sua localização - é só aceitar.\nOu, se preferir, você pode digitar o endereço (ex: “Rua Senador Nabuco, perto da praça”).",custom={"type": "location_request"})
+        dispatcher.utter_message(text="Agora precisamos saber *onde está o risco* que você quer compartilhar.\n👉 Se clicar no botão, o WhatsApp vai pedir permissão para usar sua localização - é só aceitar.\nOu, se preferir, você pode *digitar o endereço* (ex: “Rua Senador Nabuco, 11”).",custom={"type": "location_request"})
         return []
 
 class ActionApagarRisco(Action):
@@ -216,6 +216,7 @@ class ActionPerguntarNome(Action):
         nome = tracker.get_slot("nome")
 
         if nome:
+            logger.debug(f"Achou nome no slot")
             return [SlotSet("pagina_risco",1), FollowupAction("utter_menu_inicial")]
 
         try:
@@ -239,7 +240,7 @@ class ActionPerguntarNome(Action):
             logger.error(f"Erro ao buscar nome no banco: {e}")
 
         dispatcher.utter_message(
-            text="Oie! Bem-vindo(a) à Defesa Climática Popular.\nPra começar, como você prefere ser chamado(a)?"
+            text="Oie! Bem-vindo(a) à Defesa Climática Popular.\nPra começar, *como você prefere ser chamado(a)?*"
         )
         return [SlotSet("pagina_risco",1)]
 
@@ -250,7 +251,7 @@ class ActionSalvarNome(Action):
     def run(self, dispatcher, tracker, domain):
         nome = tracker.latest_message.get("text") if tracker.latest_message.get("text") != '/affirm_name' else tracker.get_slot("nome")
         whatsapp_id = tracker.sender_id
-
+        logger.debug(f"Buscando id do wa")
         if nome:
             try:
                 conn = get_db_connection()
@@ -272,8 +273,8 @@ class ActionSalvarNome(Action):
                 print(f"[ERRO BANCO] {e}")
         else:
             dispatcher.utter_message(text="Não consegui entender seu nome.")
-
-        return [SlotSet("nome", nome),FollowupAction("utter_menu_inicial")]
+        logger.debug(f"Salvando nome no slot e n")
+        return [SlotSet("nome", nome),FollowupAction("action_perguntar_nome")]
 
 class ActionApagarNome(Action):
     def name(self):
