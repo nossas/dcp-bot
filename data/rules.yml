@@ -11,49 +11,11 @@ rules:
     - intent: menu_inicial
     - action: utter_menu_inicial
   
-  - rule: menu inicial outras opções
-    steps:
-    - intent: menu_inicial_2
-    - action: utter_menu_inicial_2
-  
-  # - rule: perguntar nome - salvar com intent
-  #   steps:
-  #   - action: action_perguntar_nome
-  #   - intent: informar_nome
-  #   - action: action_salvar_nome
-
-  - rule: perguntar nome - affirm
-    steps:
-    - action: action_perguntar_nome
-    - or:
-      - intent: affirm
-      - intent: affirm_name
-    - action: utter_menu_inicial
-
-  - rule: perguntar nome - deny
-    steps:
-    - action: action_perguntar_nome
-    - or:
-      - intent: deny
-      - intent: deny_name
-    - action: action_apagar_nome
-    - action: action_perguntar_nome
-
   - rule: Tentar novamente
     steps:
       - intent: tentar_novamente
       - action: action_repeat_last_message
   
-  # - rule: iniciar
-  #   steps:
-  #     - intent: saudacao
-  #     - action: action_perguntar_nome
-
-  # - rule: iniciar 2
-  #   steps:
-  #     - intent: session_start
-  #     - action: action_perguntar_nome
-
   - rule: Apagar risco
     steps:
       - intent: apagar_risco
@@ -153,7 +115,7 @@ rules:
     steps:
       - intent: recusar_confirmacao_risco
       - action: utter_menu_inicial
-      
+
   - rule: Continuar o risco iniciado
     steps:
       - intent: continuar_risco
