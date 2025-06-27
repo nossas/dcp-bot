@@ -55,11 +55,30 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
                }
             }
             WhatsApp.send_custom_json(self,data=json, recipient_id=recipient_id)
+        elif custom.get('type') == "media_id":
+            media_type = custom.get("media_type", "image") 
+            media_id = custom.get("media_id")
+        
+            if media_type not in ["image", "video"] or not media_id:
+                logger.warning("Tipo de mídia inválido ou media_id ausente")
+            else:
+                json = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": recipient_id,
+                    "type": media_type,
+                    media_type: {
+                        "id": media_id
+                    }
+                }
+
+                WhatsApp.send_custom_json(self, data=json, recipient_id=recipient_id)
+
         elif custom.get('type') == "video":
-            logger.error(f"Video usando custom recipient: {recipient_id} aaa")
+            logger.error(f"Video usando custom recipient: {recipient_id} ")
             self.send_video(custom.get('url'),recipient_id)
             if custom.get('is_last'):
-                await asyncio.sleep(3)
+                await asyncio.sleep(2)
             
             
 
