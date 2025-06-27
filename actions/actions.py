@@ -557,7 +557,7 @@ class ActionConfirmarRisco(Action):
                 media_id = os.path.basename(media_path)
                 dispatcher.utter_message(text="", custom={"type": "media_id", "media_id": media_id, "media_type":media_type})   
         mensagem = (    
-            f"Essas informações estão corretas?\nSe estiver tudo certo, clique em *Confirmar e enviar.*\n Seu relato será salvo com segurança, passará por uma verificação rápida e, se aprovado, será publicado no mapa. Tudo conforme nossa política de privacidade: https://bit.ly/termo-privacidade"
+            f"Essas informações estão corretas?\nSe estiver tudo certo, clique em *Confirmar e enviar.*\nSeu relato será salvo com segurança, passará por uma verificação rápida e, se aprovado, será publicado no mapa. Tudo conforme nossa política de privacidade: https://bit.ly/termo-privacidade"
         )
         dispatcher.utter_message(
             text=mensagem,
@@ -576,7 +576,7 @@ class ActionRecusarRisco(Action):
     def run(self, dispatcher, tracker, domain):
         
         return [AllSlotsReset(),
-            Restarted()]
+            Restarted(),FollowupAction("action_perguntar_nome")]
 class ActionSalvarRisco(Action):
     def name(self) -> str:
         return "action_salvar_risco"
