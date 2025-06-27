@@ -33,12 +33,7 @@ rules:
     - intent: affirm_address
     - action: utter_classificar_risco
 
-  - rule: Processar endereço texto e confirmar
-    steps:
-      - intent: compartilhar_risco
-      - action: action_request_location
-
-  - rule: Processar endereço texto e confirmar
+  - rule: Processar endereço texto
     steps:
       - intent: informar_endereco_texto
       - action: action_buscar_endereco_texto
@@ -92,7 +87,7 @@ rules:
 
   - rule: Não enviar midia de risco e partir para revisão
     steps:
-      - intent: nao_enviar_midia_risco
+      - intent: pular_enviar_midia_risco
       - action: action_confirmar_relato
 
   - rule: Enviar midia de risco
@@ -109,6 +104,7 @@ rules:
   - rule: Confirmação negativa de risco
     steps:
       - intent: recusar_confirmacao_risco
+      - action: action_recusar_risco
       - action: utter_menu_inicial
 
   - rule: Continuar o risco iniciado
@@ -121,13 +117,13 @@ rules:
       - intent: ajuda
       - action: utter_ajuda
 
-  - rule: situação na região
+  - rule: como está minha área
     steps:
-      - intent: situacao_regiao
+      - intent: como_ta_minha_area
       - action: action_nivel_de_risco
       - action: action_listar_riscos
 
-  - rule: situação na região
+  - rule: como está minha área - mais riscos
     steps:
       - intent: mais_riscos
       - action: action_listar_riscos

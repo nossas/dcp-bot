@@ -171,15 +171,17 @@ nlu:
     - Alan
 
    
-- intent: compartilhar_risco
+- intent: informar_risco
   examples: |
     - Quero compartilhar um risco
     - Quero compartilhar risco
     - Escolher compartilhar risco
     - Compartilhar um risco
     - Compartilhar risco
-    - compartilhar_risco
-    - /compartilhar_risco
+    - informar_risco
+    - /informar_risco
+    - Quero informar um risco
+    - Informar um risco
 
 - intent: apagar_risco
   examples: |
@@ -420,9 +422,9 @@ nlu:
     - Não quero descrever
     - Quero ir direto
 
-- intent: nao_enviar_midia_risco
+- intent: pular_enviar_midia_risco
   examples: |
-    - /nao_enviar_midia_risco
+    - /pular_enviar_midia_risco
     - não enviar midia
 
 - intent: receber_midia_risco
@@ -470,13 +472,17 @@ nlu:
     - /menu_inicial_2
     - outras opções
 
-- intent: situacao_regiao
+- intent: como_ta_minha_area
   examples: |
-    - /situacao_regiao
-    - situacao_regiao
+    - /como_ta_minha_area
+    - como_ta_minha_area
     - situação na minha região
     - situação na região
     - como está a região
+    - como está minha área
+    - como tá a área
+    - como tá minha área
+    - como ta minha area
 
 - intent: ajuda
   examples: |
@@ -491,6 +497,7 @@ nlu:
     - /o_que_fazer
     - o que fazer agora?
     - o que faço?
+    - saber o que fazer
 
 - intent: contatos_emergencia
   examples: |

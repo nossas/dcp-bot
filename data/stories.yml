@@ -33,7 +33,7 @@ stories:
 - story: Responder compartilhar risco com texto e affirm
   steps:
     - action: utter_menu_inicial
-    - intent: compartilhar_risco
+    - intent: informar_risco
     - action: action_request_location
     - intent: informar_endereco_texto
     - action: action_buscar_endereco_texto
@@ -47,7 +47,7 @@ stories:
 - story: Responder compartilhar risco com loalização e affirm
   steps:
     - action: utter_menu_inicial
-    - intent: compartilhar_risco
+    - intent: informar_risco
     - action: action_request_location
     - intent: informar_localizacao
     - action: action_buscar_endereco
@@ -59,15 +59,16 @@ stories:
 - story: Responder compartilhar risco com endereço não encontrado
   steps:
     - action: utter_menu_inicial
-    - intent: compartilhar_risco
+    - intent: informar_risco
     - action: action_request_location
-    - intent: action_buscar_endereco_texto
+    - action: action_listen 
+    - action: action_buscar_endereco_texto
     - action: action_request_location
     - action: action_listen 
    
 - story: Responder compartilhar risco com localização e deny
   steps:
-    - intent: compartilhar_risco
+    - intent: informar_risco
     - action: action_request_location
     - intent: informar_localizacao
     - action: action_buscar_endereco
@@ -78,7 +79,7 @@ stories:
  
 - story: Responder compartilhar risco com texto de endereço com deny
   steps:
-    - intent: compartilhar_risco
+    - intent: informar_risco
     - action: action_request_location
     - intent: informar_endereco_texto
     - action: action_buscar_endereco_texto

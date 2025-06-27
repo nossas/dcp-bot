@@ -15,7 +15,7 @@ intents:
 - affirm_name
 - deny_address
 - affirm_address
-- compartilhar_risco
+- informar_risco
 - apagar_risco
 - continuar_risco
 - informar_endereco_texto
@@ -23,16 +23,14 @@ intents:
 - informar_classificacao_risco
 - informar_descricao_risco
 - pular_descricao_risco
-- nao_enviar_midia_risco
+- pular_enviar_midia_risco
 - tentar_novamente
 - receber_midia_risco
 - afirmar_confirmacao_risco
 - recusar_confirmacao_risco
-- indentificar_no_risco
-- nao_indentificar_no_risco
 - menu_inicial
 - menu_inicial_2
-- situacao_regiao
+- como_ta_minha_area
 - o_que_fazer
 - contatos_emergencia
 - ajuda
@@ -44,6 +42,8 @@ intents:
 - nao_receber_notificacoes
 - parar_notificacoes
 - mais_riscos
+- apagar_nome
+
 
 actions:
 - action_alterar_nome
@@ -69,6 +69,7 @@ actions:
 - action_salvar_midia_risco
 - utter_perguntar_por_nova_midia
 - action_confirmar_relato
+- action_recusar_risco
 - action_salvar_risco
 - action_retoma_risco
 - action_listar_riscos
@@ -146,10 +147,10 @@ responses:
   utter_menu_inicial:
   - text: "Certo, {nome}! Escolha uma opção pra começar:"
     buttons:
-    - title: Adicionar um risco
-      payload: /compartilhar_risco
-    - title: Situação atual
-      payload: /situacao_regiao
+    - title: Informar um risco
+      payload: /informar_risco
+    - title: Como tá minha área
+      payload: /como_ta_minha_area
     - title: Saber o que fazer
       payload: /o_que_fazer
 
@@ -164,7 +165,7 @@ responses:
       payload: /locais_seguros
 
   utter_classificar_risco:
-  - text: "Perfeito {nome}. Escolha a opção que descreva melhor o que está ocorrendo:" 
+  - text: "Perfeito {nome}. Você quer falar sobre:" 
     buttons:
     - title: Alagamento
       payload: '/informar_classificacao_risco{"classificacao_risco": "Alagamento"}'
@@ -175,18 +176,17 @@ responses:
   
   utter_perguntar_por_midia:
   - text: | 
-      Gostaria de enviar uma foto ou vídeo? 📸
-      Isso pode ajudar a entender melhor a situação.
+      📸 Se você tiver uma foto ou vídeo, envie agora ou clique em pular. 
     buttons:
-    - title: Não Enviar
-      payload: '/nao_enviar_midia_risco'
+    - title: Pular
+      payload: '/pular_enviar_midia_risco'
 
 
   utter_perguntar_por_nova_midia:
   - text: Você pode mandar mais mídias ou clicar em Não enviar mais para seguir.
     buttons:
     - title: Não Enviar mais
-      payload: '/nao_enviar_midia_risco'
+      payload: '/pular_enviar_midia_risco'
 
   utter_o_que_fazer:
   - text: |
