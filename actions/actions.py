@@ -760,7 +760,7 @@ class ActionListarRiscos(Action):
                     logger.error(f"video: {video}")
                     dispatcher.utter_message(text="", custom={"type": "video", "url": video, 'is_last': is_last})
 
-                dispatcher.utter_message(text="-------------------------------------------------\n")
+                dispatcher.utter_message(text="\n\n\n\n")
 
             dispatcher.utter_message(
                 text="Quer ver mais relatos da comunidade?",
