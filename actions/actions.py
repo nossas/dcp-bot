@@ -107,9 +107,13 @@ class ActionInatividadeTimeout(Action):
 
         # Para compatibilidade com o tracker
         dispatcher.utter_message(text=message)
-
-        return [ AllSlotsReset(),
-            Restarted()]
+        SlotSet("classificacao_risco", None),
+        SlotSet("descricao_risco", None),
+        SlotSet("endereco", None),
+        SlotSet("latitude", None),
+        SlotSet("longitude", None),
+        SlotSet("midias", None),
+        return []
 
 
 class ActionRequestLocation(Action):
@@ -574,9 +578,13 @@ class ActionRecusarRisco(Action):
         return "action_recusar_risco"
 
     def run(self, dispatcher, tracker, domain):
-        
-        return [AllSlotsReset(),
-            Restarted(),FollowupAction("action_perguntar_nome")]
+        SlotSet("classificacao_risco", None),
+        SlotSet("descricao_risco", None),
+        SlotSet("endereco", None),
+        SlotSet("latitude", None),
+        SlotSet("longitude", None),
+        SlotSet("midias", None),
+        return [FollowupAction("action_perguntar_nome")]
 class ActionSalvarRisco(Action):
     def name(self) -> str:
         return "action_salvar_risco"
@@ -743,7 +751,6 @@ class ActionListarRiscos(Action):
                 icone = icones.get(opcao, "")
 
                 mensagem = (
-                    "-------------------------------------------------\n"
                     f"{icone} {risco['classificacao'][0]}\n"
                     f"📅 {risco['data']}\n"
                     f"📍 Local: {risco['endereco']}\n"
