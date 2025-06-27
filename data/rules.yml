@@ -157,13 +157,6 @@ rules:
       - action: action_buscar_dicas
       - action: utter_pos_ajuda
 
-  - rule: Sair
-    steps:
-      - intent: sair
-      - action: action_pergunta_notificacoes
-      - action: action_listen
-
-
   - rule: Receber notificações
     steps:
       - intent: receber_notificacoes
@@ -206,3 +199,8 @@ rules:
       - action: action_listen
       - action: utter_menu_inicial
       
+
+  - rule: Sair
+    steps:
+      - intent: sair
+      - action: action_sair

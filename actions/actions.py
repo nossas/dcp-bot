@@ -16,7 +16,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 logging.basicConfig(level=logging.DEBUG)  # Força o nível global de debug
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
-from .utils import verificar_tipo_arquivo
+from .utils import verificar_tipo_arquivo, enviar_risco_para_wordpress, extrair_riscos
 
 class ActionFallbackButtons(Action):
     def name(self):
@@ -610,7 +610,7 @@ class ActionSalvarRisco(Action):
 
             # Inserir mídias e coletar ids
             id_midias = []
-            logger.error(f"Erro no usuário:::: {midias}")
+            logger.debug(f"midias a salvar: {midias}")
             for midia_path in midias:
                 # Aqui mime_type é opcional — você pode adaptar para pegar do nome do arquivo ou outro slot
                 cursor.execute("""
@@ -647,6 +647,25 @@ class ActionSalvarRisco(Action):
             conn.commit()
             cursor.close()
             conn.close()
+            logger.debug(f"cadastro endereco: {endereco}")
+            logger.debug(f"cadastro descricao: {descricao}")
+            logger.debug(f"cadastro midias: {midias}")
+            logger.debug(f"cadastro nome: {nome}")
+            logger.debug(f"cadastro whatsapp_id: {whatsapp_id}")
+            logger.debug(f"cadastro classificacao: {classificacao}")
+
+            enviar_risco_para_wordpress(
+                endereco=endereco,
+                descricao=descricao,
+                midias_paths=midias,
+                latitude=latitude,
+                longitude=longitude,
+                nome_completo=nome,
+                email="anonimo@nossasdcp.org.br",
+                telefone=whatsapp_id,
+                autoriza_contato=False,
+                classificacao=classificacao,
+            )
 
         except Exception as e:
             dispatcher.utter_message(text="Erro ao salvar os dados do risco.")
@@ -654,7 +673,7 @@ class ActionSalvarRisco(Action):
             return []
 
         dispatcher.utter_message(
-            text='✅ *Registrado!*\nEstamos verificando suas informações e, assim que aprovadas, serão publicadas. Você vai receber uma mensagem confirmando a publicação.'
+            text='✅ *Registrado!*\nEstamos verificando suas informações. Assim que a revisão for concluída, você receberá uma mensagem de confirmação.'
         )
         dispatcher.utter_message(
             text='⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil – 199.*', 
@@ -665,7 +684,7 @@ class ActionSalvarRisco(Action):
             buttons=[
                 {"title": "Voltar ao menu", "payload": "/menu_inicial"},
                 {"title": "Como tá minha área", "payload": "/como_ta_minha_area"},
-                {"title": "Encerrar", "payload": "/o_que_fazer"}
+                {"title": "Encerrar", "payload": "/sair"}
             ]
         )
 
@@ -684,67 +703,79 @@ class ActionListarRiscos(Action):
     def run(self, dispatcher, tracker, domain):
         last_action = None
         for event in reversed(tracker.events):
-            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons"]:
+            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons","action_agendar_inatividade"]:
                 last_action = event.get("name")
                 break
         logger.debug(f"Last action:{last_action}")
         pagina = tracker.get_slot("pagina_risco") or 1
         if last_action != "action_listar_riscos":
+            logger.debug(f"Last action:: {last_action}")
             pagina = 1
+
         wordpress_url = os.getenv("WORDPRESS_URL")
-        endpoint = f"{wordpress_url}/wp-json/dcp/v1/riscos?per_page=1&page={pagina}"
+        if not wordpress_url:
+            dispatcher.utter_message(text="Erro de configuração: URL do WordPress não definida.")
+            logger.error("WORDPRESS_URL não está definida nas variáveis de ambiente.")
+            return []
+
+        endpoint = f"{wordpress_url}wp-json/dcp/v1/riscos?per_page=2&page={pagina}"
+        logger.debug(f"Buscando riscos na URL: {endpoint}")
+
         try:
             response = requests.get(endpoint)
+            logger.debug(f"Resposta HTTP: {response.status_code} - {response.text}")
             response.raise_for_status()
-            riscos = response.json()
+            dados = response.json()
+            riscos = extrair_riscos(dados)
 
             if not riscos:
                 dispatcher.utter_message(text="Não temos mais relatos na sua região.")
-                return [SlotSet("pagina_risco",1),FollowupAction("action_sair")]
+                return [SlotSet("pagina_risco", 1)]
+
             mensagem = ''
             for risco in riscos:
-                opcao = risco['classificacao']
+                opcao = risco['classificacao'][0]
                 icones = {
                     "Alagamento": "☔️",
                     "Lixo": "🗑️",
                     "Outros": "❔"
                 }
                 icone = icones.get(opcao, "")
-                
+
                 mensagem = (
                     "-------------------------------------------------\n"
-                    f"{icone} {risco['classificacao']}\n"
-                    f"📅 {risco['timestamp']}\n"
+                    f"{icone} {risco['classificacao'][0]}\n"
+                    f"📅 {risco['data']}\n"
                     f"📍 Local: {risco['endereco']}\n"
                     f"📝 Descrição: {risco['descricao']}\n"
                     f"\nFotos abaixo:\n\n"
                 )
-                dispatcher.utter_message(text=mensagem,)
-                dispatcher.utter_message(text=mensagem,)
-                for image in risco['url_imagens']:     
-                    dispatcher.utter_message(image=image,)
-                videos = risco['url_videos']
+                dispatcher.utter_message(text=mensagem)
+                for image in risco['imagens']:
+                    dispatcher.utter_message(image=image)
 
+                videos = risco['videos']
                 for idx, video in enumerate(videos):
                     is_last = idx == len(videos) - 1
-
                     logger.error(f"video: {video}")
-                    dispatcher.utter_message(text="", custom={"type": "video", "url": video, 'is_last': is_last})   
+                    dispatcher.utter_message(text="", custom={"type": "video", "url": video, 'is_last': is_last})
 
-                dispatcher.utter_message(text="-------------------------------------------------\n",)
+                dispatcher.utter_message(text="-------------------------------------------------\n")
+
             dispatcher.utter_message(
-                    text="Quer ver mais relatos da comunidade?",
-                    buttons=[
-                        {"title": "Sim", "payload": "/mais_riscos"},
-                        {"title": "Não", "payload": "/sair"}
-                    ]
+                text="Quer ver mais relatos da comunidade?",
+                buttons=[
+                    {"title": "Sim", "payload": "/mais_riscos"},
+                    {"title": "Não", "payload": "/sair"}
+                ]
             )
             return [SlotSet("pagina_risco", pagina + 1)]
 
         except requests.RequestException as e:
             dispatcher.utter_message(text="Ocorreu um erro ao buscar os riscos.")
-            print(f"[ERRO] Falha na requisição: {e}")
+            logger.error(f"[ERRO] Falha na requisição para {endpoint}: {e}", exc_info=True)
             return []
+
 
 class ActionNivelDeRisco(Action):
     def name(self):
@@ -999,3 +1030,10 @@ class ActionPararNotificacoes(Action):
         return [FollowupAction("utter_finalizar")]
 
     
+class ActionSair(Action):
+    def name(self) -> str:
+        return "action_sair"
+
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(text="Certo! Se precisar de mais informações no futuro ou quiser falar com a gente de novo, é só voltar aqui e mandar um “oi”.\n\nEstamos por aqui pra ajudar no que for possível!🫂\n\n🌐 Acompanhe as atualizações no site: www.defesaclimaticapopular.org\n\n📢 Quer receber avisos e alertas sobre a sua região?\n\nEntre no grupo da Defesa Climática Popular pelo link: https://chat.whatsapp.com/JrabtO1ww07KbJolQVOi2y. Por lá, avisamos sempre que houver mudanças ou novidades na sua área.")
+        return []

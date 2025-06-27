@@ -86,6 +86,7 @@ actions:
 - action_nivel_de_risco
 - action_parar_notificacoes
 - action_pergunta_notificacoes
+- action_sair
 
 
 slots:
@@ -168,11 +169,11 @@ responses:
   - text: "Perfeito {nome}. Você quer falar sobre:" 
     buttons:
     - title: Alagamento
-      payload: '/informar_classificacao_risco{"classificacao_risco": "Alagamento"}'
+      payload: '/informar_classificacao_risco{"classificacao_risco": "alagamento"}'
     - title: Lixo
-      payload: '/informar_classificacao_risco{"classificacao_risco": "Lixo"}'
+      payload: '/informar_classificacao_risco{"classificacao_risco": "lixo"}'
     - title: Outros
-      payload: '/informar_classificacao_risco{"classificacao_risco": "Outros"}'
+      payload: '/informar_classificacao_risco{"classificacao_risco": "outros"}'
   
   utter_perguntar_por_midia:
   - text: | 

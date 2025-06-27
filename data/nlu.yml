@@ -229,24 +229,12 @@ nlu:
 - intent: informar_endereco_texto
   examples: |
     - Rua das Flores, 123
-    - Av. Paulista, São Paulo
-    - Rua dos Andradas, Porto Alegre
-    - Avenida Central, 45, Centro, Rio de Janeiro
     - Rua Bahia, número 200
-    - irmão lucas, 198
-    - joaquim antunes 345
     - rua teodoro sampaio, 1999
     - rua planejada
-    - estrada do cascalho
-    - estrada do evangelho pleno
-    - avenida pedroso de moraes
-    - avenida brasil
     - Rua irmão lucas, 83
-    - avenida barra funda , 12
     - rua irmão lucas, 83
     - rua deputado lacerda franco, 53
-    - Estrada do cascalho, 1989
-    - beco do batman
     - Rua das Flores, 123
     - Av. Paulista, São Paulo
     - Rua dos Andradas, Porto Alegre
@@ -342,8 +330,8 @@ nlu:
     - Fios elétricos
     - Outros
     - /informar_classificacao_risco
-    - /informar_classificacao_risco{"classificacao_risco": "Alagamento"}
-    - {"classificacao_risco": "Alagamento"}
+    - /informar_classificacao_risco{"classificacao_risco": "alagamento"}
+    - {"classificacao_risco": "alagamento"}
     - /informar_classificacao_risco{"classificacao_risco": "Lixo"}
     - {"classificacao_risco": "Lixo"}
     - /informar_classificacao_risco{"classificacao_risco": "Outros"}

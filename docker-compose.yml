@@ -18,7 +18,7 @@ services:
       - 'whatsapp_connector.WhatsAppInput'
       - '--debug'
     environment:
-      WORDPRESS_URL: https://wp.defesaclimaticapopular.org/
+      WORDPRESS_URL: https://nossasdcp.hacklab.com.br/
     ports:
       - '5005:5005'
 
@@ -34,6 +34,8 @@ services:
       GOOGLE_MAPS_API_KEY: key
       WHATSAPP_AUTH_TOKEN: key
       WHATSAPP_PHONE_NUMBER_ID: id
+      WORDPRESS_URL: https://nossasdcp.hacklab.com.br/
+
     ports: 
       - '5055:5055'
     user: root
