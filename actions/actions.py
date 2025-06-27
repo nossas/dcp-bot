@@ -123,15 +123,15 @@ class ActionRequestLocation(Action):
         endereco = tracker.get_slot("endereco")
         nome = tracker.get_slot("nome")
         classificacao_risco = tracker.get_slot("classificacao_risco")
-        if endereco and nome and classificacao_risco:
-            dispatcher.utter_message(
-                text="Você já iniciou o processo para relatar uma stuação de risco.",
-                buttons=[
-                    {"title": "Começar de novo", "payload": "/apagar_risco"},
-                    {"title": "Continuar/Corrigir", "payload": "/continuar_risco"}
-                ]
-            )
-            return[]
+        # if endereco and nome and classificacao_risco:
+        #     dispatcher.utter_message(
+        #         text="Você já iniciou o processo para relatar uma stuação de risco.",
+        #         buttons=[
+        #             {"title": "Começar de novo", "payload": "/apagar_risco"},
+        #             {"title": "Continuar/Corrigir", "payload": "/continuar_risco"}
+        #         ]
+        #     )
+        #     return[]
         SlotSet("classificacao_risco", None),
         SlotSet("descricao_risco", None),
         SlotSet("endereco", None),
@@ -472,7 +472,7 @@ class ActionSolicitarDescricaoRisco(Action):
 
         if risco:
             dispatcher.utter_message(
-                text=f"Entendi! Pode contar mais sobre o que está acontecendo? 📝\nEscreva mais detalhes ou toque em pular.",
+                text=f"Entendi! Se você tiver mais detalhes a acrescentar, pode escrever agora ou clique em pular.",
                 buttons=[
                     {"title": "Pular", "payload": "/pular_descricao_risco"},
                 ]
@@ -511,7 +511,7 @@ class ActionSalvarMidiaRisco(Action):
             if midia_data.get("tipo") == "mídia_combinada":
                 novas_midias = [m["path"] for m in midia_data["midias"]]
                 midias_slot.extend(novas_midias)
-                dispatcher.utter_message(text=f"Recebido! Se ainda estiver carregando, aguarde um pouco.")
+                dispatcher.utter_message(text=f"Estou recebendo. Se ainda tiver arquivos carregando, aguarde concluir.")
             else:
                 # Caso venha uma mídia só
                 path = midia_data["path"]
@@ -524,7 +524,7 @@ class ActionSalvarMidiaRisco(Action):
             dispatcher.utter_message(
                 text="*Opa, algo deu errado com o envio.*\nVocê pode tentar de novo ou pular essa parte, como preferir.", 
                 buttons=[
-                    {"title": "Não enviar", "payload": "/nao_enviar_midia_risco"},
+                    {"title": "Não enviar", "payload": "/pular_enviar_midia_risco"},
                 ])
             logger.error(f"Erro ao salvar mídia no slot: {e}")
             return []
@@ -548,27 +548,35 @@ class ActionConfirmarRisco(Action):
             f"⚠️ *Tipo de risco:* {classificacao}\n"
             f"📝 *Descrição:* {descricao}\n\n"
         )
-
         dispatcher.utter_message(text=mensagem)
-        for midia in midias_slot:
-            media_type = verificar_tipo_arquivo(midia)
-            media_path = os.path.splitext(midia)[0]
-            media_id = os.path.basename(media_path)
-            dispatcher.utter_message(text="", custom={"type": "media_id", "media_id": media_id, "media_type":media_type})   
-            
+        if (len(midias_slot)):
+            dispatcher.utter_message(text="📸 Fotos/vídeos: ")
+            for midia in midias_slot:
+                media_type = verificar_tipo_arquivo(midia)
+                media_path = os.path.splitext(midia)[0]
+                media_id = os.path.basename(media_path)
+                dispatcher.utter_message(text="", custom={"type": "media_id", "media_id": media_id, "media_type":media_type})   
         mensagem = (    
-            f"Essas informações estão corretas?"
+            f"Essas informações estão corretas?\nSe estiver tudo certo, clique em *Confirmar e enviar.*\n Seu relato será salvo com segurança, passará por uma verificação rápida e, se aprovado, será publicado no mapa. Tudo conforme nossa política de privacidade: https://bit.ly/termo-privacidade"
         )
         dispatcher.utter_message(
             text=mensagem,
             buttons=[
-                {"title": "Sim", "payload": "/afirmar_confirmacao_risco"},
-                {"title": "Não", "payload": "/recusar_confirmacao_risco"}
+                {"title": "Confirmar e enviar", "payload": "/afirmar_confirmacao_risco"},
+                {"title": "Corrigir informações", "payload": "/recusar_confirmacao_risco"}
             ]
         )
 
         return []
 
+class ActionRecusarRisco(Action):
+    def name(self) -> str:
+        return "action_recusar_risco"
+
+    def run(self, dispatcher, tracker, domain):
+        
+        return [AllSlotsReset(),
+            Restarted()]
 class ActionSalvarRisco(Action):
     def name(self) -> str:
         return "action_salvar_risco"
@@ -646,18 +654,18 @@ class ActionSalvarRisco(Action):
             return []
 
         dispatcher.utter_message(
-            text='✅ *Informações recebidas!*\nAs informações serão verificadas e, assim que aprovadas, serão publicadas. Você vai receber uma mensagem confirmando a publicação'
+            text='✅ *Registrado!*\nEstamos verificando suas informações e, assim que aprovadas, serão publicadas. Você vai receber uma mensagem confirmando a publicação.'
         )
         dispatcher.utter_message(
             text='⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil – 199.*', 
         )
         
         dispatcher.utter_message(
-            text='ℹ️ Quer mais informações? Você pode:',
+            text='ℹ️ Te ajudo em algo mais? Você pode clicar em:',
             buttons=[
-                {"title": "Enviar outro risco", "payload": "/compartilhar_risco"},
-                {"title": "Situação atual", "payload": "/situacao_regiao"},
-                {"title": "Saber o que fazer", "payload": "/o_que_fazer"}
+                {"title": "Voltar ao menu", "payload": "/menu_inicial"},
+                {"title": "Como tá minha área", "payload": "/como_ta_minha_area"},
+                {"title": "Encerrar", "payload": "/o_que_fazer"}
             ]
         )
 
