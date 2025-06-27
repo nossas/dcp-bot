@@ -16,6 +16,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 logging.basicConfig(level=logging.DEBUG)  # Força o nível global de debug
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
+from .utils import verificar_tipo_arquivo
 
 class ActionFallbackButtons(Action):
     def name(self):
@@ -48,6 +49,11 @@ class ActionFallbackButtons(Action):
             return [
                 SlotSet("descricao_risco", user_message),
                 FollowupAction("utter_perguntar_por_midia")
+            ]
+        if last_action == "action_request_location":
+            logger.debug(f"Fallback de localização")
+            return [
+                FollowupAction("action_buscar_endereco_texto")
             ]
 
         # Caso contrário, volta ao fallback padrão
@@ -151,12 +157,18 @@ class ActionApagarRisco(Action):
             SlotSet("midias", []),
         ]
 
-class ActionRetomarRisco(Action):
+class ActionAlterarNome(Action):
     def name(self):
-        return "retomar_risco"
+        return "action_alterar_nome"
 
     def run(self, dispatcher, tracker, domain):
-        dispatcher.utter_message(text="Ok, vamos retomar.")
+        dispatcher.utter_message(
+                text="Entendi que você quer alterar o nome cadastrado, é isso?",
+                buttons=[
+                    {"title": "Apagar nome", "payload": "/apagar_nome"},
+                    {"title": "Retomar", "payload": "/tentar_novamente"}
+                ]
+            )
         return[]
 
 class ActionRepeatLastMessage(Action):
@@ -213,12 +225,7 @@ class ActionPerguntarNome(Action):
 
     def run(self, dispatcher, tracker, domain):
         sender_id = tracker.sender_id
-        nome = tracker.get_slot("nome")
-
-        if nome:
-            logger.debug(f"Achou nome no slot")
-            return [SlotSet("pagina_risco",1), FollowupAction("utter_menu_inicial")]
-
+       
         try:
             conn = get_db_connection()
             if conn:
@@ -242,6 +249,7 @@ class ActionPerguntarNome(Action):
         dispatcher.utter_message(
             text="Oie! Bem-vindo(a) à Defesa Climática Popular.\nPra começar, *como você prefere ser chamado(a)?*"
         )
+        
         return [SlotSet("pagina_risco",1)]
 
 class ActionSalvarNome(Action):
@@ -301,11 +309,11 @@ class ActionApagarNome(Action):
         finally:
             if conn:
                 conn.close()
-        return [SlotSet("nome", None)]
-    
-class ActionBuscarEnderecoOpenStreet(Action):
+        dispatcher.utter_message(text="Tudo bem, vamos começar de novo. *Como você prefere ser chamado(a)?*")
+        return [SlotSet("nome", None)]    
+class ActionBuscarEndereco(Action):
     def name(self):
-        return "action_buscar_endereco_openstreet"
+        return "action_buscar_endereco"
 
     def run(self, dispatcher, tracker, domain):
         user_message = tracker.latest_message.get("text")
@@ -348,9 +356,11 @@ class ActionBuscarEnderecoOpenStreet(Action):
                         ]
                     else:
                         logger.error(f"Erro na API do Google Maps: {data.get('status')}")
+                        dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
+                        return [FollowupAction("action_request_location")]
                 else:
                     logger.error("Erro HTTP na chamada à API do Google Maps")
-                dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo, de preferência com o nome da rua e um ponto de referência.\nOu, se preferir, toque no botão abaixo para enviar sua localização pelo WhatsApp:")
+                dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
                 return [FollowupAction("action_request_location")]
             else:
                 logger.debug(f"tem endereço")
@@ -378,9 +388,9 @@ class ActionBuscarEnderecoOpenStreet(Action):
             )
             return []
 
-class ActionBuscarEnderecoTextoOpenStreet(Action):
+class ActionBuscarEnderecoTexto(Action):
     def name(self):
-        return "action_buscar_endereco_texto_openstreet"
+        return "action_buscar_endereco_texto"
 
     def run(self, dispatcher, tracker, domain):
         last_action = None
@@ -427,9 +437,8 @@ class ActionBuscarEnderecoTextoOpenStreet(Action):
                 ]
             else:
                 logger.error(f"Erro na API do Google Maps: {data.get('status')} - {data.get('error_message')}")
-        else:
-            dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo, de preferência com o nome da rua e um ponto de referência.\nOu, se preferir, toque no botão abaixo para enviar sua localização pelo WhatsApp:")
-            return [FollowupAction("action_request_location")]
+        dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
+        return [FollowupAction("action_request_location")]
 
 class ActionSalvarClassificacaoRisco(Action):
     def name(self) -> str:
@@ -497,6 +506,7 @@ class ActionSalvarMidiaRisco(Action):
             midia_data = json.loads(user_message)
 
             midias_slot = tracker.get_slot("midias") or []
+            logger.error(f"midia_data: {midia_data}")
 
             if midia_data.get("tipo") == "mídia_combinada":
                 novas_midias = [m["path"] for m in midia_data["midias"]]
@@ -531,15 +541,24 @@ class ActionConfirmarRisco(Action):
         endereco = tracker.get_slot("endereco") or "não informado"
         classificacao = tracker.get_slot("classificacao_risco") or "não informado"
         descricao = tracker.get_slot("descricao_risco") or "não informado"
-
+        midias_slot = tracker.get_slot("midias") or []
         mensagem = (
             f"Resumo do seu relato:\n"
             f"📍 *Endereço:* {endereco}\n"
-            f"⚠️ *Tipo de risco:* {classificacao}\n\n"
+            f"⚠️ *Tipo de risco:* {classificacao}\n"
             f"📝 *Descrição:* {descricao}\n\n"
-            f"Essas informações estão corretas?"
         )
 
+        dispatcher.utter_message(text=mensagem)
+        for midia in midias_slot:
+            media_type = verificar_tipo_arquivo(midia)
+            media_path = os.path.splitext(midia)[0]
+            media_id = os.path.basename(media_path)
+            dispatcher.utter_message(text="", custom={"type": "media_id", "media_id": media_id, "media_type":media_type})   
+            
+        mensagem = (    
+            f"Essas informações estão corretas?"
+        )
         dispatcher.utter_message(
             text=mensagem,
             buttons=[
@@ -630,8 +649,9 @@ class ActionSalvarRisco(Action):
             text='✅ *Informações recebidas!*\nAs informações serão verificadas e, assim que aprovadas, serão publicadas. Você vai receber uma mensagem confirmando a publicação'
         )
         dispatcher.utter_message(
-            text='⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil – 199.*'
+            text='⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil – 199.*', 
         )
+        
         dispatcher.utter_message(
             text='ℹ️ Quer mais informações? Você pode:',
             buttons=[
@@ -904,7 +924,6 @@ class ActionPerguntaNotificacoes(Action):
             )
 
         return []
-
     
 class ActionReceberNotificacoes(Action):
     def name(self) -> str:
@@ -939,8 +958,6 @@ class ActionReceberNotificacoes(Action):
 
         return [FollowupAction("utter_finalizar")]
     
-
-
 class ActionPararNotificacoes(Action):
     def name(self) -> str:
         return "action_parar_notificacoes"  

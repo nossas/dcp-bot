@@ -1,7 +1,7 @@
 version: "3.1"
 stories:
 
-- story: Saudação sem nome (primeira vez ou após deny com intent)
+- story: Saudação sem nome 
   steps:
     - or:
       - intent: saudacao
@@ -10,6 +10,25 @@ stories:
     - intent: informar_nome
     - action: action_salvar_nome
     - action: utter_menu_inicial
+    - action: action_listen
+
+- story: informa nome
+  steps:
+    - action: action_perguntar_nome
+    - intent: informar_nome
+    - action: action_salvar_nome
+    - action: utter_menu_inicial
+    - action: action_listen
+
+- story: informa nome com fallback
+  steps:
+    - action: action_perguntar_nome
+    - intent: nlu_fallback
+    - action: action_fallback_buttons
+    - action: action_salvar_nome
+    - action: utter_menu_inicial
+    - action: action_listen
+
 
 - story: Responder compartilhar risco com texto e affirm
   steps:
@@ -17,7 +36,7 @@ stories:
     - intent: compartilhar_risco
     - action: action_request_location
     - intent: informar_endereco_texto
-    - action: action_buscar_endereco_texto_openstreet
+    - action: action_buscar_endereco_texto
     - or:
       - intent: affirm
       - intent: affirm_address    
@@ -31,18 +50,27 @@ stories:
     - intent: compartilhar_risco
     - action: action_request_location
     - intent: informar_localizacao
-    - action: action_buscar_endereco_openstreet
+    - action: action_buscar_endereco
     - or:
       - intent: affirm
       - intent: affirm_address    
     - action: utter_classificar_risco 
+   
+- story: Responder compartilhar risco com endereço não encontrado
+  steps:
+    - action: utter_menu_inicial
+    - intent: compartilhar_risco
+    - action: action_request_location
+    - intent: action_buscar_endereco_texto
+    - action: action_request_location
+    - action: action_listen 
    
 - story: Responder compartilhar risco com localização e deny
   steps:
     - intent: compartilhar_risco
     - action: action_request_location
     - intent: informar_localizacao
-    - action: action_buscar_endereco_openstreet
+    - action: action_buscar_endereco
     - or:
       - intent: deny
       - intent: deny_address    
@@ -53,24 +81,16 @@ stories:
     - intent: compartilhar_risco
     - action: action_request_location
     - intent: informar_endereco_texto
-    - action: action_buscar_endereco_texto_openstreet
+    - action: action_buscar_endereco_texto
     - or:
       - intent: deny
       - intent: deny_address
     - action: action_request_location 
 
-
-# - story: Responder ver situação com texto e affirm
-#   steps:
-#     - action: utter_menu_inicial
-#     - intent: menu_inicial_2
-#     - action: utter_menu_inicial_2
-#     - intent: situacao_regiao
-#     - action: action_request_location
-#     - intent: informar_endereco_texto
-#     - action: action_buscar_endereco_texto_openstreet
-#     - or:
-#       - intent: affirm
-#       - intent: affirm_address    
-#     - action: action_listar_riscos 
-
+- story: Descrever risco com inatividade
+  steps:
+    - action: action_ask_descricao_risco
+    - action: action_agendar_inatividade 
+    - intent: informar_descricao_risco
+    - action: action_salvar_descricao_risco
+    - action: utter_perguntar_por_midia

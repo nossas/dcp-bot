@@ -7,7 +7,6 @@ nlu:
     - bom dia
     - boa tarde
     - boa noite
-    - e aí
     - oi, tudo bem?
     - ola
     - tudo bem?
@@ -16,13 +15,11 @@ nlu:
     - beleza?
     - tranquilo?
     - salve
-    - alô
     - e aí, beleza?
     - oii
     - oi oi
     - olá, tudo certo?
     - oi, como você está?
-    - ei
     - e aí, tudo bem?
     - bom dia, tudo bem?
 - intent: informar_nome
@@ -106,6 +103,72 @@ nlu:
     - Tamires
     - Roberto
     - Michele
+    - tabata
+    - tereza
+    - tiago
+    - tomas
+    - Cássia
+    - Milena
+    - Bruna
+    - Patrícia
+    - Rafaela
+    - Cristiane
+    - Amanda
+    - Érica
+    - Joana
+    - Kelly
+    - Flávia
+    - Débora
+    - Adriana
+    - Sheila
+    - Paula
+    - Sônia
+    - Clarice
+    - Eliane
+    - Márcia
+    - Silvana
+    - Noemi
+    - Rebeca
+    - Neide
+    - Luzia
+    - Vânia
+    - Carla Beatriz
+    - Ana Lúcia
+    - Camila Fernanda
+    - Hugo
+    - André Luiz
+    - Renan
+    - Vitor
+    - Murilo
+    - Enzo
+    - Breno
+    - Luan
+    - Caetano
+    - Wallace
+    - Mateus
+    - Jonas
+    - Paulo
+    - Bruno
+    - Renato
+    - Fernando
+    - César
+    - Tiago Henrique
+    - Eduardo José
+    - Lucas Gabriel
+    - Felipe Augusto
+    - João Pedro
+    - Gabriel Souza
+    - Davi Lima
+    - Kauã Oliveira
+    - Guilherme Rocha
+    - Nicolas Almeida
+    - Antônio Carlos
+    - José Luiz
+    - Marcos Vinícius
+    - Samuel
+    - Vinícius
+    - Ruan
+    - Alan
 
    
 - intent: compartilhar_risco
@@ -298,6 +361,56 @@ nlu:
     - descrição do Alagamento
     - descrição de lixo
     - descrição de outros
+
+- intent: alterar_nome
+  examples: |
+    - Meu nome está errado
+    - errei meu nome
+    - mudar meu nome
+    - Alterar nome
+    - Esse não é meu nome
+    - Meu nome é outro
+    - quero corrigir meu nome
+    - digitei meu nome errado
+    - coloquei o nome errado
+    - tá errado meu nome
+    - tá com nome errado
+    - como mudo meu nome?
+    - não é esse meu nome
+    - corrige meu nome aí
+    - troque meu nome
+    - mudar o nome cadastrado
+    - tem como alterar meu nome?
+    - nome incorreto
+    - meu nome tá incorreto
+    - como faço pra mudar meu nome?
+    - você anotou meu nome errado
+    - esse nome tá errado
+    - meu nome tá diferente
+    - meu nome de verdade é outro
+    - tá com nome diferente aqui
+    - altere meu nome, por favor
+    - gostaria de mudar meu nome
+    - por favor, troque meu nome
+    - não me chamo assim
+    - não é esse meu nome
+    - não gostei do nome
+    - você entendeu errado meu nome
+    - meu nome apareceu errado
+    - quero editar meu nome
+    - quero mudar como meu nome aparece
+    - você escreveu errado meu nome
+    - mudar nome
+    - alterar o nome
+    - ajustar meu nome
+    - não está certo meu nome
+    - você registrou meu nome errado
+
+- intent: apagar_nome
+  examples: |
+    - /apagar_nome
+    - apagar_nome
+    - Apagar nome
 
 - intent: pular_descricao_risco
   examples: |

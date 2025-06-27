@@ -1,11 +1,6 @@
 version: "3.1"
 
 rules:
-  - rule: Fallback padrão
-    steps:
-      - intent: nlu_fallback
-      - action: action_fallback_buttons
-
   - rule: menu inicial
     steps:
     - intent: menu_inicial
@@ -26,7 +21,7 @@ rules:
   - rule: Processar localização e confirmar endereço
     steps:
       - intent: informar_localizacao
-      - action: action_buscar_endereco_openstreet
+      - action: action_buscar_endereco
 
   - rule: Recusar endereço
     steps:
@@ -46,34 +41,34 @@ rules:
   - rule: Processar endereço texto e confirmar
     steps:
       - intent: informar_endereco_texto
-      - action: action_buscar_endereco_texto_openstreet
+      - action: action_buscar_endereco_texto
   
   - rule: Processar endereço localização 
     steps:
       - intent: informar_localizacao
-      - action: action_buscar_endereco_openstreet
+      - action: action_buscar_endereco
 
   - rule: Confirmar endereço leva para classificação de risco
     steps:
-      - action: action_buscar_endereco_texto_openstreet
+      - action: action_buscar_endereco_texto
       - intent: affirm
       - action: utter_classificar_risco
 
   - rule: Confirmar localização leva para classificação de risco
     steps:
-      - action: action_buscar_endereco_openstreet
+      - action: action_buscar_endereco
       - intent: affirm
       - action: utter_classificar_risco
   
   - rule: recusar endereço texto
     steps:
-    - action: action_buscar_endereco_openstreet
+    - action: action_buscar_endereco
     - intent: deny
     - action: action_request_location 
   
   - rule: recusar endereço localização
     steps:  
-    - action: action_buscar_endereco_texto_openstreet
+    - action: action_buscar_endereco_texto
     - intent: deny
     - action: action_request_location 
 
@@ -203,3 +198,15 @@ rules:
       - intent: inatividade_timeout
       - action: action_inatividade_timeout
 
+  - rule: Alterar nome
+    steps:
+      - intent: alterar_nome
+      - action: action_alterar_nome
+
+  - rule: Apagar nome
+    steps:
+      - intent: apagar_nome
+      - action: action_apagar_nome
+      - action: action_listen
+      - action: utter_menu_inicial
+      

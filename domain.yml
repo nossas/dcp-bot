@@ -4,6 +4,7 @@ session_config:
   carry_over_slots_to_new_session: false
 
 intents:
+- alterar_nome
 - inatividade_timeout
 - inatividade_monitoramento
 - saudacao
@@ -45,6 +46,7 @@ intents:
 - mais_riscos
 
 actions:
+- action_alterar_nome
 - action_agendar_inatividade
 - action_inatividade_timeout
 - action_request_location
@@ -54,12 +56,12 @@ actions:
 - action_apagar_risco
 - utter_menu_inicial
 - utter_menu_inicial_2
-- action_buscar_endereco_texto_openstreet
+- action_buscar_endereco_texto
 - descrever_risco
 - utter_classificar_risco
 - action_fallback_buttons
 - action_repeat_last_message
-- action_buscar_endereco_openstreet
+- action_buscar_endereco
 - action_salvar_classificacao_risco
 - action_ask_descricao_risco
 - action_salvar_descricao_risco
@@ -192,7 +194,7 @@ responses:
         • Tenha separado seu kit de sobrevivência com documentos, remédios e itens essenciais.
         • Tenha cuidado com fios caídos ou locais com risco de choque elétrico.
         • Evite contato com a água de enchentes, pois pode estar contaminada.
-        ⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil* – 199.
+        ⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil* – tel:199 .
         É só clicar no número para fazer a ligação automaticamente
         
   utter_ajuda:
