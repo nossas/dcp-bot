@@ -31,7 +31,7 @@ class ActionFallbackButtons(Action):
                 last_action = event.get("name")
                 break
         logger.debug(f"Last action:{last_action}")
-        if last_action == "action_perguntar_nome":
+        if last_action == "action_perguntar_nome" or "action_apagar_nome":
             user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como nome: {user_message}")
             return [
@@ -395,11 +395,11 @@ class ActionBuscarEnderecoTexto(Action):
     def run(self, dispatcher, tracker, domain):
         last_action = None
         for event in reversed(tracker.events):
-            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons"]:
+            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons","action_agendar_inatividade"]:
                 last_action = event.get("name")
                 break
         logger.debug(f"Last action:{last_action}")
-        if last_action == "action_perguntar_nome":
+        if last_action == "action_perguntar_nome" or "action_apagar_nome":
             user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como nome: {user_message}")
             return [

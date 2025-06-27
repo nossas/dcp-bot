@@ -196,7 +196,6 @@ responses:
         • Tenha cuidado com fios caídos ou locais com risco de choque elétrico.
         • Evite contato com a água de enchentes, pois pode estar contaminada.
         ⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil* – tel:199 .
-        É só clicar no número para fazer a ligação automaticamente
         
   utter_ajuda:
   - text: |

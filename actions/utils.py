@@ -20,7 +20,10 @@ def extrair_riscos(json_data: Dict) -> List[Dict]:
             "latitude": item.get("latitude"),
             "longitude": item.get("longitude"),
             "descricao": item.get("descricao"),
-            "classificacao": [c.get("name") for c in item.get("classificacao", [])],
+            "classificacao": [
+                c.get("name") if isinstance(c, dict) else "Outros"
+                for c in item.get("classificacao") if isinstance(item.get("classificacao"), list)
+            ] if isinstance(item.get("classificacao"), list) else ["Outros"],
             "imagens": item.get("url_imagens", []),
             "videos": item.get("url_videos", []),
             "identificar": item.get("identificar", False)
