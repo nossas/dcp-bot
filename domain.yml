@@ -192,7 +192,7 @@ responses:
   utter_o_que_fazer:
   - text: |
       ⚠️ Recomendamos que você:
-        • Tenha separado seu kit de sobrevivência com documentos, remédios e itens essenciais.
+        • Separe agora mesmo um kit de sobrevivência com documentos, remédios e itens essenciais.
         • Tenha cuidado com fios caídos ou locais com risco de choque elétrico.
         • Evite contato com a água de enchentes, pois pode estar contaminada.
         ⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil* – tel:199 .
@@ -223,12 +223,12 @@ responses:
   - text: |
        Como podemos te ajudar agora?
     buttons:
-    - title: Dicas de segurança
-      payload: '/dicas_segurança'
-    - title: Saber o que fazer
-      payload: /o_que_fazer
+    - title: Mais ajuda
+      payload: '/menu_dicas'
     - title: Menu inicial
       payload: '/menu_inicial'
+    - title: Encerrar
+      payload: /sair
 
 
   utter_finalizar:
