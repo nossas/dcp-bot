@@ -9,15 +9,16 @@ import json
 import aiohttp
 from collections import defaultdict
 import asyncio
+import os
 logger = logging.getLogger(__name__)
 
 
 async def agendar_inatividade(sender_id: str):
     async with aiohttp.ClientSession() as session:
         logger.error(f"----------------------------------fazendo chamada schedule")
-
+        rasa_url = os.environ.get("RASA_URL")
         await session.post(
-            f"http://localhost:5005/conversations/{sender_id}/trigger_intent",
+            f"{rasa_url}/conversations/{sender_id}/trigger_intent",
             json={"name": "inatividade_monitoramento", "entities": []}
         )
 

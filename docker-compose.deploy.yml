@@ -17,6 +17,8 @@ services:
       GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
       WHATSAPP_AUTH_TOKEN: ${WHATSAPP_AUTH_TOKEN}
       WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID}
+      RASA_URL: ${RASA_URL}
+
     ports:
       - '5005:5005'
 
@@ -31,6 +33,7 @@ services:
       GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
       WHATSAPP_AUTH_TOKEN: ${WHATSAPP_AUTH_TOKEN}
       WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID}
+      RASA_URL: ${RASA_URL}
     volumes:
       - /home/ubuntu/config_rasa/credentials.yml:/app/credentials.yml
       - /home/ubuntu/config_rasa/endpoints.yml:/app/endpoints.yml

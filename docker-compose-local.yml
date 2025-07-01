@@ -18,7 +18,8 @@ services:
       POSTGRES_DB: banco
       POSTGRES_HOST: postgres
       RASA_CACHE: disabled
-      WORDPRESS_URL: https://wp.defesaclimaticapopular.org/
+      WORDPRESS_URL: http://localhost
+      RASA_URL: http://localhost:5005
     networks:
       - interna
  
@@ -31,9 +32,10 @@ services:
       dockerfile: ./docker/Dockerfile    
     environment:
       GOOGLE_MAPS_API_KEY: key
-      WHATSAPP_AUTH_TOKEN: key
+      WHATSAPP_AUTH_TOKEN: auth
       WHATSAPP_PHONE_NUMBER_ID: id
-      WORDPRESS_URL: https://wp.defesaclimaticapopular.org/
+      WORDPRESS_URL: http://localhost
+      RASA_URL: http://localhost:5005
     volumes:
       - .:/app
     command:
