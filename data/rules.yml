@@ -106,6 +106,7 @@ rules:
       - intent: recusar_confirmacao_risco
       - action: action_recusar_risco
       - action: utter_menu_inicial
+      - action: action_listen
 
   - rule: Continuar o risco iniciado
     steps:
