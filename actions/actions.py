@@ -31,7 +31,7 @@ class ActionFallbackButtons(Action):
                 last_action = event.get("name")
                 break
         logger.debug(f"Last action:{last_action}")
-        if last_action == "action_perguntar_nome" or "action_apagar_nome":
+        if last_action == "action_perguntar_nome" or last_action == "action_apagar_nome":
             user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como nome: {user_message}")
             return [
@@ -403,7 +403,7 @@ class ActionBuscarEnderecoTexto(Action):
                 last_action = event.get("name")
                 break
         logger.debug(f"Last action:{last_action}")
-        if last_action == "action_perguntar_nome" or "action_apagar_nome":
+        if last_action == "action_perguntar_nome" or last_action == "action_apagar_nome":
             user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como nome: {user_message}")
             return [
