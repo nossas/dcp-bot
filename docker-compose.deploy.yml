@@ -12,6 +12,7 @@ services:
       - '--connector' 
       - 'whatsapp_connector.WhatsAppInput'
       - '--debug'
+      - '--enable-api'
     environment:
       WORDPRESS_URL: ${RASA_WORDPRESS_URL:-http://wordpress}
       GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
@@ -28,6 +29,7 @@ services:
       - 'run'
       - 'actions'
       - '--debug'
+      - '--enable-api'
     environment:
       WORDPRESS_URL: ${RASA_WORDPRESS_URL:-http://wordpress}
       GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
