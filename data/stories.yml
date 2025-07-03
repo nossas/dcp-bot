@@ -30,6 +30,12 @@ stories:
     - action: action_listen
 
 
+- story: menu inicial com fallback
+  steps:
+    - action: action_repeat_last_message  
+    - action: utter_menu_inicial
+    - action: action_listen
+
 - story: Responder compartilhar risco com texto e affirm
   steps:
     - action: utter_menu_inicial

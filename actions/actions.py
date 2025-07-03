@@ -8,6 +8,7 @@ from rasa_sdk.executor import CollectingDispatcher
 from .db_utils import get_db_connection
 import os
 from datetime import datetime, timedelta,timezone
+import time
 import sys
 from whatsapp_connector import WhatsAppOutput
 import pytz
@@ -55,7 +56,11 @@ class ActionFallbackButtons(Action):
             return [
                 FollowupAction("action_buscar_endereco_texto")
             ]
-
+        if last_action == "utter_menu_inicial":
+            logger.debug(f"Fallback de menu inicial")
+            return [
+                FollowupAction("utter_menu_inicial")
+            ]
         # Caso contrário, volta ao fallback padrão
         last_bot_message = None
         for event in reversed(tracker.events):
@@ -112,7 +117,7 @@ class ActionInatividadeTimeout(Action):
         SlotSet("endereco", None),
         SlotSet("latitude", None),
         SlotSet("longitude", None),
-        SlotSet("midias", None),
+        SlotSet("midias", []),
         return []
 
 
@@ -141,7 +146,7 @@ class ActionRequestLocation(Action):
         SlotSet("endereco", None),
         SlotSet("latitude", None),
         SlotSet("longitude", None),
-        SlotSet("midias", None),
+        SlotSet("midias", []),
         logger.debug(f"solicitando localização")
         dispatcher.utter_message(text="Agora precisamos saber *onde está o risco* que você quer compartilhar.\n👉 Se clicar no botão, o WhatsApp vai pedir permissão para usar sua localização - é só aceitar.\nOu, se preferir, você pode *digitar o endereço* (ex: “Rua Senador Nabuco, 11”).",custom={"type": "location_request"})
         return []
@@ -183,7 +188,7 @@ class ActionRepeatLastMessage(Action):
         last_bot_messages = []
         last_action = None
         for event in reversed(tracker.events):
-            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons"]:
+            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons", "action_agendar_inatividade"]:
                 last_action = event.get("name")
                 break
         logger.debug(f"Last action:{last_action}")
@@ -583,7 +588,7 @@ class ActionRecusarRisco(Action):
         SlotSet("endereco", None),
         SlotSet("latitude", None),
         SlotSet("longitude", None),
-        SlotSet("midias", None),
+        SlotSet("midias", []),
         return [FollowupAction("action_perguntar_nome")]
 class ActionSalvarRisco(Action):
     def name(self) -> str:
@@ -726,7 +731,7 @@ class ActionListarRiscos(Action):
             logger.error("WORDPRESS_URL não está definida nas variáveis de ambiente.")
             return []
 
-        endpoint = f"{wordpress_url}wp-json/dcp/v1/riscos?per_page=2&page={pagina}"
+        endpoint = f"{wordpress_url}wp-json/dcp/v1/riscos?per_page=1&page={pagina}"
         logger.debug(f"Buscando riscos na URL: {endpoint}")
 
         try:
@@ -755,8 +760,9 @@ class ActionListarRiscos(Action):
                     f"📅 {risco['data']}\n"
                     f"📍 Local: {risco['endereco']}\n"
                     f"📝 Descrição: {risco['descricao']}\n"
-                    f"\nFotos abaixo:\n\n"
                 )
+                if risco['imagens'] or risco['videos']:
+                    mensagem = mensagem + f"\nFotos e/ou vídeos abaixo:\n\n"
                 dispatcher.utter_message(text=mensagem)
                 for image in risco['imagens']:
                     dispatcher.utter_message(image=image)
@@ -768,7 +774,7 @@ class ActionListarRiscos(Action):
                     dispatcher.utter_message(text="", custom={"type": "video", "url": video, 'is_last': is_last})
 
                 dispatcher.utter_message(text="\n\n\n\n")
-
+                time.sleep(5)
             dispatcher.utter_message(
                 text="Quer ver mais relatos da comunidade?",
                 buttons=[

@@ -46,6 +46,7 @@ intents:
 
 
 actions:
+- utter_pos_ajuda_dicas
 - action_alterar_nome
 - action_agendar_inatividade
 - action_inatividade_timeout
@@ -224,12 +225,22 @@ responses:
        Como podemos te ajudar agora?
     buttons:
     - title: Mais ajuda
-      payload: '/menu_dicas'
+      payload: '/ajuda'
     - title: Menu inicial
       payload: '/menu_inicial'
     - title: Encerrar
       payload: /sair
 
+  utter_pos_ajuda_dicas:
+  - text: |
+       Como podemos te ajudar agora?
+    buttons:
+    - title: Outras situações
+      payload: '/menu_dicas'
+    - title: Menu inicial
+      payload: '/menu_inicial'
+    - title: Encerrar
+      payload: /sair
 
   utter_finalizar:
   - text: |
