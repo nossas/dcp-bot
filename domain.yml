@@ -187,7 +187,7 @@ responses:
   utter_perguntar_por_nova_midia:
   - text: Você pode mandar mais mídias ou clicar em Não enviar mais para seguir.
     buttons:
-    - title: Não Enviar mais
+    - title: Não enviar mais
       payload: '/pular_enviar_midia_risco'
 
   utter_o_que_fazer:
