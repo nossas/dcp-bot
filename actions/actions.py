@@ -17,8 +17,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 logging.basicConfig(level=logging.DEBUG)  # Força o nível global de debug
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
-from .utils import verificar_tipo_arquivo, enviar_risco_para_wordpress, extrair_riscos
+from .utils import verificar_tipo_arquivo, enviar_risco_para_wordpress, extrair_riscos, get_last_action
 
+        
 class ActionFallbackButtons(Action):
     def name(self):
         return "action_fallback_buttons"
@@ -27,11 +28,7 @@ class ActionFallbackButtons(Action):
         logger.debug("Fallback! fallback!!")
 
         last_action = None
-        for event in reversed(tracker.events):
-            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons","action_agendar_inatividade"]:
-                last_action = event.get("name")
-                break
-        logger.debug(f"Last action:{last_action}")
+        last_action = get_last_action(tracker)
         if last_action == "action_perguntar_nome" or last_action == "action_apagar_nome":
             user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como nome: {user_message}")
@@ -82,7 +79,7 @@ class ActionAgendarInatividade(Action):
         return "action_agendar_inatividade"
 
     def run(self, dispatcher, tracker, domain):
-        trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) + timedelta(minutes=5)
+        trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) + timedelta(minutes=3)
         logger.debug(f"agendando timeout para: {trigger_date_time}")
         
         return [
@@ -112,13 +109,15 @@ class ActionInatividadeTimeout(Action):
 
         # Para compatibilidade com o tracker
         dispatcher.utter_message(text=message)
-        SlotSet("classificacao_risco", None),
-        SlotSet("descricao_risco", None),
-        SlotSet("endereco", None),
-        SlotSet("latitude", None),
-        SlotSet("longitude", None),
-        SlotSet("midias", []),
-        return []
+        
+        return [
+            SlotSet("classificacao_risco", None),
+            SlotSet("descricao_risco", None),
+            SlotSet("endereco", None),
+            SlotSet("latitude", None),
+            SlotSet("longitude", None),
+            SlotSet("midias", [])
+        ]
 
 
 class ActionRequestLocation(Action):
@@ -132,24 +131,16 @@ class ActionRequestLocation(Action):
         endereco = tracker.get_slot("endereco")
         nome = tracker.get_slot("nome")
         classificacao_risco = tracker.get_slot("classificacao_risco")
-        # if endereco and nome and classificacao_risco:
-        #     dispatcher.utter_message(
-        #         text="Você já iniciou o processo para relatar uma stuação de risco.",
-        #         buttons=[
-        #             {"title": "Começar de novo", "payload": "/apagar_risco"},
-        #             {"title": "Continuar/Corrigir", "payload": "/continuar_risco"}
-        #         ]
-        #     )
-        #     return[]
-        SlotSet("classificacao_risco", None),
-        SlotSet("descricao_risco", None),
-        SlotSet("endereco", None),
-        SlotSet("latitude", None),
-        SlotSet("longitude", None),
-        SlotSet("midias", []),
         logger.debug(f"solicitando localização")
         dispatcher.utter_message(text="Agora precisamos saber *onde está o risco* que você quer compartilhar.\n👉 Se clicar no botão, o WhatsApp vai pedir permissão para usar sua localização - é só aceitar.\nOu, se preferir, você pode *digitar o endereço* (ex: “Rua Senador Nabuco, 11”).",custom={"type": "location_request"})
-        return []
+        return [
+            SlotSet("classificacao_risco", None),
+            SlotSet("descricao_risco", None),
+            SlotSet("endereco", None),
+            SlotSet("latitude", None),
+            SlotSet("longitude", None),
+            SlotSet("midias", [])
+            ]
 
 class ActionApagarRisco(Action):
     def name(self):
@@ -163,7 +154,7 @@ class ActionApagarRisco(Action):
             SlotSet("endereco", None),
             SlotSet("latitude", None),
             SlotSet("longitude", None),
-            SlotSet("midias", []),
+            SlotSet("midias", [])
         ]
 
 class ActionAlterarNome(Action):
@@ -187,11 +178,7 @@ class ActionRepeatLastMessage(Action):
     def run(self, dispatcher, tracker, domain):
         last_bot_messages = []
         last_action = None
-        for event in reversed(tracker.events):
-            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons", "action_agendar_inatividade"]:
-                last_action = event.get("name")
-                break
-        logger.debug(f"Last action:{last_action}")
+        last_action = get_last_action(tracker)
         
         # for event in reversed(tracker.events):
         #     if event.get("event") == "bot":
@@ -266,6 +253,10 @@ class ActionSalvarNome(Action):
         return "action_salvar_nome"
 
     def run(self, dispatcher, tracker, domain):
+        last_action = get_last_action(tracker)
+        if last_action == 'action_request_location':
+            return [FollowupAction("action_buscar_endereco_texto")]
+
         nome = tracker.latest_message.get("text") if tracker.latest_message.get("text") != '/affirm_name' else tracker.get_slot("nome")
         whatsapp_id = tracker.sender_id
         logger.debug(f"Buscando id do wa")
@@ -403,11 +394,7 @@ class ActionBuscarEnderecoTexto(Action):
 
     def run(self, dispatcher, tracker, domain):
         last_action = None
-        for event in reversed(tracker.events):
-            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons","action_agendar_inatividade"]:
-                last_action = event.get("name")
-                break
-        logger.debug(f"Last action:{last_action}")
+        last_action = get_last_action(tracker)
         if last_action == "action_perguntar_nome" or last_action == "action_apagar_nome":
             user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como nome: {user_message}")
@@ -583,13 +570,13 @@ class ActionRecusarRisco(Action):
         return "action_recusar_risco"
 
     def run(self, dispatcher, tracker, domain):
-        SlotSet("classificacao_risco", None),
+        return [SlotSet("classificacao_risco", None),
         SlotSet("descricao_risco", None),
         SlotSet("endereco", None),
         SlotSet("latitude", None),
         SlotSet("longitude", None),
         SlotSet("midias", []),
-        return [FollowupAction("action_perguntar_nome")]
+        FollowupAction("action_perguntar_nome")]
 class ActionSalvarRisco(Action):
     def name(self) -> str:
         return "action_salvar_risco"
@@ -706,7 +693,7 @@ class ActionSalvarRisco(Action):
             SlotSet("endereco", None),
             SlotSet("latitude", None),
             SlotSet("longitude", None),
-            SlotSet("midias", []),
+            SlotSet("midias", [])
             ]
 
 class ActionListarRiscos(Action):
@@ -715,11 +702,7 @@ class ActionListarRiscos(Action):
 
     def run(self, dispatcher, tracker, domain):
         last_action = None
-        for event in reversed(tracker.events):
-            if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons","action_agendar_inatividade"]:
-                last_action = event.get("name")
-                break
-        logger.debug(f"Last action:{last_action}")
+        last_action = get_last_action(tracker)
         pagina = tracker.get_slot("pagina_risco") or 1
         if last_action != "action_listar_riscos":
             logger.debug(f"Last action:: {last_action}")

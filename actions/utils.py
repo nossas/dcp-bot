@@ -7,6 +7,16 @@ from typing import List, Dict
 logger = logging.getLogger('actions')
 logger.setLevel(logging.DEBUG) 
 
+def get_last_action(tracker):
+    last_action = None
+    for event in reversed(tracker.events):
+        if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons","action_agendar_inatividade"]:
+            last_action = event.get("name")
+            logger.debug(f"Last action:{last_action}")
+            break
+    return last_action
+
+
 def extrair_riscos(json_data: Dict) -> List[Dict]:
     riscos_extraidos = []
     logger.debug(f"Json data: {json_data}")
