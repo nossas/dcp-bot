@@ -1031,5 +1031,7 @@ class ActionSair(Action):
         return "action_sair"
 
     def run(self, dispatcher, tracker, domain):
-        dispatcher.utter_message(text="Certo! Se precisar de mais informações no futuro ou quiser falar com a gente de novo, é só voltar aqui e mandar um “oi”.\n\nEstamos por aqui pra ajudar no que for possível!🫂\n\n🌐 Acompanhe as atualizações no site: www.defesaclimaticapopular.org\n\n📢 Quer receber avisos e alertas sobre a sua região?\n\nEntre no grupo da Defesa Climática Popular pelo link: https://chat.whatsapp.com/JrabtO1ww07KbJolQVOi2y. Por lá, avisamos sempre que houver mudanças ou novidades na sua área.")
+        dispatcher.utter_message(text="Certo! Se quiser mais informações é só mandar um “oi” por aqui. \n \nVocê também pode acompanhar atualizações no site www.defesaclimaticapopular.org\n\n")
+        dispatcher.utter_message(text="E, se quiser receber avisos sobre sua região, entre no grupo da Defesa Climática Popular pelo link bit.ly/grupodefesaclimaticapopular. \n \nPor lá, avisamos quando houver mudanças ou novidades no Jacarezinho.")
+        dispatcher.utter_message(text="Estamos por aqui pra ajudar no que for possível! 🫂")
         return []
