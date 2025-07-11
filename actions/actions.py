@@ -510,7 +510,7 @@ class ActionSalvarMidiaRisco(Action):
             midia_data = json.loads(user_message)
 
             midias_slot = tracker.get_slot("midias") or []
-            logger.error(f"midia_data: {midia_data}")
+            logger.debug(f"midia_data: {midia_data}")
 
             if midia_data.get("tipo") == "mídia_combinada":
                 novas_midias = [m["path"] for m in midia_data["midias"]]

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 async def agendar_inatividade(sender_id: str):
     async with aiohttp.ClientSession() as session:
-        logger.error(f"----------------------------------fazendo chamada schedule")
+        logger.debug(f"----------------------------------fazendo chamada schedule")
         rasa_url = os.environ.get("RASA_URL")
         await session.post(
             f"{rasa_url}/conversations/{sender_id}/trigger_intent",
@@ -76,7 +76,7 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
                 WhatsApp.send_custom_json(self, data=json, recipient_id=recipient_id)
 
         elif custom.get('type') == "video":
-            logger.error(f"Video usando custom recipient: {recipient_id} ")
+            logger.debug(f"Video usando custom recipient: {recipient_id} ")
             self.send_video(custom.get('url'),recipient_id)
             if custom.get('is_last'):
                 await asyncio.sleep(2)
