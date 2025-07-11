@@ -25,8 +25,7 @@ class ActionFallbackButtons(Action):
         return "action_fallback_buttons"
 
     def run(self, dispatcher, tracker, domain):
-        logger.debug("Fallback! fallback!!")
-
+        logger.debug("Fallback!")
         last_action = None
         last_action = get_last_action(tracker)
         if last_action == "action_perguntar_nome" or last_action == "action_corrigir_nome":
@@ -1048,4 +1047,4 @@ class ActionSair(Action):
         dispatcher.utter_message(text="Certo! Se quiser mais informações é só mandar um “oi” por aqui. \n \nVocê também pode acompanhar atualizações no site www.defesaclimaticapopular.org\n\n")
         dispatcher.utter_message(text="E, se quiser receber avisos sobre sua região, entre no grupo da Defesa Climática Popular pelo link bit.ly/grupodefesaclimaticapopular. \n \nPor lá, avisamos quando houver mudanças ou novidades no Jacarezinho.")
         dispatcher.utter_message(text="Estamos por aqui pra ajudar no que for possível! 🫂")
-        return []
+        return [ ReminderCancelled()]

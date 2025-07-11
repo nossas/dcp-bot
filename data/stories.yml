@@ -30,6 +30,13 @@ stories:
     - action: action_listen
 
 
+- story: informa endereço com fallback
+  steps:
+    - intent: nlu_fallback
+    - action: action_fallback_buttons
+    - action: action_buscar_endereco_texto
+    - action: action_listen
+
 - story: menu inicial com fallback
   steps:
     - action: action_repeat_last_message  
