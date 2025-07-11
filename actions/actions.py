@@ -17,8 +17,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 logging.basicConfig(level=logging.DEBUG)  # Força o nível global de debug
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
-from .utils import verificar_tipo_arquivo, enviar_risco_para_wordpress, extrair_riscos, get_last_action
-
+from .utils import verificar_tipo_arquivo, enviar_risco_para_wordpress, extrair_riscos, get_last_action, formata_data
+import re
         
 class ActionFallbackButtons(Action):
     def name(self):
@@ -29,7 +29,7 @@ class ActionFallbackButtons(Action):
 
         last_action = None
         last_action = get_last_action(tracker)
-        if last_action == "action_perguntar_nome" or last_action == "action_apagar_nome":
+        if last_action == "action_perguntar_nome" or last_action == "action_corrigir_nome":
             user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como nome: {user_message}")
             return [
@@ -99,7 +99,7 @@ class ActionInatividadeTimeout(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         recipient_id = tracker.sender_id
-        message = "Percebi que você se afastou. Se precisar de ajuda, é só me chamar! 😊"
+        message = "Percebi que você não respondeu. Vou encerrar a conversa, mas se quiser falar comigo novamente, é só mandar um ‘oi’. 👋🏽"
 
         # Forçar envio direto usando a API do WhatsApp
         output_channel = WhatsAppOutput(auth_token=os.getenv("WHATSAPP_AUTH_TOKEN"),phone_number_id=os.getenv("WHATSAPP_PHONE_NUMBER_ID"))
@@ -132,7 +132,9 @@ class ActionRequestLocation(Action):
         nome = tracker.get_slot("nome")
         classificacao_risco = tracker.get_slot("classificacao_risco")
         logger.debug(f"solicitando localização")
-        dispatcher.utter_message(text="Agora precisamos saber *onde está o risco* que você quer compartilhar.\n👉 Se clicar no botão, o WhatsApp vai pedir permissão para usar sua localização - é só aceitar.\nOu, se preferir, você pode *digitar o endereço* (ex: “Rua Senador Nabuco, 11”).",custom={"type": "location_request"})
+        dispatcher.utter_message(text="Precisamos saber onde está o risco que você quer compartilhar. Você pode:")
+        dispatcher.utter_message(text="✏️ *Digitar o endereço:* Como por exemplo 'Rua Senador Nabuco, 11, Jacarezinho'")
+        dispatcher.utter_message(text="📍 *Enviar sua localização atual:* Se clicar no botão abaixo o WhatsApp vai pedir permissão para usar sua localização - é só aceitar.",custom={"type": "location_request"})
         return [
             SlotSet("classificacao_risco", None),
             SlotSet("descricao_risco", None),
@@ -163,10 +165,10 @@ class ActionAlterarNome(Action):
 
     def run(self, dispatcher, tracker, domain):
         dispatcher.utter_message(
-                text="Entendi que você quer alterar o nome cadastrado, é isso?",
+                text="Entendi, você quer corrigir o nome que foi informado, certo?",
                 buttons=[
-                    {"title": "Apagar nome", "payload": "/apagar_nome"},
-                    {"title": "Retomar", "payload": "/tentar_novamente"}
+                    {"title": "Corrigir nome", "payload": "/corrigir_nome"},
+                    {"title": "Manter como está", "payload": "/menu_inicial"}
                 ]
             )
         return[]
@@ -258,6 +260,7 @@ class ActionSalvarNome(Action):
             return [FollowupAction("action_buscar_endereco_texto")]
 
         nome = tracker.latest_message.get("text") if tracker.latest_message.get("text") != '/affirm_name' else tracker.get_slot("nome")
+        nome = nome.title()
         whatsapp_id = tracker.sender_id
         logger.debug(f"Buscando id do wa")
         if nome:
@@ -286,7 +289,7 @@ class ActionSalvarNome(Action):
 
 class ActionApagarNome(Action):
     def name(self):
-        return "action_apagar_nome"
+        return "action_corrigir_nome"
 
     def run(self, dispatcher, tracker, domain):
         logger.debug("Apagando nome do slot e do banco.")
@@ -309,7 +312,7 @@ class ActionApagarNome(Action):
         finally:
             if conn:
                 conn.close()
-        dispatcher.utter_message(text="Tudo bem, vamos começar de novo. *Como você prefere ser chamado(a)?*")
+        dispatcher.utter_message(text="Sem problemas! Como você prefere ser chamado(a)?")
         return [SlotSet("nome", None)]    
 class ActionBuscarEndereco(Action):
     def name(self):
@@ -395,13 +398,15 @@ class ActionBuscarEnderecoTexto(Action):
     def run(self, dispatcher, tracker, domain):
         last_action = None
         last_action = get_last_action(tracker)
-        if last_action == "action_perguntar_nome" or last_action == "action_apagar_nome":
+        if last_action == "action_perguntar_nome" or last_action == "action_corrigir_nome":
             user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como nome: {user_message}")
             return [
                 FollowupAction("action_salvar_nome")
             ]
         endereco_texto = tracker.latest_message.get("text")
+        endereco_texto = re.sub(r'jacarezinho|jacare|rj|rio de janeiro', '', endereco_texto, flags=re.IGNORECASE)            
+        endereco_texto += ",bairro Jacarezinho, Rio de Janeiro, RJ"
         logger.debug(f"Buscando endereço pelo texto: {endereco_texto}")
         
                 
@@ -468,7 +473,10 @@ class ActionSolicitarDescricaoRisco(Action):
 
         if risco:
             dispatcher.utter_message(
-                text=f"Entendi! Se você tiver mais detalhes a acrescentar, pode escrever agora ou clique em pular.",
+                text=f"Se puder, conte um pouco mais sobre o que está acontecendo. Isso ajuda a entender melhor a situação.",
+            )
+            dispatcher.utter_message(
+                text=f"Você pode *escrever uma mensagem* ou clicar em *pular* para continuar.",
                 buttons=[
                     {"title": "Pular", "payload": "/pular_descricao_risco"},
                 ]
@@ -552,9 +560,10 @@ class ActionConfirmarRisco(Action):
                 media_path = os.path.splitext(midia)[0]
                 media_id = os.path.basename(media_path)
                 dispatcher.utter_message(text="", custom={"type": "media_id", "media_id": media_id, "media_type":media_type})   
-        mensagem = (    
-            f"Essas informações estão corretas?\nSe estiver tudo certo, clique em *Confirmar e enviar.*\nSeu relato será salvo com segurança, passará por uma verificação rápida e, se aprovado, será publicado no mapa. Tudo conforme nossa política de privacidade: https://bit.ly/termo-privacidade"
-        )
+        
+        dispatcher.utter_message(text="Essas informações estão corretas? Se sim, clique em *Confirmar e enviar*.")
+        dispatcher.utter_message(text="Seu relato será salvo com segurança, passará por uma verificação rápida e, se aprovado, será publicado no mapa. Tudo conforme nossa política de privacidade (saiba mais em bit.ly/termo-privacidade)")
+        mensagem = ("Confirmar envio:")
         dispatcher.utter_message(
             text=mensagem,
             buttons=[
@@ -704,7 +713,7 @@ class ActionListarRiscos(Action):
         last_action = None
         last_action = get_last_action(tracker)
         pagina = tracker.get_slot("pagina_risco") or 1
-        if last_action != "action_listar_riscos":
+        if last_action != "action_listar_riscos" and last_action != "action_perguntar_mais_riscos":
             logger.debug(f"Last action:: {last_action}")
             pagina = 1
 
@@ -727,51 +736,56 @@ class ActionListarRiscos(Action):
             if not riscos:
                 dispatcher.utter_message(text="Não temos mais relatos na sua região.")
                 return [SlotSet("pagina_risco", 1)]
-
+            
             mensagem = ''
             for risco in riscos:
-                opcao = risco['classificacao'][0]
-                icones = {
-                    "Alagamento": "☔️",
-                    "Lixo": "🗑️",
-                    "Outros": "❔"
+                classificacao = risco['classificacao'][0]
+                classificacao_dict = {
+                    "Alagamento": "☔️ Alagamento informado",
+                    "Lixo": "🗑️ Lixo registrado",
+                    "Outros": "🔺 Risco informado"
                 }
-                icone = icones.get(opcao, "")
-
+                classificacao_texto = classificacao_dict.get(classificacao, "")
+                data_hora = formata_data(risco['data'],'%H:%M do dia %d/%m/%Y')
                 mensagem = (
-                    f"{icone} {risco['classificacao'][0]}\n"
-                    f"📅 {risco['data']}\n"
-                    f"📍 Local: {risco['endereco']}\n"
-                    f"📝 Descrição: {risco['descricao']}\n"
+                    f"{classificacao_texto} às {data_hora}\n \n"
+                    f"*Local:* {risco['endereco']}\n \n"
                 )
+                if risco['descricao']:
+                    mensagem += f"*Descrição:* {risco['descricao']}\n\n"
                 if risco['imagens'] or risco['videos']:
-                    mensagem = mensagem + f"\nFotos e/ou vídeos abaixo:\n\n"
+                    mensagem = mensagem + f"*Fotos/vídeos:*\n \n"
                 dispatcher.utter_message(text=mensagem)
                 for image in risco['imagens']:
                     dispatcher.utter_message(image=image)
-
                 videos = risco['videos']
                 for idx, video in enumerate(videos):
                     is_last = idx == len(videos) - 1
-                    logger.error(f"video: {video}")
+                    logger.debug(f"video: {video}")
                     dispatcher.utter_message(text="", custom={"type": "video", "url": video, 'is_last': is_last})
-
-                dispatcher.utter_message(text="\n\n\n\n")
-                time.sleep(5)
-            dispatcher.utter_message(
-                text="Quer ver mais relatos da comunidade?",
-                buttons=[
-                    {"title": "Sim", "payload": "/mais_riscos"},
-                    {"title": "Não", "payload": "/sair"}
-                ]
-            )
-            return [SlotSet("pagina_risco", pagina + 1)]
+                dispatcher.utter_message(text="\n \n \n \n")
+            
+            return [SlotSet("pagina_risco", pagina + 1), FollowupAction("action_perguntar_mais_riscos")]
 
         except requests.RequestException as e:
             dispatcher.utter_message(text="Ocorreu um erro ao buscar os riscos.")
             logger.error(f"[ERRO] Falha na requisição para {endpoint}: {e}", exc_info=True)
             return []
 
+class ActionPerguntarMaisRiscos(Action):
+    def name(self) -> str:
+        return "action_perguntar_mais_riscos"
+
+    def run(self, dispatcher, tracker, domain):
+        time.sleep(2)
+        dispatcher.utter_message(
+            text="Quer ver mais relatos da comunidade?",
+            buttons=[
+                {"title": "Sim", "payload": "/mais_riscos"},
+                {"title": "Não", "payload": "/sair_consulta_risco"}
+            ]
+        )
+        return []
 
 class ActionNivelDeRisco(Action):
     def name(self):

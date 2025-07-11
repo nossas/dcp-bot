@@ -395,12 +395,14 @@ nlu:
     - ajustar meu nome
     - não está certo meu nome
     - você registrou meu nome errado
-
-- intent: apagar_nome
-  examples: |
-    - /apagar_nome
-    - apagar_nome
     - Apagar nome
+    - Apagar meu nome
+
+- intent: corrigir_nome
+  examples: |
+    - /corrigir_nome
+    - corrigir_nome
+    - corrigir meu nome
 
 - intent: pular_descricao_risco
   examples: |
@@ -471,11 +473,14 @@ nlu:
     - como tá a área
     - como tá minha área
     - como ta minha area
+    - Tem risco ainda?
+    - Fico ou saio de casa?
+    - É seguro sair agora?
+
 
 - intent: ajuda
   examples: |
     - Preciso de ajuda
-    - socorro
     - não sei o que fazer
     - /ajuda
 
@@ -486,12 +491,32 @@ nlu:
     - o que fazer agora?
     - o que faço?
     - saber o que fazer
+    - Como me proteger?
+    - Preciso me proteger?
+    - O que não fazer?
+    - O que evitar?
+
 
 - intent: contatos_emergencia
   examples: |
     - contatos_emergencia
     - /contatos_emergencia
     - contatos de emergência
+    - Quem eu chamo?
+    - Telefone de emergência
+    - Preciso de resgate
+    - Socorro/Contato de socorro
+    - Número da Defesa civil
+    - Número do bombeiro
+    - Número dos bombeiros
+    - Número dos samu
+    - Numero da Defesa civil
+    - Numero do bombeiro
+    - Numero dos bombeiros
+    - Numero dos samu
+    - socorro
+
+
 
 - intent: encontrar_abrigo
   examples: |
@@ -500,12 +525,18 @@ nlu:
     - encontrar abrigo
     - preciso me abrigar
     - para onde ir
+    - Para onde eu vou
+    - Onde está/tá seguro
+    - Onde tem abrigo? Tem abrigo perto?
+    - Preciso sair de casa, pra onde vou?
+
 
 - intent: menu_dicas
   examples: |
     - dicas_de_seguranca
     - /dicas_de_seguranca
     - dicas de segurança
+    - Como ficar em segurança
 
 - intent: dicas_de
   examples: |
@@ -518,6 +549,9 @@ nlu:
     - dicas de Calor
     - dicas de lixo
     - dicas de enchente
+    - O que fazer quando tem enchente {"dicas": "enchente"}
+    - O que fazer quando tem lixo {"dicas": "lixo"}
+    - O que fazer quando tem calor {"dicas": "calor"}
 
 - intent: sair
   examples: |
@@ -558,3 +592,10 @@ nlu:
     - /mais_riscos
     - quer ver mais riscos
     - me mostre mais riscos
+
+- intent: sair_consulta_risco
+  examples: |
+    - /sair_consulta_risco
+    - não quero mais riscos
+    - sair_consulta_risco
+    - sair consulta risco

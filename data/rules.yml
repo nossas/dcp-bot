@@ -100,7 +100,8 @@ rules:
     steps:
       - intent: afirmar_confirmacao_risco
       - action: action_salvar_risco
-  
+
+
   - rule: Confirmação negativa de risco
     steps:
       - intent: recusar_confirmacao_risco
@@ -195,11 +196,22 @@ rules:
 
   - rule: Apagar nome
     steps:
-      - intent: apagar_nome
-      - action: action_apagar_nome
+      - intent: corrigir_nome
+      - action: action_corrigir_nome
       - action: action_listen
       - action: utter_menu_inicial
-      
+
+  - rule: Sair da lista de riscos
+    steps:
+      - intent: sair_consulta_risco
+      - action: utter_saida_riscos
+      - action: action_listen
+
+  - rule: Sair da lista de riscos
+    steps:
+      - action: action_perguntar_mais_riscos
+      - action: action_listen
+
 
   - rule: Sair
     steps:

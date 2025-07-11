@@ -6,7 +6,7 @@ import logging
 from typing import List, Dict
 logger = logging.getLogger('actions')
 logger.setLevel(logging.DEBUG) 
-
+from datetime import datetime
 def get_last_action(tracker):
     last_action = None
     for event in reversed(tracker.events):
@@ -105,3 +105,9 @@ def enviar_risco_para_wordpress(
             logger.debug("[INFO] Risco enviado com sucesso para o WordPress.")
     except Exception as e:
         logger.debug(f"[ERRO] Falha ao enviar risco para WordPress: {e}")
+        
+        
+def formata_data(data_str,formato = '%H:%M do dia %d/%m/%Y'):
+    dt = datetime.fromisoformat(data_str)
+    resultado = dt.strftime(formato)
+    return resultado
