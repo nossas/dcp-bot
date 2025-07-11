@@ -42,8 +42,8 @@ intents:
 - nao_receber_notificacoes
 - parar_notificacoes
 - mais_riscos
-- apagar_nome
-
+- corrigir_nome
+- sair_consulta_risco
 
 actions:
 - utter_pos_ajuda_dicas
@@ -51,12 +51,11 @@ actions:
 - action_agendar_inatividade
 - action_inatividade_timeout
 - action_request_location
-- action_apagar_nome
+- action_corrigir_nome
 - action_perguntar_nome
 - action_salvar_nome
 - action_apagar_risco
 - utter_menu_inicial
-- utter_menu_inicial_2
 - action_buscar_endereco_texto
 - descrever_risco
 - utter_classificar_risco
@@ -74,6 +73,7 @@ actions:
 - action_salvar_risco
 - action_retoma_risco
 - action_listar_riscos
+- action_perguntar_mais_riscos
 - utter_o_que_fazer
 - action_listar_abrigos
 - action_listar_contatos_emergencia
@@ -87,6 +87,7 @@ actions:
 - action_nivel_de_risco
 - action_parar_notificacoes
 - action_pergunta_notificacoes
+- utter_saida_riscos
 - action_sair
 
 
@@ -147,7 +148,9 @@ entities:
 - dicas
 responses:
   utter_menu_inicial:
-  - text: "Certo, {nome}! Escolha uma opção pra começar:"
+  - text: | 
+      Oi, {nome}! 
+      Escolha uma opção pra começar:
     buttons:
     - title: Informar um risco
       payload: /informar_risco
@@ -155,16 +158,6 @@ responses:
       payload: /como_ta_minha_area
     - title: Saber o que fazer
       payload: /o_que_fazer
-
-  utter_menu_inicial_2:
-  - text: Como posso te ajudar?
-    buttons:
-    - title: Preciso de Ajuda
-      payload: /ajuda
-    - title: Ver recomendações
-      payload: /recomendacoes
-    - title: Ver locais Seguros
-      payload: /locais_seguros
 
   utter_classificar_risco:
   - text: "Perfeito {nome}. Você quer falar sobre:" 
@@ -239,6 +232,17 @@ responses:
       payload: '/menu_dicas'
     - title: Menu inicial
       payload: '/menu_inicial'
+    - title: Encerrar
+      payload: /sair
+  
+  utter_saida_riscos:
+  - text: |
+      ℹ️ Te ajudo em algo mais? Você pode clicar em:
+    buttons:
+    - title: Voltar ao menu
+      payload: '/menu_inicial'
+    - title: Saber o que fazer
+      payload: '/o_que_fazer'
     - title: Encerrar
       payload: /sair
 
