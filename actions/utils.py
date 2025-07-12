@@ -3,6 +3,7 @@ import os
 import mimetypes
 import json
 import logging
+import re
 from typing import List, Dict
 logger = logging.getLogger('actions')
 logger.setLevel(logging.DEBUG) 
@@ -111,3 +112,30 @@ def formata_data(data_str,formato = '%H:%M do dia %d/%m/%Y'):
     dt = datetime.fromisoformat(data_str)
     resultado = dt.strftime(formato)
     return resultado
+
+
+def chamada_google_maps(*args, **kwargs):
+        api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={kwargs['endereco']}&key={api_key}"
+        response = requests.get(url)
+        # logger.debug(f"Resposta do Google Maps (texto): {response.status_code} - {response.text}")
+        return response
+    
+
+def get_endereco_texto(endereco):
+    endereco_texto = re.sub(r'jacarezinho|jacare|rj|rio de janeiro', '', endereco, flags=re.IGNORECASE)            
+    endereco_texto += ",bairro Jacarezinho, Rio de Janeiro, RJ"
+    logger.debug(f"Buscando endereço pelo texto: {endereco_texto}")
+    response = chamada_google_maps(endereco=endereco_texto)
+    if response.status_code == 200:
+        data = response.json()
+        if data["status"] == "OK" and data["results"]:
+            resultado = data["results"][0]
+            endereco = resultado.get("formatted_address", "Endereço não encontrado.")
+            lat = resultado["geometry"]["location"]["lat"]
+            lng = resultado["geometry"]["location"]["lng"]        
+            return ({'lat':lat,'lng':lng,'endereco':endereco})
+    else:
+        logger.error(f"Erro na API do Google Maps: {data.get('status')} - {data.get('error_message')}")
+    return False            
+    

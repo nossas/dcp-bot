@@ -17,7 +17,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 logging.basicConfig(level=logging.DEBUG)  # Força o nível global de debug
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
-from .utils import verificar_tipo_arquivo, enviar_risco_para_wordpress, extrair_riscos, get_last_action, formata_data
+from .utils import *
 import re
         
 class ActionFallbackButtons(Action):
@@ -403,41 +403,28 @@ class ActionBuscarEnderecoTexto(Action):
             return [
                 FollowupAction("action_salvar_nome")
             ]
-        endereco_texto = tracker.latest_message.get("text")
-        endereco_texto = re.sub(r'jacarezinho|jacare|rj|rio de janeiro', '', endereco_texto, flags=re.IGNORECASE)            
-        endereco_texto += ",bairro Jacarezinho, Rio de Janeiro, RJ"
-        logger.debug(f"Buscando endereço pelo texto: {endereco_texto}")
-        
-                
-        api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={endereco_texto}&key={api_key}"
-
-        response = requests.get(url)
-        logger.debug(f"Resposta do Google Maps (texto): {response.status_code} - {response.text}")
-
-        if response.status_code == 200:
-            data = response.json()
-            if data["status"] == "OK" and data["results"]:
-                resultado = data["results"][0]
-                endereco = resultado.get("formatted_address", "Endereço não encontrado.")
-                latitude = resultado["geometry"]["location"]["lat"]
-                longitude = resultado["geometry"]["location"]["lng"]
-
-                dispatcher.utter_message(
-                    text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
-                    buttons=[
-                        {"title": "Sim", "payload": "/affirm_address"},
-                        {"title": "Não", "payload": "/deny_address"}
-                    ]
-                )
-                return [
-                    SlotSet("latitude", latitude),
-                    SlotSet("longitude", longitude),
-                    SlotSet("endereco", endereco)
+        endereco_texto = tracker.latest_message.get("text")   
+        coords = get_endereco_texto(endereco_texto)
+        logger.debug(coords)
+        if coords:
+            endereco = coords.get("endereco", "Endereço não encontrado.")
+            latitude = coords.get("lat","")
+            longitude = coords.get("lng","")
+            dispatcher.utter_message(
+                text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
+                buttons=[
+                    {"title": "Sim", "payload": "/affirm_address"},
+                    {"title": "Não", "payload": "/deny_address"}
                 ]
-            else:
-                logger.error(f"Erro na API do Google Maps: {data.get('status')} - {data.get('error_message')}")
-        dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
+            )
+            return [
+                SlotSet("latitude", latitude),
+                SlotSet("longitude", longitude),
+                SlotSet("endereco", endereco)
+            ]
+        else:
+            logger.debug(f"Não encontrou endereço: {endereco}")
+            dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
         return [FollowupAction("action_request_location")]
 
 class ActionSalvarClassificacaoRisco(Action):
