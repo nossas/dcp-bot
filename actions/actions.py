@@ -329,41 +329,23 @@ class ActionBuscarEndereco(Action):
                 logger.debug(f"latitude: {latitude}")
                 logger.debug(f"longitude: {longitude}")
                 logger.debug(f"não tem endereço")
-
-                api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
-                url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={latitude},{longitude}&key={api_key}"
-
-                response = requests.get(url)
-                logger.debug(f"Received response: {response}")
-                if response.status_code == 200:
-                    data = response.json()
-                    logger.debug(f"Received data: {data}")
-
-                    if data["status"] == "OK":
-                        resultado = data["results"][0]
-                        endereco = resultado.get("formatted_address", "Endereço não encontrado.")
-
-                        dispatcher.utter_message(
-                            text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
-                            buttons=[
-                                {"title": "Sim", "payload": "/affirm_address"},
-                                {"title": "Não", "payload": "/deny_address"}
-                            ]
-                        )
-
-                        return [
-                            SlotSet("latitude", latitude),
-                            SlotSet("longitude", longitude),
-                            SlotSet("endereco", endereco)
+                endereco = get_endereco_latlong(latitude,longitude )
+                if endereco:
+                    dispatcher.utter_message(
+                        text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
+                        buttons=[
+                            {"title": "Sim", "payload": "/affirm_address"},
+                            {"title": "Não", "payload": "/deny_address"}
                         ]
-                    else:
-                        logger.error(f"Erro na API do Google Maps: {data.get('status')}")
-                        dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
-                        return [FollowupAction("action_request_location")]
+                    )
+                    return [
+                        SlotSet("latitude", latitude),
+                        SlotSet("longitude", longitude),
+                        SlotSet("endereco", endereco)
+                    ]
                 else:
-                    logger.error("Erro HTTP na chamada à API do Google Maps")
-                dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
-                return [FollowupAction("action_request_location")]
+                    dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
+                    return [FollowupAction("action_request_location")]
             else:
                 logger.debug(f"tem endereço")
                 endereco = location_data['address']
@@ -375,12 +357,9 @@ class ActionBuscarEndereco(Action):
                     ]
                 )
                 return [SlotSet("latitude", latitude), SlotSet("longitude", longitude), SlotSet("endereco", endereco)]
-
                 
         except (json.JSONDecodeError, KeyError) as e:
             logger.debug(f"Erro ao processar JSON ou chave não encontrada: {e}")
-             
-
             dispatcher.utter_message(
                 text=f"Acho que a sua localização não veio de forma correta, você quer enviar um endereço?",
                 buttons=[
