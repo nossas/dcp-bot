@@ -23,6 +23,7 @@ intents:
 - informar_classificacao_risco
 - informar_descricao_risco
 - pular_descricao_risco
+- pular_descricao_risco_corrigir
 - pular_enviar_midia_risco
 - tentar_novamente
 - receber_midia_risco
@@ -44,6 +45,8 @@ intents:
 - mais_riscos
 - corrigir_nome
 - sair_consulta_risco
+- corrigir_midias
+- corrigir_classificacao
 
 actions:
 - utter_pos_ajuda_dicas
@@ -59,6 +62,7 @@ actions:
 - action_buscar_endereco_texto
 - descrever_risco
 - utter_classificar_risco
+- action_classificar_risco_corrigir
 - action_fallback_buttons
 - action_repeat_last_message
 - action_buscar_endereco
@@ -89,6 +93,8 @@ actions:
 - action_pergunta_notificacoes
 - utter_saida_riscos
 - action_sair
+- action_corrigir_midias
+
 
 
 slots:
@@ -141,6 +147,12 @@ slots:
     influence_conversation: false
     mappings:
       - type: custom
+  contexto_classificacao_corrigida:
+    type: bool
+    influence_conversation: true
+    initial_value: false
+    mappings:
+      - type: custom
 
 entities:
 - nome
@@ -169,6 +181,7 @@ responses:
     - title: Outros
       payload: '/informar_classificacao_risco{"classificacao_risco": "outros"}'
   
+
   utter_perguntar_por_midia:
   - text: | 
       📸 Se você tiver uma foto ou vídeo, envie agora ou clique em pular. 

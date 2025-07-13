@@ -8,13 +8,16 @@ from typing import List, Dict
 logger = logging.getLogger('actions')
 logger.setLevel(logging.DEBUG) 
 from datetime import datetime
-def get_last_action(tracker):
+def get_last_action(tracker, depth=1):
     last_action = None
     for event in reversed(tracker.events):
-        if event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons","action_agendar_inatividade"]:
+        if (event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons","action_agendar_inatividade"]):
             last_action = event.get("name")
-            logger.debug(f"Last action:{last_action}")
-            break
+            logger.debug(f"Last action:{last_action} depth:{depth}")
+            if depth < 2: 
+                logger.debug(f"Last action:{last_action} break:{depth}")
+                break
+            depth -= 1
     return last_action
 
 
@@ -127,7 +130,7 @@ def chamada_google_maps(*args, **kwargs):
                 raise ValueError("Parâmetros insuficientes: é necessário 'endereco' ou 'latitude' e 'longitude'.")
         url = f"https://maps.googleapis.com/maps/api/geocode/json{args}&key={api_key}"
         response = requests.get(url)
-        logger.debug(f"Resposta do Google Maps (texto): {response.status_code} - {response.text}")
+        # logger.debug(f"Resposta do Google Maps (texto): {response.status_code} - {response.text}")
         return response
     
 def get_endereco_latlong(latitude,longitude):

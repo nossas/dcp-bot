@@ -413,18 +413,18 @@ class ActionSalvarClassificacaoRisco(Action):
     def run(self, dispatcher,
             tracker,
             domain):
-        
+        last_action = get_last_action(tracker)
         risco = tracker.get_slot("classificacao_risco")
         logger.debug(risco)
-
+        next_action = "action_ask_descricao_risco"
         if risco:
             return [
                 SlotSet("classificacao_risco", risco),
-                FollowupAction("action_ask_descricao_risco")
+                FollowupAction(next_action)
             ]        
         else:
             dispatcher.utter_message(text="Não consegui entender a classificação do risco.")
-            return [FollowupAction("utter_classificar_risco")]
+            return [FollowupAction(last_action)]
 
 class ActionSolicitarDescricaoRisco(Action):
     def name(self) -> str:
@@ -434,8 +434,9 @@ class ActionSolicitarDescricaoRisco(Action):
             tracker,
             domain):
         
+        last_action = get_last_action(tracker,2)
         risco = tracker.get_slot("classificacao_risco")
-
+        action_classificar = "utter_classificar_risco" if last_action == "utter_classificar_risco" else "action_classificar_risco_corrigir"
         if risco:
             dispatcher.utter_message(
                 text=f"Se puder, conte um pouco mais sobre o que está acontecendo. Isso ajuda a entender melhor a situação.",
@@ -449,7 +450,7 @@ class ActionSolicitarDescricaoRisco(Action):
             return []        
         else:
             dispatcher.utter_message(text="Não consegui entender a classificação do risco.")
-            return [FollowupAction("utter_classificar_risco")]
+            return [FollowupAction(action_classificar)]
 
 class ActionSalvarDescricaoRisco(Action):
     def name(self) -> str:
@@ -457,10 +458,12 @@ class ActionSalvarDescricaoRisco(Action):
     def run(self, dispatcher,
             tracker,
             domain):
+        last_action = get_last_action(tracker,3)
+        next_action = "utter_perguntar_por_midia" if last_action == "utter_classificar_risco" else "action_confirmar_relato"
         descricao = tracker.get_slot("descricao_risco")
         if descricao:
             dispatcher.utter_message(text="Obrigado pela descrição!")
-            return [FollowupAction("utter_perguntar_por_midia")]
+            return [FollowupAction(next_action)]
         else:
             dispatcher.utter_message(text="Não consegui entender a descrição, tente novamente.")
             return [FollowupAction("action_ask_descricao_risco")]
@@ -505,12 +508,12 @@ class ActionConfirmarRisco(Action):
     def run(self, dispatcher,
             tracker,
             domain):
-
-        nome = tracker.get_slot("nome") or "não informado"
+        
         endereco = tracker.get_slot("endereco") or "não informado"
         classificacao = tracker.get_slot("classificacao_risco") or "não informado"
         descricao = tracker.get_slot("descricao_risco") or "não informado"
         midias_slot = tracker.get_slot("midias") or []
+        
         mensagem = (
             f"Resumo do seu relato:\n"
             f"📍 *Endereço:* {endereco}\n"
@@ -537,20 +540,49 @@ class ActionConfirmarRisco(Action):
             ]
         )
 
-        return []
+        return [SlotSet("contexto_classificacao_corrigida", False)]
 
 class ActionRecusarRisco(Action):
     def name(self) -> str:
         return "action_recusar_risco"
+    
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(
+            text="Qual informação deseja atualizar?",
+            buttons=[
+                {"title": "Endereço", "payload": "/corrigir_endereco"},
+                {"title": "Tipo/Descrição", "payload": "/corrigir_classificacao"},
+                {"title": "Imagens/Vídeos", "payload": "/corrigir_midias"}
+            ]
+        )
+        return []
+
+class ActionCorrigirMidias(Action):
+    def name(self) -> str:
+        return "action_corrigir_midias"
 
     def run(self, dispatcher, tracker, domain):
-        return [SlotSet("classificacao_risco", None),
-        SlotSet("descricao_risco", None),
-        SlotSet("endereco", None),
-        SlotSet("latitude", None),
-        SlotSet("longitude", None),
-        SlotSet("midias", []),
-        FollowupAction("action_perguntar_nome")]
+        return [
+            SlotSet("midias", []),
+            FollowupAction("utter_perguntar_por_midia")
+        ]
+
+class ActionClassificarRiscoCorrigir(Action):
+    def name(self):
+        return "action_classificar_risco_corrigir"
+
+    def run(self, dispatcher, tracker, domain):
+        nome = tracker.get_slot("nome") or ""
+        dispatcher.utter_message(
+            text=f"Perfeito {nome}. Você quer falar sobre:",
+            buttons=[
+                {"title": "Alagamento", "payload": '/informar_classificacao_risco{"classificacao_risco": "alagamento"}'},
+                {"title": "Lixo", "payload": '/informar_classificacao_risco{"classificacao_risco": "lixo"}'},
+                {"title": "Outros", "payload": '/informar_classificacao_risco{"classificacao_risco": "outros"}'}
+            ]
+        )
+        return [SlotSet("contexto_classificacao_corrigida", True)]
+    
 class ActionSalvarRisco(Action):
     def name(self) -> str:
         return "action_salvar_risco"

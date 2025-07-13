@@ -67,24 +67,6 @@ rules:
     - intent: deny
     - action: action_request_location 
 
-  - rule: Classificar risco
-    steps:
-      - intent: informar_classificacao_risco
-      - action: action_salvar_classificacao_risco
-  
-
-  - rule: pular descrição do Risco
-    steps:
-      - intent: pular_descricao_risco
-      - action: utter_perguntar_por_midia
-
-  - rule: Descrever risco
-    steps:
-      - action: action_ask_descricao_risco
-      - intent: informar_descricao_risco
-      - action: action_salvar_descricao_risco
-      - action: utter_perguntar_por_midia
-
   - rule: Não enviar midia de risco e partir para revisão
     steps:
       - intent: pular_enviar_midia_risco
@@ -101,12 +83,16 @@ rules:
       - intent: afirmar_confirmacao_risco
       - action: action_salvar_risco
 
-
   - rule: Confirmação negativa de risco
     steps:
       - intent: recusar_confirmacao_risco
       - action: action_recusar_risco
-      - action: utter_menu_inicial
+
+  - rule: Corrigir midia
+    steps:
+      - intent: corrigir_midias
+      - action: action_corrigir_midias
+      - action: utter_perguntar_por_midia
       - action: action_listen
 
   - rule: Continuar o risco iniciado
@@ -217,3 +203,26 @@ rules:
     steps:
       - intent: sair
       - action: action_sair
+
+  - rule: Corrigir classificação
+    steps:
+    - intent: corrigir_classificacao
+    - action: action_classificar_risco_corrigir
+
+  - rule: Pular descrição do risco sem correção
+    condition:
+      - slot_was_set:
+        - contexto_classificacao_corrigida: false
+    steps:
+      - intent: pular_descricao_risco
+      - action: utter_perguntar_por_midia
+      - action: action_listen
+
+  - rule: Pular descrição do risco com correção
+    condition:
+      - slot_was_set:
+          - contexto_classificacao_corrigida: true
+    steps:
+      - intent: pular_descricao_risco
+      - action: action_confirmar_relato
+      - action: action_listen

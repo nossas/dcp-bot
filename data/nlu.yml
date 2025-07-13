@@ -442,7 +442,19 @@ nlu:
     - /recusar_confirmacao_risco
     - não está correto
     - as informações não estão corretas
-    
+
+- intent: corrigir_midias
+  examples: |
+    - /corrigir_midias
+    - corrigir_midias
+    - corrigir midias
+
+- intent: corrigir_classificacao
+  examples: |
+    - /corrigir_classificacao
+    - corrigir_classificacao
+    - corrigir classificacao
+
 - intent: afirmar_confirmacao_risco
   examples: |
     - /afirmar_confirmacao_risco

@@ -101,10 +101,36 @@ stories:
       - intent: deny_address
     - action: action_request_location 
 
-- story: Descrever risco com inatividade
+- story: Classificar risco
+  steps:
+    - intent: informar_classificacao_risco
+    - action: action_salvar_classificacao_risco
+  
+- story: Descrever risco sem correção
   steps:
     - action: action_ask_descricao_risco
-    - action: action_agendar_inatividade 
     - intent: informar_descricao_risco
     - action: action_salvar_descricao_risco
     - action: utter_perguntar_por_midia
+    - action: action_listen
+
+- story: Corrigir classificação/descrição do risco com descrição
+  steps:
+    - intent: corrigir_classificacao
+    - action: action_classificar_risco_corrigir
+    - slot_was_set:
+        - contexto_classificacao_corrigida: true
+    - intent: informar_classificacao_risco
+    - action: action_salvar_classificacao_risco
+    - action: action_listen
+    - action: action_ask_descricao_risco
+    - intent: informar_descricao_risco
+    - action: action_salvar_descricao_risco
+    - action: action_confirmar_relato
+
+- story: corrigir midias
+  steps:
+    - intent: corrigir_midias
+    - action: action_corrigir_midias
+    - action: utter_perguntar_por_midia
+    - action: action_listen
