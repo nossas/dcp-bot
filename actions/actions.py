@@ -114,7 +114,9 @@ class ActionInatividadeTimeout(Action):
             tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         recipient_id = tracker.sender_id
         message = "Percebi que você não respondeu. Vou encerrar a conversa, mas se quiser falar comigo novamente, é só mandar um ‘oi’. 👋🏽"
-
+        last_action = get_last_action(tracker)
+        if last_action == 'action_sair':
+            return[]
         # Forçar envio direto usando a API do WhatsApp
         output_channel = WhatsAppOutput(auth_token=os.getenv("WHATSAPP_AUTH_TOKEN"),phone_number_id=os.getenv("WHATSAPP_PHONE_NUMBER_ID"))
         logger.debug(os.getenv("WHATSAPP_AUTH_TOKEN"))
@@ -1041,7 +1043,13 @@ class ActionSair(Action):
         dispatcher.utter_message(text="Certo! Se quiser mais informações é só mandar um “oi” por aqui. \n \nVocê também pode acompanhar atualizações no site www.defesaclimaticapopular.org\n\n")
         dispatcher.utter_message(text="E, se quiser receber avisos sobre sua região, entre no grupo da Defesa Climática Popular pelo link bit.ly/grupodefesaclimaticapopular. \n \nPor lá, avisamos quando houver mudanças ou novidades no Jacarezinho.")
         dispatcher.utter_message(text="Estamos por aqui pra ajudar no que for possível! 🫂")
-        return [ ReminderCancelled(), 
+        trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) - timedelta(minutes=3)
+        return [ ReminderScheduled(
+                "inatividade_timeout",
+                trigger_date_time = trigger_date_time,
+                name="lembrete_inatividade",
+                kill_on_user_message=True
+            ),
             SlotSet("classificacao_risco", None),
             SlotSet("descricao_risco", None),
             SlotSet("endereco", None),
