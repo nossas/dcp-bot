@@ -16,21 +16,17 @@ intents:
 - deny_address
 - affirm_address
 - informar_risco
-- apagar_risco
-- continuar_risco
 - informar_endereco_texto
 - informar_localizacao
 - informar_classificacao_risco
 - informar_descricao_risco
 - pular_descricao_risco
-- pular_descricao_risco_corrigir
 - pular_enviar_midia_risco
 - tentar_novamente
 - receber_midia_risco
 - afirmar_confirmacao_risco
 - recusar_confirmacao_risco
 - menu_inicial
-- menu_inicial_2
 - como_ta_minha_area
 - o_que_fazer
 - contatos_emergencia
@@ -47,6 +43,7 @@ intents:
 - sair_consulta_risco
 - corrigir_midias
 - corrigir_classificacao
+- corrigir_endereco
 
 actions:
 - utter_pos_ajuda_dicas
@@ -57,7 +54,6 @@ actions:
 - action_corrigir_nome
 - action_perguntar_nome
 - action_salvar_nome
-- action_apagar_risco
 - utter_menu_inicial
 - action_buscar_endereco_texto
 - descrever_risco
@@ -75,7 +71,6 @@ actions:
 - action_confirmar_relato
 - action_recusar_risco
 - action_salvar_risco
-- action_retoma_risco
 - action_listar_riscos
 - action_perguntar_mais_riscos
 - utter_o_que_fazer
@@ -94,6 +89,7 @@ actions:
 - utter_saida_riscos
 - action_sair
 - action_corrigir_midias
+- action_corrigir_endereco
 
 
 
@@ -119,7 +115,6 @@ slots:
     initial_value: 1
     mappings:
       - type: custom
-
   nome:
     type: text
     influence_conversation: false
@@ -148,6 +143,12 @@ slots:
     mappings:
       - type: custom
   contexto_classificacao_corrigida:
+    type: bool
+    influence_conversation: true
+    initial_value: false
+    mappings:
+      - type: custom
+  contexto_endereco_corrigido:
     type: bool
     influence_conversation: true
     initial_value: false
