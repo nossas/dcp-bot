@@ -57,7 +57,20 @@ stories:
     - intent: informar_classificacao_risco
     - action: action_salvar_classificacao_risco
 
-- story: Responder compartilhar risco com loalização e affirm
+- story: endereço de texto e affirm - correcao de endereço
+  steps:
+    - action: action_corrigir_endereco
+    - slot_was_set:
+        - contexto_endereco_corrigido: true
+    - action: action_request_location
+    - intent: informar_endereco_texto
+    - action: action_buscar_endereco_texto
+    - or:
+      - intent: affirm
+      - intent: affirm_address    
+    - action: action_confirmar_relato
+
+- story: Responder compartilhar risco com localização e affirm
   steps:
     - action: utter_menu_inicial
     - intent: informar_risco
@@ -68,7 +81,21 @@ stories:
       - intent: affirm
       - intent: affirm_address    
     - action: utter_classificar_risco 
-   
+
+
+- story: endereço latlong e affirm - correção de endereço
+  steps:
+    - action: action_corrigir_endereco
+    - slot_was_set:
+        - contexto_endereco_corrigido: true
+    - action: action_request_location
+    - intent: informar_localizacao
+    - action: action_buscar_endereco
+    - or:
+      - intent: affirm
+      - intent: affirm_address    
+    - action: action_confirmar_relato 
+
 - story: Responder compartilhar risco com endereço não encontrado
   steps:
     - action: utter_menu_inicial
@@ -78,7 +105,30 @@ stories:
     - action: action_buscar_endereco_texto
     - action: action_request_location
     - action: action_listen 
-   
+
+- story: endereço não encontrado - correção de endereço
+  steps:  
+    - action: action_corrigir_endereco
+    - slot_was_set:
+        - contexto_endereco_corrigido: true
+    - action: action_request_location
+    - action: action_listen 
+    - action: action_buscar_endereco_texto
+    - action: action_request_location
+    - action: action_listen 
+
+
+- story: endereço não encontrado - correção de endereço 2
+  steps:  
+    - action: action_request_location
+    - slot_was_set:
+        - contexto_endereco_corrigido: true
+    - action: action_listen 
+    - action: action_buscar_endereco_texto
+    - action: action_request_location
+    - action: action_listen 
+
+
 - story: Responder compartilhar risco com localização e deny
   steps:
     - intent: informar_risco
@@ -90,11 +140,49 @@ stories:
       - intent: deny_address    
     - action: action_request_location 
  
+- story: endereço latlong e deny - correção de endereço
+  steps:
+    - action: action_corrigir_endereco
+    - slot_was_set:
+        - contexto_endereco_corrigido: true
+    - action: action_request_location
+    - intent: informar_localizacao
+    - action: action_buscar_endereco
+    - or:
+      - intent: deny
+      - intent: deny_address    
+    - action: action_confirmar_relato 
+ 
+- story: endereço latlong e deny - correção de endereço 2
+  steps:
+    - action: action_request_location
+    - slot_was_set:
+        - contexto_endereco_corrigido: true
+    - intent: informar_localizacao
+    - action: action_buscar_endereco
+    - or:
+      - intent: deny
+      - intent: deny_address    
+    - action: action_confirmar_relato 
+
 - story: Responder compartilhar risco com texto de endereço com deny
   steps:
     - intent: informar_risco
     - action: action_request_location
     - intent: informar_endereco_texto
+    - action: action_buscar_endereco_texto
+    - or:
+      - intent: deny
+      - intent: deny_address
+    - action: action_request_location
+    
+- story:  endereço de texto e deny - correcao de endereço
+  steps:
+    - action: action_corrigir_endereco
+    - slot_was_set:
+        - contexto_endereco_corrigido: true
+    - action: action_request_location
+    - intent: informar_endereco_texto    
     - action: action_buscar_endereco_texto
     - or:
       - intent: deny
@@ -120,6 +208,7 @@ stories:
     - action: action_classificar_risco_corrigir
     - slot_was_set:
         - contexto_classificacao_corrigida: true
+    - action: action_listen
     - intent: informar_classificacao_risco
     - action: action_salvar_classificacao_risco
     - action: action_listen
