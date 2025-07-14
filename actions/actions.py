@@ -17,7 +17,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 logging.basicConfig(level=logging.DEBUG)  # Força o nível global de debug
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
-from .utils import verificar_tipo_arquivo, enviar_risco_para_wordpress, extrair_riscos, get_last_action, formata_data
+from .utils import *
 import re
         
 class ActionFallbackButtons(Action):
@@ -28,8 +28,16 @@ class ActionFallbackButtons(Action):
         logger.debug("Fallback!")
         last_action = None
         last_action = get_last_action(tracker)
+        user_message = tracker.latest_message.get("text")
+        if 'sair' in  user_message.lower():
+            return [
+                FollowupAction("action_sair")
+            ]
+        if 'menu inicial' in  user_message.lower():
+            return [
+                FollowupAction("utter_menu_inicial")
+            ]
         if last_action == "action_perguntar_nome" or last_action == "action_corrigir_nome":
-            user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como nome: {user_message}")
             return [
                 FollowupAction("action_salvar_nome")
@@ -43,9 +51,11 @@ class ActionFallbackButtons(Action):
         if last_action == "action_ask_descricao_risco":
             user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como descrição de risco: {user_message}")
+            correcao_classificacao = tracker.get_slot("contexto_classificacao_corrigida")
+            next_action = "utter_perguntar_por_midia" if not correcao_classificacao else "action_confirmar_relato"
             return [
                 SlotSet("descricao_risco", user_message),
-                FollowupAction("utter_perguntar_por_midia")
+                FollowupAction(next_action)
             ]
         if last_action == "action_request_location":
             logger.debug(f"Fallback de localização")
@@ -56,6 +66,11 @@ class ActionFallbackButtons(Action):
             logger.debug(f"Fallback de menu inicial")
             return [
                 FollowupAction("utter_menu_inicial")
+            ]
+        if last_action == "action_buscar_endereco_texto":
+            logger.debug(f"Fallback de buscar endereço")
+            return [
+                FollowupAction("action_listen")
             ]
         # Caso contrário, volta ao fallback padrão
         last_bot_message = None
@@ -115,7 +130,9 @@ class ActionInatividadeTimeout(Action):
             SlotSet("endereco", None),
             SlotSet("latitude", None),
             SlotSet("longitude", None),
-            SlotSet("midias", [])
+            SlotSet("midias", []),
+            SlotSet("contexto_endereco_corrigido", False), 
+            SlotSet("contexto_classificacao_corrigida", False)
         ]
 
 
@@ -135,28 +152,10 @@ class ActionRequestLocation(Action):
         dispatcher.utter_message(text="✏️ *Digitar o endereço:* Como por exemplo 'Rua Senador Nabuco, 11, Jacarezinho'")
         dispatcher.utter_message(text="📍 *Enviar sua localização atual:* Se clicar no botão abaixo o WhatsApp vai pedir permissão para usar sua localização - é só aceitar.",custom={"type": "location_request"})
         return [
-            SlotSet("classificacao_risco", None),
-            SlotSet("descricao_risco", None),
             SlotSet("endereco", None),
             SlotSet("latitude", None),
             SlotSet("longitude", None),
-            SlotSet("midias", [])
             ]
-
-class ActionApagarRisco(Action):
-    def name(self):
-        return "action_apagar_risco"
-
-    def run(self, dispatcher, tracker, domain):
-        dispatcher.utter_message(text="Ok, vamos recomeçar.")
-        return [
-            SlotSet("classificacao_risco", None),
-            SlotSet("descricao_risco", None),
-            SlotSet("endereco", None),
-            SlotSet("latitude", None),
-            SlotSet("longitude", None),
-            SlotSet("midias", [])
-        ]
 
 class ActionAlterarNome(Action):
     def name(self):
@@ -196,25 +195,6 @@ class ActionRepeatLastMessage(Action):
         else:
             dispatcher.utter_message(text="Desculpe, não consigo repetir a última mensagem.")
             return [FollowupAction("utter_menu_inicial")]
-
-class ActionRetomaRisco(Action):
-    def name(self) -> str:
-        return "action_retoma_risco"
-
-    def run(self, dispatcher,
-            tracker,
-            domain):
-        slots = {
-            "classificacao_risco": tracker.get_slot("classificacao_risco"),
-            "descricao_risco": tracker.get_slot("descricao_risco"),
-            "endereco": tracker.get_slot("endereco"),
-            "midias": tracker.get_slot("midias"),
-        }
-        if slots['endereco']:
-            if slots['classificacao_risco']:
-                return[FollowupAction("action_ask_descricao_risco")]
-            return[FollowupAction("utter_classificar_risco")]
-        return[FollowupAction("action_request_location")]
     
 class ActionPerguntarNome(Action):
     def name(self):
@@ -329,41 +309,26 @@ class ActionBuscarEndereco(Action):
                 logger.debug(f"latitude: {latitude}")
                 logger.debug(f"longitude: {longitude}")
                 logger.debug(f"não tem endereço")
-
-                api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
-                url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={latitude},{longitude}&key={api_key}"
-
-                response = requests.get(url)
-                logger.debug(f"Received response: {response}")
-                if response.status_code == 200:
-                    data = response.json()
-                    logger.debug(f"Received data: {data}")
-
-                    if data["status"] == "OK":
-                        resultado = data["results"][0]
-                        endereco = resultado.get("formatted_address", "Endereço não encontrado.")
-
-                        dispatcher.utter_message(
-                            text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
-                            buttons=[
-                                {"title": "Sim", "payload": "/affirm_address"},
-                                {"title": "Não", "payload": "/deny_address"}
-                            ]
-                        )
-
-                        return [
-                            SlotSet("latitude", latitude),
-                            SlotSet("longitude", longitude),
-                            SlotSet("endereco", endereco)
+                endereco = get_endereco_latlong(latitude,longitude )
+                if endereco:
+                    dispatcher.utter_message(
+                        text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
+                        buttons=[
+                            {"title": "Sim", "payload": "/affirm_address"},
+                            {"title": "Não", "payload": "/deny_address"}
                         ]
-                    else:
-                        logger.error(f"Erro na API do Google Maps: {data.get('status')}")
-                        dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
-                        return [FollowupAction("action_request_location")]
+                    )
+                    logger.debug(f"achou endereço: {endereco}")
+                    
+                    return [
+                        SlotSet("latitude", latitude),
+                        SlotSet("longitude", longitude),
+                        SlotSet("endereco", endereco),
+                        FollowupAction("action_listen")
+                    ]
                 else:
-                    logger.error("Erro HTTP na chamada à API do Google Maps")
-                dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
-                return [FollowupAction("action_request_location")]
+                    dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
+                    return [FollowupAction("action_request_location")]
             else:
                 logger.debug(f"tem endereço")
                 endereco = location_data['address']
@@ -375,12 +340,9 @@ class ActionBuscarEndereco(Action):
                     ]
                 )
                 return [SlotSet("latitude", latitude), SlotSet("longitude", longitude), SlotSet("endereco", endereco)]
-
                 
         except (json.JSONDecodeError, KeyError) as e:
             logger.debug(f"Erro ao processar JSON ou chave não encontrada: {e}")
-             
-
             dispatcher.utter_message(
                 text=f"Acho que a sua localização não veio de forma correta, você quer enviar um endereço?",
                 buttons=[
@@ -403,41 +365,30 @@ class ActionBuscarEnderecoTexto(Action):
             return [
                 FollowupAction("action_salvar_nome")
             ]
-        endereco_texto = tracker.latest_message.get("text")
-        endereco_texto = re.sub(r'jacarezinho|jacare|rj|rio de janeiro', '', endereco_texto, flags=re.IGNORECASE)            
-        endereco_texto += ",bairro Jacarezinho, Rio de Janeiro, RJ"
-        logger.debug(f"Buscando endereço pelo texto: {endereco_texto}")
-        
-                
-        api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
-        url = f"https://maps.googleapis.com/maps/api/geocode/json?address={endereco_texto}&key={api_key}"
-
-        response = requests.get(url)
-        logger.debug(f"Resposta do Google Maps (texto): {response.status_code} - {response.text}")
-
-        if response.status_code == 200:
-            data = response.json()
-            if data["status"] == "OK" and data["results"]:
-                resultado = data["results"][0]
-                endereco = resultado.get("formatted_address", "Endereço não encontrado.")
-                latitude = resultado["geometry"]["location"]["lat"]
-                longitude = resultado["geometry"]["location"]["lng"]
-
-                dispatcher.utter_message(
-                    text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
-                    buttons=[
-                        {"title": "Sim", "payload": "/affirm_address"},
-                        {"title": "Não", "payload": "/deny_address"}
-                    ]
-                )
-                return [
-                    SlotSet("latitude", latitude),
-                    SlotSet("longitude", longitude),
-                    SlotSet("endereco", endereco)
+        endereco_texto = tracker.latest_message.get("text")   
+        coords = get_endereco_texto(endereco_texto)
+        logger.debug(coords)
+        if coords:
+            endereco = coords.get("endereco", "Endereço não encontrado.")
+            latitude = coords.get("lat","")
+            longitude = coords.get("lng","")
+            dispatcher.utter_message(
+                text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
+                buttons=[
+                    {"title": "Sim", "payload": "/affirm_address"},
+                    {"title": "Não", "payload": "/deny_address"}
                 ]
-            else:
-                logger.error(f"Erro na API do Google Maps: {data.get('status')} - {data.get('error_message')}")
-        dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
+            )
+            return [
+                SlotSet("latitude", latitude),
+                SlotSet("longitude", longitude),
+                SlotSet("endereco", endereco),
+                FollowupAction("action_listen")
+
+            ]
+        else:
+            logger.debug(f"Não encontrou endereço: {endereco}")
+            dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
         return [FollowupAction("action_request_location")]
 
 class ActionSalvarClassificacaoRisco(Action):
@@ -447,18 +398,18 @@ class ActionSalvarClassificacaoRisco(Action):
     def run(self, dispatcher,
             tracker,
             domain):
-        
+        last_action = get_last_action(tracker)
         risco = tracker.get_slot("classificacao_risco")
         logger.debug(risco)
-
+        next_action = "action_ask_descricao_risco"
         if risco:
             return [
                 SlotSet("classificacao_risco", risco),
-                FollowupAction("action_ask_descricao_risco")
+                FollowupAction(next_action)
             ]        
         else:
             dispatcher.utter_message(text="Não consegui entender a classificação do risco.")
-            return [FollowupAction("utter_classificar_risco")]
+            return [FollowupAction(last_action)]
 
 class ActionSolicitarDescricaoRisco(Action):
     def name(self) -> str:
@@ -468,8 +419,9 @@ class ActionSolicitarDescricaoRisco(Action):
             tracker,
             domain):
         
+        last_action = get_last_action(tracker,2)
         risco = tracker.get_slot("classificacao_risco")
-
+        action_classificar = "utter_classificar_risco" if last_action == "utter_classificar_risco" else "action_classificar_risco_corrigir"
         if risco:
             dispatcher.utter_message(
                 text=f"Se puder, conte um pouco mais sobre o que está acontecendo. Isso ajuda a entender melhor a situação.",
@@ -480,10 +432,10 @@ class ActionSolicitarDescricaoRisco(Action):
                     {"title": "Pular", "payload": "/pular_descricao_risco"},
                 ]
             )
-            return []        
+            return [SlotSet("descricao_risco", None),FollowupAction('action_listen')]        
         else:
             dispatcher.utter_message(text="Não consegui entender a classificação do risco.")
-            return [FollowupAction("utter_classificar_risco")]
+            return [FollowupAction(action_classificar)]
 
 class ActionSalvarDescricaoRisco(Action):
     def name(self) -> str:
@@ -491,10 +443,12 @@ class ActionSalvarDescricaoRisco(Action):
     def run(self, dispatcher,
             tracker,
             domain):
+        last_action = get_last_action(tracker,3)
+        next_action = "utter_perguntar_por_midia" if last_action == "utter_classificar_risco" else "action_confirmar_relato"
         descricao = tracker.get_slot("descricao_risco")
         if descricao:
             dispatcher.utter_message(text="Obrigado pela descrição!")
-            return [FollowupAction("utter_perguntar_por_midia")]
+            return [FollowupAction(next_action)]
         else:
             dispatcher.utter_message(text="Não consegui entender a descrição, tente novamente.")
             return [FollowupAction("action_ask_descricao_risco")]
@@ -539,12 +493,12 @@ class ActionConfirmarRisco(Action):
     def run(self, dispatcher,
             tracker,
             domain):
-
-        nome = tracker.get_slot("nome") or "não informado"
+        
         endereco = tracker.get_slot("endereco") or "não informado"
         classificacao = tracker.get_slot("classificacao_risco") or "não informado"
         descricao = tracker.get_slot("descricao_risco") or "não informado"
         midias_slot = tracker.get_slot("midias") or []
+        
         mensagem = (
             f"Resumo do seu relato:\n"
             f"📍 *Endereço:* {endereco}\n"
@@ -571,20 +525,58 @@ class ActionConfirmarRisco(Action):
             ]
         )
 
-        return []
+        return [
+            SlotSet("contexto_classificacao_corrigida", False), 
+                SlotSet("contexto_endereco_corrigido", False)]
 
 class ActionRecusarRisco(Action):
     def name(self) -> str:
         return "action_recusar_risco"
+    
+    def run(self, dispatcher, tracker, domain):
+        dispatcher.utter_message(
+            text="Qual informação deseja atualizar?",
+            buttons=[
+                {"title": "Endereço", "payload": "/corrigir_endereco"},
+                {"title": "Tipo/Descrição", "payload": "/corrigir_classificacao"},
+                {"title": "Imagens/Vídeos", "payload": "/corrigir_midias"}
+            ]
+        )
+        return []
+
+class ActionCorrigirMidias(Action):
+    def name(self) -> str:
+        return "action_corrigir_midias"
 
     def run(self, dispatcher, tracker, domain):
-        return [SlotSet("classificacao_risco", None),
-        SlotSet("descricao_risco", None),
-        SlotSet("endereco", None),
-        SlotSet("latitude", None),
-        SlotSet("longitude", None),
-        SlotSet("midias", []),
-        FollowupAction("action_perguntar_nome")]
+        return [
+            SlotSet("midias", []),
+            FollowupAction("utter_perguntar_por_midia")
+        ]
+
+class ActionClassificarRiscoCorrigir(Action):
+    def name(self):
+        return "action_classificar_risco_corrigir"
+
+    def run(self, dispatcher, tracker, domain):
+        nome = tracker.get_slot("nome") or ""
+        dispatcher.utter_message(
+            text=f"Perfeito {nome}. Você quer falar sobre:",
+            buttons=[
+                {"title": "Alagamento", "payload": '/informar_classificacao_risco{"classificacao_risco": "alagamento"}'},
+                {"title": "Lixo", "payload": '/informar_classificacao_risco{"classificacao_risco": "lixo"}'},
+                {"title": "Outros", "payload": '/informar_classificacao_risco{"classificacao_risco": "outros"}'}
+            ]
+        )
+        return [SlotSet("contexto_classificacao_corrigida", True), FollowupAction("action_listen")]
+
+class ActionEnderecoRiscoCorrigir(Action):
+    def name(self):
+        return "action_corrigir_endereco"
+
+    def run(self, dispatcher, tracker, domain):
+        return [SlotSet("contexto_endereco_corrigido", True), FollowupAction("action_request_location")]
+    
 class ActionSalvarRisco(Action):
     def name(self) -> str:
         return "action_salvar_risco"
@@ -701,7 +693,9 @@ class ActionSalvarRisco(Action):
             SlotSet("endereco", None),
             SlotSet("latitude", None),
             SlotSet("longitude", None),
-            SlotSet("midias", [])
+            SlotSet("midias", []),
+            SlotSet("contexto_endereco_corrigido", False), 
+            SlotSet("contexto_classificacao_corrigida", False)
             ]
 
 class ActionListarRiscos(Action):
@@ -1047,4 +1041,13 @@ class ActionSair(Action):
         dispatcher.utter_message(text="Certo! Se quiser mais informações é só mandar um “oi” por aqui. \n \nVocê também pode acompanhar atualizações no site www.defesaclimaticapopular.org\n\n")
         dispatcher.utter_message(text="E, se quiser receber avisos sobre sua região, entre no grupo da Defesa Climática Popular pelo link bit.ly/grupodefesaclimaticapopular. \n \nPor lá, avisamos quando houver mudanças ou novidades no Jacarezinho.")
         dispatcher.utter_message(text="Estamos por aqui pra ajudar no que for possível! 🫂")
-        return [ ReminderCancelled()]
+        return [ ReminderCancelled(), 
+            SlotSet("classificacao_risco", None),
+            SlotSet("descricao_risco", None),
+            SlotSet("endereco", None),
+            SlotSet("latitude", None),
+            SlotSet("longitude", None),
+            SlotSet("midias", []),
+            SlotSet("contexto_endereco_corrigido", False), 
+            SlotSet("contexto_classificacao_corrigida", False)
+            ]

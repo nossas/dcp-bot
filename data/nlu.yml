@@ -183,21 +183,6 @@ nlu:
     - Quero informar um risco
     - Informar um risco
 
-- intent: apagar_risco
-  examples: |
-    - /apagar_risco
-    - começar de novo
-    - apagar risco
-    - reiniciar
-
-- intent: continuar_risco
-  examples: |
-    - continuar_risco
-    - /continuar_risco
-    - quero continuar
-    - continuar reportando
-    - corrigir relato
-
 - intent: informar_localizacao
   examples: |
     - {"latitude": 38.748666, "longitude": -9.103002}
@@ -442,7 +427,25 @@ nlu:
     - /recusar_confirmacao_risco
     - não está correto
     - as informações não estão corretas
-    
+
+- intent: corrigir_midias
+  examples: |
+    - /corrigir_midias
+    - corrigir_midias
+    - corrigir midias
+
+- intent: corrigir_classificacao
+  examples: |
+    - /corrigir_classificacao
+    - corrigir_classificacao
+    - corrigir classificacao
+
+- intent: corrigir_endereco
+  examples: |
+    - /corrigir_endereco
+    - corrigir_endereco
+    - corrigir endereco
+
 - intent: afirmar_confirmacao_risco
   examples: |
     - /afirmar_confirmacao_risco
@@ -455,12 +458,6 @@ nlu:
     - menu inicial
     - /menu_inicial
     - começar
-
-- intent: menu_inicial_2
-  examples: |
-    - menu_inicial_2
-    - /menu_inicial_2
-    - outras opções
 
 - intent: como_ta_minha_area
   examples: |

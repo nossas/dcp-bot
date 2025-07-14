@@ -5,33 +5,21 @@ rules:
     steps:
     - intent: menu_inicial
     - action: utter_menu_inicial
-  
+
+  - rule: informar_risco
+    steps:
+    - intent: informar_risco
+    - action: action_request_location
+
   - rule: Tentar novamente
     steps:
       - intent: tentar_novamente
       - action: action_repeat_last_message
   
-  - rule: Apagar risco
-    steps:
-      - intent: apagar_risco
-      - action: action_apagar_risco
-      - action: action_request_location
-
-
   - rule: Processar localização e confirmar endereço
     steps:
       - intent: informar_localizacao
       - action: action_buscar_endereco
-
-  - rule: Recusar endereço
-    steps:
-    - intent: deny_address
-    - action: action_request_location
-
-  - rule: Aceitar endereço
-    steps:
-    - intent: affirm_address
-    - action: utter_classificar_risco
 
   - rule: Processar endereço texto
     steps:
@@ -67,24 +55,6 @@ rules:
     - intent: deny
     - action: action_request_location 
 
-  - rule: Classificar risco
-    steps:
-      - intent: informar_classificacao_risco
-      - action: action_salvar_classificacao_risco
-  
-
-  - rule: pular descrição do Risco
-    steps:
-      - intent: pular_descricao_risco
-      - action: utter_perguntar_por_midia
-
-  - rule: Descrever risco
-    steps:
-      - action: action_ask_descricao_risco
-      - intent: informar_descricao_risco
-      - action: action_salvar_descricao_risco
-      - action: utter_perguntar_por_midia
-
   - rule: Não enviar midia de risco e partir para revisão
     steps:
       - intent: pular_enviar_midia_risco
@@ -101,18 +71,17 @@ rules:
       - intent: afirmar_confirmacao_risco
       - action: action_salvar_risco
 
-
   - rule: Confirmação negativa de risco
     steps:
       - intent: recusar_confirmacao_risco
       - action: action_recusar_risco
-      - action: utter_menu_inicial
-      - action: action_listen
 
-  - rule: Continuar o risco iniciado
+  - rule: Corrigir midia
     steps:
-      - intent: continuar_risco
-      - action: action_retoma_risco
+      - intent: corrigir_midias
+      - action: action_corrigir_midias
+      - action: utter_perguntar_por_midia
+      - action: action_listen
   
   - rule: pedido de ajuda
     steps: 
@@ -212,8 +181,72 @@ rules:
       - action: action_perguntar_mais_riscos
       - action: action_listen
 
-
   - rule: Sair
     steps:
       - intent: sair
       - action: action_sair
+
+  - rule: Corrigir classificação
+    steps:
+    - intent: corrigir_classificacao
+    - action: action_classificar_risco_corrigir
+    - action: action_listen
+
+  - rule: Pular descrição do risco sem correção
+    condition:
+      - slot_was_set:
+        - contexto_classificacao_corrigida: false
+    steps:
+      - intent: pular_descricao_risco
+      - action: utter_perguntar_por_midia
+      - action: action_listen
+
+  - rule: Pular descrição do risco com correção
+    condition:
+      - slot_was_set:
+          - contexto_classificacao_corrigida: true
+    steps:
+      - intent: pular_descricao_risco
+      - action: action_confirmar_relato
+      - action: action_listen
+
+  - rule: Salvar descrição do risco sem correção
+    condition:
+      - slot_was_set:
+        - contexto_classificacao_corrigida: false
+    steps:
+      - action: action_salvar_classificacao_risco
+      - action: utter_perguntar_por_midia
+      - action: action_listen
+
+  - rule: Salvar descrição do risco com correção
+    condition:
+      - slot_was_set:
+          - contexto_classificacao_corrigida: true
+    steps:
+      - intent: pular_descricao_risco
+      - action: action_confirmar_relato
+      - action: action_listen
+
+  - rule: Corrigir endereço
+    steps:
+      - intent: corrigir_endereco
+      - action: action_corrigir_endereco
+
+  - rule: aceitar endereço 
+    condition:
+      - slot_was_set:
+          - contexto_endereco_corrigido: false
+    steps:
+      - intent: affirm_address    
+      - action: utter_classificar_risco 
+      - action: action_listen
+
+  - rule: aceitar endereço na correção
+    condition:
+      - slot_was_set:
+          - contexto_endereco_corrigido: true
+    steps:
+      - intent: affirm_address    
+      - action: action_confirmar_relato 
+      - action: action_listen

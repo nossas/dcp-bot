@@ -31,6 +31,7 @@ policies:
   core_fallback_threshold: 0.1
   core_fallback_action_name: "action_default_fallback"
   enable_fallback_prediction: false
+  check_for_contradictions: false #desabilitado por conta das regras "Pular descrição do risco sem correção" e "Pular descrição do risco com correção"
 - name: MemoizationPolicy
   max_history: 5
 - name: TEDPolicy
