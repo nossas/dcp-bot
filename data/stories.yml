@@ -48,6 +48,7 @@ stories:
     - action: utter_menu_inicial
     - intent: informar_risco
     - action: action_request_location
+    - action: action_listen
     - intent: informar_endereco_texto
     - action: action_buscar_endereco_texto
     - or:
@@ -63,6 +64,7 @@ stories:
     - slot_was_set:
         - contexto_endereco_corrigido: true
     - action: action_request_location
+    - action: action_listen
     - intent: informar_endereco_texto
     - action: action_buscar_endereco_texto
     - or:
@@ -75,6 +77,7 @@ stories:
     - action: utter_menu_inicial
     - intent: informar_risco
     - action: action_request_location
+    - action: action_listen
     - intent: informar_localizacao
     - action: action_buscar_endereco
     - or:
@@ -89,6 +92,7 @@ stories:
     - slot_was_set:
         - contexto_endereco_corrigido: true
     - action: action_request_location
+    - action: action_listen
     - intent: informar_localizacao
     - action: action_buscar_endereco
     - or:
@@ -133,12 +137,14 @@ stories:
   steps:
     - intent: informar_risco
     - action: action_request_location
+    - action: action_listen
     - intent: informar_localizacao
     - action: action_buscar_endereco
     - or:
       - intent: deny
       - intent: deny_address    
     - action: action_request_location 
+    - action: action_listen
  
 - story: endereço latlong e deny - correção de endereço
   steps:
@@ -146,6 +152,7 @@ stories:
     - slot_was_set:
         - contexto_endereco_corrigido: true
     - action: action_request_location
+    - action: action_listen
     - intent: informar_localizacao
     - action: action_buscar_endereco
     - or:
@@ -158,6 +165,7 @@ stories:
     - action: action_request_location
     - slot_was_set:
         - contexto_endereco_corrigido: true
+    - action: action_listen
     - intent: informar_localizacao
     - action: action_buscar_endereco
     - or:
@@ -169,12 +177,14 @@ stories:
   steps:
     - intent: informar_risco
     - action: action_request_location
+    - action: action_listen
     - intent: informar_endereco_texto
     - action: action_buscar_endereco_texto
     - or:
       - intent: deny
       - intent: deny_address
     - action: action_request_location
+    - action: action_listen
     
 - story:  endereço de texto e deny - correcao de endereço
   steps:
@@ -182,12 +192,14 @@ stories:
     - slot_was_set:
         - contexto_endereco_corrigido: true
     - action: action_request_location
+    - action: action_listen
     - intent: informar_endereco_texto    
     - action: action_buscar_endereco_texto
     - or:
       - intent: deny
       - intent: deny_address
     - action: action_request_location 
+    - action: action_listen
 
 - story: Classificar risco
   steps:
