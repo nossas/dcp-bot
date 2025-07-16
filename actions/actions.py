@@ -25,6 +25,7 @@ class ActionFallbackButtons(Action):
         return "action_fallback_buttons"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_fallback_buttons")
         logger.debug("Fallback!")
         last_action = None
         last_action = get_last_action(tracker)
@@ -69,8 +70,10 @@ class ActionFallbackButtons(Action):
             ]
         if last_action == "action_buscar_endereco_texto":
             logger.debug(f"Fallback de buscar endereço")
+            logger.debug(f"user_message: {user_message}")
+            dispatcher.utter_message(text="Não consegui entender esse endereço.\nVocê pode tentar de novo.")
             return [
-                FollowupAction("action_listen")
+                    FollowupAction("action_request_location")
             ]
         # Caso contrário, volta ao fallback padrão
         last_bot_message = None
@@ -93,6 +96,7 @@ class ActionAgendarInatividade(Action):
         return "action_agendar_inatividade"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_agendar_inatividade")
         trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) + timedelta(minutes=3)
         logger.debug(f"agendando timeout para: {trigger_date_time}")
         
@@ -102,7 +106,8 @@ class ActionAgendarInatividade(Action):
                 trigger_date_time = trigger_date_time,
                 name="lembrete_inatividade",
                 kill_on_user_message=True
-            )
+            ),
+            FollowupAction("action_listen")
         ]
 
         
@@ -110,8 +115,8 @@ class ActionInatividadeTimeout(Action):
     def name(self) -> Text:
         return "action_inatividade_timeout"
 
-    def run(self, dispatcher: CollectingDispatcher,
-            tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+    def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_inatividade_timeout")
         recipient_id = tracker.sender_id
         message = "Percebi que você não respondeu. Vou encerrar a conversa, mas se quiser falar comigo novamente, é só mandar um ‘oi’. 👋🏽"
         last_action = get_last_action(tracker)
@@ -143,6 +148,7 @@ class ActionRequestLocation(Action):
         return "action_request_location"
 
     def run(self, dispatcher, tracker, domain): 
+        logger.debug("rodando action: action_request_location")
         
         latitude = tracker.get_slot("latitude")
         longitude = tracker.get_slot("longitude")
@@ -157,6 +163,7 @@ class ActionRequestLocation(Action):
             SlotSet("endereco", None),
             SlotSet("latitude", None),
             SlotSet("longitude", None),
+            FollowupAction("action_listen")
             ]
 
 class ActionAlterarNome(Action):
@@ -164,6 +171,7 @@ class ActionAlterarNome(Action):
         return "action_alterar_nome"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_alterar_nome")
         dispatcher.utter_message(
                 text="Entendi, você quer corrigir o nome que foi informado, certo?",
                 buttons=[
@@ -178,6 +186,7 @@ class ActionRepeatLastMessage(Action):
         return "action_repeat_last_message"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_repeat_last_message")
         last_bot_messages = []
         last_action = None
         last_action = get_last_action(tracker)
@@ -203,6 +212,7 @@ class ActionPerguntarNome(Action):
         return "action_perguntar_nome"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_perguntar_nome")
         sender_id = tracker.sender_id
        
         try:
@@ -236,6 +246,7 @@ class ActionSalvarNome(Action):
         return "action_salvar_nome"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_salvar_nome")
         last_action = get_last_action(tracker)
         if last_action == 'action_request_location':
             return [FollowupAction("action_buscar_endereco_texto")]
@@ -273,6 +284,7 @@ class ActionApagarNome(Action):
         return "action_corrigir_nome"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_corrigir_nome")
         logger.debug("Apagando nome do slot e do banco.")
 
         whatsapp_id = tracker.sender_id
@@ -300,6 +312,7 @@ class ActionBuscarEndereco(Action):
         return "action_buscar_endereco"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_buscar_endereco")
         user_message = tracker.latest_message.get("text")
         logger.debug(f"entrou na action user_message: {user_message}")
         
@@ -341,7 +354,12 @@ class ActionBuscarEndereco(Action):
                         {"title": "Não", "payload": "/deny_address"}
                     ]
                 )
-                return [SlotSet("latitude", latitude), SlotSet("longitude", longitude), SlotSet("endereco", endereco)]
+                return [
+                    SlotSet("latitude", latitude), 
+                    SlotSet("longitude", longitude), 
+                    SlotSet("endereco", endereco),
+                    FollowupAction("action_listen")
+                    ]
                 
         except (json.JSONDecodeError, KeyError) as e:
             logger.debug(f"Erro ao processar JSON ou chave não encontrada: {e}")
@@ -359,6 +377,8 @@ class ActionBuscarEnderecoTexto(Action):
         return "action_buscar_endereco_texto"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_buscar_endereco_texto")
+        logger.debug(f"ultima mensagem: {tracker.latest_message}")
         last_action = None
         last_action = get_last_action(tracker)
         if last_action == "action_perguntar_nome" or last_action == "action_corrigir_nome":
@@ -397,9 +417,8 @@ class ActionSalvarClassificacaoRisco(Action):
     def name(self) -> str:
         return "action_salvar_classificacao_risco"
 
-    def run(self, dispatcher,
-            tracker,
-            domain):
+    def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_salvar_classificacao_risco")
         last_action = get_last_action(tracker)
         risco = tracker.get_slot("classificacao_risco")
         logger.debug(risco)
@@ -417,9 +436,8 @@ class ActionSolicitarDescricaoRisco(Action):
     def name(self) -> str:
         return "action_ask_descricao_risco"
 
-    def run(self, dispatcher,
-            tracker,
-            domain):
+    def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_ask_descricao_risco")
         
         last_action = get_last_action(tracker,2)
         risco = tracker.get_slot("classificacao_risco")
@@ -442,9 +460,9 @@ class ActionSolicitarDescricaoRisco(Action):
 class ActionSalvarDescricaoRisco(Action):
     def name(self) -> str:
         return "action_salvar_descricao_risco"
-    def run(self, dispatcher,
-            tracker,
-            domain):
+    
+    def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_salvar_descricao_risco")
         last_action = get_last_action(tracker,3)
         next_action = "utter_perguntar_por_midia" if last_action == "utter_classificar_risco" else "action_confirmar_relato"
         descricao = tracker.get_slot("descricao_risco")
@@ -460,6 +478,7 @@ class ActionSalvarMidiaRisco(Action):
         return "action_salvar_midia_risco"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_salvar_midia_risco")
         try:
             user_message = tracker.latest_message.get("text")
             midia_data = json.loads(user_message)
@@ -492,9 +511,8 @@ class ActionConfirmarRisco(Action):
     def name(self) -> str:
         return "action_confirmar_relato"
 
-    def run(self, dispatcher,
-            tracker,
-            domain):
+    def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_confirmar_relato")
         
         endereco = tracker.get_slot("endereco") or "não informado"
         classificacao = tracker.get_slot("classificacao_risco") or "não informado"
@@ -536,6 +554,7 @@ class ActionRecusarRisco(Action):
         return "action_recusar_risco"
     
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_recusar_risco")
         dispatcher.utter_message(
             text="Qual informação deseja atualizar?",
             buttons=[
@@ -551,6 +570,7 @@ class ActionCorrigirMidias(Action):
         return "action_corrigir_midias"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_corrigir_midias")
         return [
             SlotSet("midias", []),
             FollowupAction("utter_perguntar_por_midia")
@@ -561,6 +581,7 @@ class ActionClassificarRiscoCorrigir(Action):
         return "action_classificar_risco_corrigir"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_classificar_risco_corrigir")
         nome = tracker.get_slot("nome") or ""
         dispatcher.utter_message(
             text=f"Perfeito {nome}. Você quer falar sobre:",
@@ -577,6 +598,7 @@ class ActionEnderecoRiscoCorrigir(Action):
         return "action_corrigir_endereco"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_corrigir_endereco")
         return [SlotSet("contexto_endereco_corrigido", True), FollowupAction("action_request_location")]
     
 class ActionSalvarRisco(Action):
@@ -584,6 +606,7 @@ class ActionSalvarRisco(Action):
         return "action_salvar_risco"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_salvar_risco")
         try:
             conn = get_db_connection()
             if not conn:
@@ -705,6 +728,7 @@ class ActionListarRiscos(Action):
         return "action_listar_riscos"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_listar_riscos")
         last_action = None
         last_action = get_last_action(tracker)
         pagina = tracker.get_slot("pagina_risco") or 1
@@ -772,6 +796,7 @@ class ActionPerguntarMaisRiscos(Action):
         return "action_perguntar_mais_riscos"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_perguntar_mais_riscos")
         time.sleep(2)
         dispatcher.utter_message(
             text="Quer ver mais relatos da comunidade?",
@@ -787,6 +812,7 @@ class ActionNivelDeRisco(Action):
         return "action_nivel_de_risco"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_nivel_de_risco")
         wordpress_url = os.getenv("WORDPRESS_URL")
         endpoint = f"{wordpress_url}/wp-json/dcp/v1/risco-regiao"
         SlotSet("pagina_risco",1)
@@ -815,6 +841,7 @@ class ActionListarAbrigos(Action):
         return "action_listar_abrigos"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_listar_abrigos")
         try:
             wordpress_url = os.getenv("WORDPRESS_URL")
             endpoint = f"{wordpress_url}/wp-json/dcp/v1/abrigos"
@@ -843,9 +870,8 @@ class ActionListarContatosEmergencia(Action):
     def name(self):
         return "action_listar_contatos_emergencia"
 
-    def run(self, dispatcher,
-            tracker,
-            domain) :
+    def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_listar_contatos_emergencia")
 
         wordpress_url = os.getenv("WORDPRESS_URL")
         if not wordpress_url:
@@ -884,9 +910,8 @@ class ActionBuscarDicas(Action):
     def name(self):
         return "action_buscar_dicas"
 
-    def run(self, dispatcher,
-            tracker,
-            domain):
+    def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_buscar_dicas")
         tipo_dica = tracker.get_slot("dicas")
         if not tipo_dica:
             dispatcher.utter_message(text="Desculpe, não entendi o tipo de dica que você deseja.")
@@ -924,7 +949,8 @@ class ActionPerguntaNotificacoes(Action):
     def name(self) -> str:
         return "action_pergunta_notificacoes"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker, domain):
+    def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_pergunta_notificacoes")
         whatsapp_id = tracker.sender_id
 
         try:
@@ -974,6 +1000,7 @@ class ActionReceberNotificacoes(Action):
         return "action_receber_notificacoes"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_receber_notificacoes")
         # Obtém o número de telefone do usuário (ID da conversa)
         telefone = tracker.sender_id
         try:
@@ -1007,6 +1034,7 @@ class ActionPararNotificacoes(Action):
         return "action_parar_notificacoes"  
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_parar_notificacoes")
         # Obtém o número de telefone do usuário (ID da conversa)
         telefone = tracker.sender_id
         try:
@@ -1040,6 +1068,7 @@ class ActionSair(Action):
         return "action_sair"
 
     def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_sair")
         dispatcher.utter_message(text="Certo! Se quiser mais informações é só mandar um “oi” por aqui. \n \nVocê também pode acompanhar atualizações no site www.defesaclimaticapopular.org\n\n")
         dispatcher.utter_message(text="E, se quiser receber avisos sobre sua região, entre no grupo da Defesa Climática Popular pelo link bit.ly/grupodefesaclimaticapopular. \n \nPor lá, avisamos quando houver mudanças ou novidades no Jacarezinho.")
         dispatcher.utter_message(text="Estamos por aqui pra ajudar no que for possível! 🫂")

@@ -17,10 +17,12 @@ async def agendar_inatividade(sender_id: str):
     async with aiohttp.ClientSession() as session:
         logger.debug(f"----------------------------------fazendo chamada schedule")
         rasa_url = os.environ.get("RASA_URL")
-        await session.post(
+
+        async with session.post(
             f"{rasa_url}/conversations/{sender_id}/trigger_intent",
             json={"name": "inatividade_monitoramento", "entities": []}
-        )
+        ) as response:
+            await response.read()
 
 class WhatsAppOutput(WhatsApp, OutputChannel):
     """Output channel for WhatsApp Cloud API"""
