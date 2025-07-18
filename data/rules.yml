@@ -59,6 +59,8 @@ rules:
     steps:
       - intent: pular_enviar_midia_risco
       - action: action_confirmar_relato
+      - action: action_confirmar_relato_pos_midia
+      - action: action_listen
 
   - rule: Enviar midia de risco
     steps:
@@ -152,11 +154,14 @@ rules:
     steps:
       - intent: inatividade_monitoramento
       - action: action_agendar_inatividade
+      - action: action_listen
 
   - rule: Mensagem após inatividade
     steps:
       - intent: inatividade_timeout
       - action: action_inatividade_timeout
+      - action: action_listen
+
 
   - rule: Alterar nome
     steps:
@@ -208,6 +213,7 @@ rules:
     steps:
       - intent: pular_descricao_risco
       - action: action_confirmar_relato
+      - action: action_confirmar_relato_pos_midia
       - action: action_listen
 
   - rule: Salvar descrição do risco sem correção
@@ -226,6 +232,7 @@ rules:
     steps:
       - intent: pular_descricao_risco
       - action: action_confirmar_relato
+      - action: action_confirmar_relato_pos_midia
       - action: action_listen
 
   - rule: Corrigir endereço
@@ -249,4 +256,10 @@ rules:
     steps:
       - intent: affirm_address    
       - action: action_confirmar_relato 
+      - action: action_confirmar_relato_pos_midia
+      - action: action_listen
+
+  - rule: previnir ações do evento externo de agendamento
+    steps:
+      - intent: just_listen
       - action: action_listen

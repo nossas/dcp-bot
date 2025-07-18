@@ -596,3 +596,8 @@ nlu:
     - não quero mais riscos
     - sair_consulta_risco
     - sair consulta risco
+
+- intent: just_listen 
+  examples: | 
+    - EXTERNAL: inatividade_monitoramento
+    - EXTERNAL: inatividade monitoramento
