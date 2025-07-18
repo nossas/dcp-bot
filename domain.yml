@@ -44,6 +44,7 @@ intents:
 - corrigir_midias
 - corrigir_classificacao
 - corrigir_endereco
+- just_listen
 
 actions:
 - utter_pos_ajuda_dicas
@@ -90,6 +91,7 @@ actions:
 - action_sair
 - action_corrigir_midias
 - action_corrigir_endereco
+- action_confirmar_relato_pos_midia
 
 
 
