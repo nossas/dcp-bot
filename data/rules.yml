@@ -263,3 +263,8 @@ rules:
     steps:
       - intent: just_listen
       - action: action_listen
+  
+  - rule: listen apos action_agendar_inatividade
+    steps:
+      - action: action_agendar_inatividade
+      - action: action_listen
