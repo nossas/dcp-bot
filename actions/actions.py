@@ -533,7 +533,17 @@ class ActionConfirmarRisco(Action):
                 media_path = os.path.splitext(midia)[0]
                 media_id = os.path.basename(media_path)
                 dispatcher.utter_message(text="", custom={"type": "media_id", "media_id": media_id, "media_type":media_type})   
-        
+        return [
+           FollowupAction("action_confirmar_relato_pos_midia")
+           ]
+
+class ActionConfirmarRiscoPosMidia(Action):
+    def name(self) -> str:
+        return "action_confirmar_relato_pos_midia"
+
+    def run(self, dispatcher, tracker, domain):
+        time.sleep(3)
+        logger.debug("rodando action: action_confirmar_relato_pos_midia")
         dispatcher.utter_message(text="Essas informações estão corretas? Se sim, clique em *Confirmar e enviar*.")
         dispatcher.utter_message(text="Seu relato será salvo com segurança, passará por uma verificação rápida e, se aprovado, será publicado no mapa. Tudo conforme nossa política de privacidade (saiba mais em bit.ly/termo-privacidade)")
         mensagem = ("Confirmar envio:")

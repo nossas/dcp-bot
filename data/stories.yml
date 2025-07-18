@@ -152,6 +152,40 @@ stories:
     - intent: informar_descricao_risco
     - action: action_salvar_descricao_risco
     - action: action_confirmar_relato
+    - action: action_confirmar_relato_pos_midia
+    - action: action_listen
+
+
+
+
+- story: Descrever risco sem correção com intent monitoramento
+  steps:
+    - action: action_ask_descricao_risco
+    - intent: inatividade_monitoramento
+    - action: action_listen 
+    - intent: informar_descricao_risco
+    - action: action_salvar_descricao_risco
+    - action: utter_perguntar_por_midia
+    - action: action_listen
+
+- story: Corrigir classificação/descrição do risco com descrição com intent monitoramento
+  steps:
+    - intent: corrigir_classificacao
+    - action: action_classificar_risco_corrigir
+    - slot_was_set:
+        - contexto_classificacao_corrigida: true
+    - action: action_listen
+    - intent: informar_classificacao_risco
+    - action: action_salvar_classificacao_risco
+    - action: action_listen
+    - action: action_ask_descricao_risco
+    - intent: inatividade_monitoramento
+    - action: action_listen 
+    - intent: informar_descricao_risco
+    - action: action_salvar_descricao_risco
+    - action: action_confirmar_relato
+    - action: action_confirmar_relato_pos_midia
+    - action: action_listen
 
 - story: corrigir midias
   steps:
@@ -176,6 +210,7 @@ stories:
       - intent: affirm
       - intent: affirm_address    
     - action: action_confirmar_relato
+    - action: action_confirmar_relato_pos_midia
     - action: action_listen
 
 - story: endereço latlong e affirm - correção de endereço
