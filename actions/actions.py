@@ -409,7 +409,7 @@ class ActionBuscarEnderecoTexto(Action):
 
             ]
         else:
-            logger.debug(f"Não encontrou endereço: {endereco}")
+            logger.debug(f"Não encontrou endereço: {endereco_texto}")
             dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
         return [FollowupAction("action_request_location")]
 
