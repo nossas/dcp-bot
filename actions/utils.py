@@ -116,20 +116,20 @@ def formata_data(data_str,formato = '%H:%M do dia %d/%m/%Y'):
     resultado = dt.strftime(formato)
     return resultado
 
+def dentro_do_retangulo(lat, lng):
+    #Restringe ao Jacarezinho, Rio de Janeiro
+    # Coordenadas do retângulo delimitador
+    
+    X0, Y0 = -43.27, -22.87 
+    X1, Y1 = -43.23, -22.91 
+    return Y1 <= lat <= Y0 and X0 <= lng <= X1
+
 def verifica_poligono(google_response):
     """
     Filtra os resultados da resposta do Google Maps, retornando apenas os que estão dentro do retângulo.
     """
-    
-    # Coordenadas do retângulo
-    X0, Y0 = -43.27, -22.87  # sudoeste
-    X1, Y1 = -43.23, -22.91  # nordeste
-
     dados = google_response.json()
     resultados_filtrados = []
-
-    def dentro_do_retangulo(lat, lng):
-        return Y1 <= lat <= Y0 and X0 <= lng <= X1
 
     for resultado in dados.get("results", []):
         location = resultado.get("geometry", {}).get("location", {})
@@ -165,7 +165,28 @@ def chamada_google_maps(*args, **kwargs):
         else:
             logger.error("Erro HTTP na chamada à API do Google Maps")
             return False
-    
+
+def format_address(endereco):
+    if not endereco:
+        return ""
+    """
+    Formata o endereço para remover palavras irrelevantes, CEP, estado e país.
+    """
+    # Remove CEP (formato 5 dígitos - 3 dígitos)
+    endereco = re.sub(r'\b\d{5}-\d{3}\b', '', endereco)
+    # Remove país (Brazil ou Brasil)
+    endereco = re.sub(r'\b(brazil|brasil)\b', '', endereco, flags=re.IGNORECASE)
+    # Remove estado (ex: - RJ, RJ, - SP, SP, etc.)
+    endereco = re.sub(r'-\s*[A-Z]{2}\b', '', endereco)
+    endereco = re.sub(r'\b[A-Z]{2}\b', '', endereco)
+    # Remove vírgulas e espaços extras
+    # Remove vírgulas duplicadas ou triplicadas
+    endereco = re.sub(r',\s*,+', ',', endereco)
+    # Remove vírgulas no final da string (com ou sem espaços)
+    endereco = re.sub(r',\s*$', '', endereco)
+    endereco = re.sub(r'\s+', ' ', endereco).strip()
+    return endereco
+
 def get_endereco_latlong(latitude,longitude):
     response = chamada_google_maps(latitude=latitude,longitude=longitude )
     print(f"response do google maps:{response}")
@@ -173,7 +194,7 @@ def get_endereco_latlong(latitude,longitude):
         resultado = response[0]
     else:
         resultado = {}
-    endereco = resultado.get("formatted_address", "")
+    endereco = format_address(resultado.get("formatted_address", ""))
     return endereco
 
 
@@ -185,7 +206,7 @@ def get_endereco_texto(endereco):
     print(f"response do google maps:{response}")
     if response and len(response) > 0:
         resultado = response[0]
-        endereco = resultado.get("formatted_address", "")
+        endereco = format_address(resultado.get("formatted_address", ""))
         lat = resultado["geometry"]["location"]["lat"] if "geometry" in resultado and "location" in resultado["geometry"] and "lat" in resultado["geometry"]["location"] else None
         lng = resultado["geometry"]["location"]["lng"] if "geometry" in resultado and "location" in resultado["geometry"] and "lng" in resultado["geometry"]["location"] else None
         resultado_dict = {'lat':lat,'lng':lng,'endereco':endereco}
