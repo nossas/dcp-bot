@@ -45,6 +45,7 @@ intents:
 - corrigir_classificacao
 - corrigir_endereco
 - just_listen
+- agradecimento
 
 actions:
 - utter_pos_ajuda_dicas
@@ -92,6 +93,7 @@ actions:
 - action_corrigir_midias
 - action_corrigir_endereco
 - action_confirmar_relato_pos_midia
+- action_agradecimento
 
 
 

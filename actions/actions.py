@@ -97,7 +97,7 @@ class ActionAgendarInatividade(Action):
 
     def run(self, dispatcher, tracker, domain):
         logger.debug("rodando action: action_agendar_inatividade")
-        trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) + timedelta(minutes=3)
+        trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) + timedelta(minutes=5)
         logger.debug(f"agendando timeout para: {trigger_date_time}")
         
         return [
@@ -655,31 +655,6 @@ class ActionSalvarRisco(Action):
                 midia_id = cursor.fetchone()[0]
                 id_midias.append(midia_id)
 
-            # Inserir risco
-            cursor.execute("""
-                INSERT INTO riscos (
-                    id_usuario,
-                    latitude,
-                    longitude,
-                    endereco,
-                    classificacao,
-                    descricao,
-                    id_midias
-                )
-                VALUES (
-                    %s, %s, %s, %s, %s, %s, %s
-                )
-            """, (
-                usuario_id,
-                float(latitude),  
-                float(longitude),
-                endereco,
-                classificacao,
-                descricao,
-                id_midias if id_midias else None,
-            ))
-
-            conn.commit()
             cursor.close()
             conn.close()
             logger.debug(f"cadastro endereco: {endereco}")
@@ -1097,4 +1072,23 @@ class ActionSair(Action):
             SlotSet("midias", []),
             SlotSet("contexto_endereco_corrigido", False), 
             SlotSet("contexto_classificacao_corrigida", False)
+            ]
+
+
+
+    
+class ActionAgradecimento(Action):
+    def name(self) -> str:
+        return "action_agradecimento"
+
+    def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_agradecimento")
+        dispatcher.utter_message(text="❤️")
+        trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) - timedelta(minutes=3)
+        return [ ReminderScheduled(
+                "inatividade_timeout",
+                trigger_date_time = trigger_date_time,
+                name="lembrete_inatividade",
+                kill_on_user_message=True
+            ),
             ]
