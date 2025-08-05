@@ -199,8 +199,6 @@ def get_endereco_latlong(latitude,longitude):
 
 
 def get_endereco_texto(endereco):
-    # endereco_texto = re.sub(r'jacarezinho|jacare|rj|rio de janeiro', '', endereco, flags=re.IGNORECASE)            
-    # endereco_texto += ",bairro Jacarezinho, Rio de Janeiro, RJ"
     logger.debug(f"Buscando endereço pelo texto: {endereco}")
     response = chamada_google_maps(endereco=endereco)
     print(f"response do google maps:{response}")
