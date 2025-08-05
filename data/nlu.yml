@@ -601,3 +601,17 @@ nlu:
   examples: | 
     - EXTERNAL: inatividade_monitoramento
     - EXTERNAL: inatividade monitoramento
+
+- intent: agradecimento
+  examples: |
+    - obrigado
+    - valeu
+    - obrg
+    - Muito obrigado
+    - obrigada
+    - obrigade
+    - gratidão
+    - gratiluz
+    - falou
+    - é nois
+    - ja é

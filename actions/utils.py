@@ -116,7 +116,30 @@ def formata_data(data_str,formato = '%H:%M do dia %d/%m/%Y'):
     resultado = dt.strftime(formato)
     return resultado
 
+def dentro_do_retangulo(lat, lng):
+    #Restringe ao Jacarezinho, Rio de Janeiro
+    # Coordenadas do retângulo delimitador
+    
+    X0, Y0 = -43.27, -22.87 
+    X1, Y1 = -43.23, -22.91 
+    return Y1 <= lat <= Y0 and X0 <= lng <= X1
 
+def verifica_poligono(google_response):
+    """
+    Filtra os resultados da resposta do Google Maps, retornando apenas os que estão dentro do retângulo.
+    """
+    dados = google_response.json()
+    resultados_filtrados = []
+
+    for resultado in dados.get("results", []):
+        location = resultado.get("geometry", {}).get("location", {})
+        lat = location.get("lat")
+        lng = location.get("lng")
+
+        if lat is not None and lng is not None and dentro_do_retangulo(lat, lng):
+            resultados_filtrados.append(resultado)
+    return resultados_filtrados    
+    
 def chamada_google_maps(*args, **kwargs):
         api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
         if kwargs.get("endereco"):
@@ -128,42 +151,64 @@ def chamada_google_maps(*args, **kwargs):
                 args = f'?latlng={lat},{lng}'
             else:
                 raise ValueError("Parâmetros insuficientes: é necessário 'endereco' ou 'latitude' e 'longitude'.")
-        url = f"https://maps.googleapis.com/maps/api/geocode/json{args}&key={api_key}"
+        url = f"https://maps.googleapis.com/maps/api/geocode/json{args}&bounds=-22.91,-43.27|-22.87,-43.23&key={api_key}"
         response = requests.get(url)
-        # logger.debug(f"Resposta do Google Maps (texto): {response.status_code} - {response.text}")
-        return response
-    
+        if response.status_code == 200:
+            data = response.json()
+            logger.debug(f"Received data: {data}")
+            if data["status"] == "OK":
+                # logger.debug(f"Resposta do Google Maps (texto): {response.status_code} - {response.text}")
+                response_filtered = verifica_poligono(response)
+                return response_filtered
+            else:
+                logger.error(f"Erro na API do Google Maps: {data.get('status')}")
+        else:
+            logger.error("Erro HTTP na chamada à API do Google Maps")
+            return False
+
+def format_address(endereco):
+    if not endereco:
+        return ""
+    """
+    Formata o endereço para remover palavras irrelevantes, CEP, estado e país.
+    """
+    # Remove CEP (formato 5 dígitos - 3 dígitos)
+    endereco = re.sub(r'\b\d{5}-\d{3}\b', '', endereco)
+    # Remove país (Brazil ou Brasil)
+    endereco = re.sub(r'\b(brazil|brasil)\b', '', endereco, flags=re.IGNORECASE)
+    # Remove estado (ex: - RJ, RJ, - SP, SP, etc.)
+    endereco = re.sub(r'-\s*[A-Z]{2}\b', '', endereco)
+    endereco = re.sub(r'\b[A-Z]{2}\b', '', endereco)
+    # Remove vírgulas e espaços extras
+    # Remove vírgulas duplicadas ou triplicadas
+    endereco = re.sub(r',\s*,+', ',', endereco)
+    # Remove vírgulas no final da string (com ou sem espaços)
+    endereco = re.sub(r',\s*$', '', endereco)
+    endereco = re.sub(r'\s+', ' ', endereco).strip()
+    return endereco
+
 def get_endereco_latlong(latitude,longitude):
     response = chamada_google_maps(latitude=latitude,longitude=longitude )
     print(f"response do google maps:{response}")
-    if response.status_code == 200:
-        data = response.json()
-        logger.debug(f"Received data: {data}")
-        if data["status"] == "OK":
-            resultado = data["results"][0]
-            endereco = resultado.get("formatted_address", "Endereço não encontrado.")
-            return endereco
-        else:
-            logger.error(f"Erro na API do Google Maps: {data.get('status')}")
+    if response and len(response) > 0:
+        resultado = response[0]
     else:
-        logger.error("Erro HTTP na chamada à API do Google Maps")
-        return False
+        resultado = {}
+    endereco = format_address(resultado.get("formatted_address", ""))
+    return endereco
 
 
 def get_endereco_texto(endereco):
-    endereco_texto = re.sub(r'jacarezinho|jacare|rj|rio de janeiro', '', endereco, flags=re.IGNORECASE)            
-    endereco_texto += ",bairro Jacarezinho, Rio de Janeiro, RJ"
-    logger.debug(f"Buscando endereço pelo texto: {endereco_texto}")
-    response = chamada_google_maps(endereco=endereco_texto)
-    if response.status_code == 200:
-        data = response.json()
-        if data["status"] == "OK" and data["results"]:
-            resultado = data["results"][0]
-            endereco = resultado.get("formatted_address", "Endereço não encontrado.")
-            lat = resultado["geometry"]["location"]["lat"]
-            lng = resultado["geometry"]["location"]["lng"]        
-            return ({'lat':lat,'lng':lng,'endereco':endereco})
+    logger.debug(f"Buscando endereço pelo texto: {endereco}")
+    response = chamada_google_maps(endereco=endereco)
+    print(f"response do google maps:{response}")
+    if response and len(response) > 0:
+        resultado = response[0]
+        endereco = format_address(resultado.get("formatted_address", ""))
+        lat = resultado["geometry"]["location"]["lat"] if "geometry" in resultado and "location" in resultado["geometry"] and "lat" in resultado["geometry"]["location"] else None
+        lng = resultado["geometry"]["location"]["lng"] if "geometry" in resultado and "location" in resultado["geometry"] and "lng" in resultado["geometry"]["location"] else None
+        resultado_dict = {'lat':lat,'lng':lng,'endereco':endereco}
     else:
-        logger.error(f"Erro na API do Google Maps: {data.get('status')} - {data.get('error_message')}")
-    return False            
+        resultado_dict = {}
+    return (resultado_dict)
     

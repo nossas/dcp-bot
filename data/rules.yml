@@ -268,3 +268,8 @@ rules:
     steps:
       - action: action_agendar_inatividade
       - action: action_listen
+
+  - rule: agradecimento
+    steps:
+      - intent: agradecimento
+      - action: action_agradecimento

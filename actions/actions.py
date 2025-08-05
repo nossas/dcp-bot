@@ -97,7 +97,7 @@ class ActionAgendarInatividade(Action):
 
     def run(self, dispatcher, tracker, domain):
         logger.debug("rodando action: action_agendar_inatividade")
-        trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) + timedelta(minutes=3)
+        trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) + timedelta(minutes=5)
         logger.debug(f"agendando timeout para: {trigger_date_time}")
         
         return [
@@ -318,14 +318,23 @@ class ActionBuscarEndereco(Action):
         
         try:
             location_data = json.loads(user_message)
+            
             latitude = location_data["latitude"]
             longitude = location_data["longitude"]
+            # lat e long para testes de envio de localização 
+            # mesmo sem estar presente na região
+            # latitude = -22.886714701159054 
+            # longitude = -43.25881604023457
+
             if not location_data.get('address'):
                 logger.debug(f"latitude: {latitude}")
                 logger.debug(f"longitude: {longitude}")
                 logger.debug(f"não tem endereço")
                 endereco = get_endereco_latlong(latitude,longitude )
-                if endereco:
+                endereco = format_address(endereco)
+                logger.debug(f"Encontrou endereco {endereco}")
+                if endereco and dentro_do_retangulo(latitude, longitude):
+                    logger.debug(f"Endereço no retangulo {latitude}{longitude}")
                     dispatcher.utter_message(
                         text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
                         buttons=[
@@ -342,24 +351,30 @@ class ActionBuscarEndereco(Action):
                         FollowupAction("action_listen")
                     ]
                 else:
-                    dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
+                    logger.debug(f"Endereço fora do retangulo {latitude},{longitude}")
+                    dispatcher.utter_message(text="Não consegui encontrar esse lugar. Este lugar pode estar fora do alcance.\nVocê pode tentar de novo.")
                     return [FollowupAction("action_request_location")]
             else:
                 logger.debug(f"tem endereço")
-                endereco = location_data['address']
-                dispatcher.utter_message(
-                    text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
-                    buttons=[
-                        {"title": "Sim", "payload": "/affirm_address"},
-                        {"title": "Não", "payload": "/deny_address"}
-                    ]
-                )
-                return [
-                    SlotSet("latitude", latitude), 
-                    SlotSet("longitude", longitude), 
-                    SlotSet("endereco", endereco),
-                    FollowupAction("action_listen")
-                    ]
+                if dentro_do_retangulo(location_data['latitude'], location_data['longitude']):
+                    endereco = location_data['address']
+                    endereco = format_address(endereco)
+                    dispatcher.utter_message(
+                        text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
+                        buttons=[
+                            {"title": "Sim", "payload": "/affirm_address"},
+                            {"title": "Não", "payload": "/deny_address"}
+                        ]
+                    )
+                    return [
+                        SlotSet("latitude", latitude), 
+                        SlotSet("longitude", longitude), 
+                        SlotSet("endereco", endereco),
+                        FollowupAction("action_listen")
+                        ]
+                else:
+                    dispatcher.utter_message(text="Não consegui encontrar esse lugar. Este lugar pode estar fora do alcance.\nVocê pode tentar de novo.")
+                    return [FollowupAction("action_request_location")]
                 
         except (json.JSONDecodeError, KeyError) as e:
             logger.debug(f"Erro ao processar JSON ou chave não encontrada: {e}")
@@ -389,9 +404,11 @@ class ActionBuscarEnderecoTexto(Action):
             ]
         endereco_texto = tracker.latest_message.get("text")   
         coords = get_endereco_texto(endereco_texto)
+
         logger.debug(coords)
         if coords:
             endereco = coords.get("endereco", "Endereço não encontrado.")
+            endereco = format_address(endereco)
             latitude = coords.get("lat","")
             longitude = coords.get("lng","")
             dispatcher.utter_message(
@@ -409,8 +426,8 @@ class ActionBuscarEnderecoTexto(Action):
 
             ]
         else:
-            logger.debug(f"Não encontrou endereço: {endereco}")
-            dispatcher.utter_message(text="Não consegui encontrar esse lugar.\nVocê pode tentar de novo.")
+            logger.debug(f"Não encontrou endereço: {endereco_texto}")
+            dispatcher.utter_message(text="Não consegui encontrar esse lugar. Este lugar pode estar fora do alcance.\nVocê pode tentar de novo.")
         return [FollowupAction("action_request_location")]
 
 class ActionSalvarClassificacaoRisco(Action):
@@ -655,31 +672,6 @@ class ActionSalvarRisco(Action):
                 midia_id = cursor.fetchone()[0]
                 id_midias.append(midia_id)
 
-            # Inserir risco
-            cursor.execute("""
-                INSERT INTO riscos (
-                    id_usuario,
-                    latitude,
-                    longitude,
-                    endereco,
-                    classificacao,
-                    descricao,
-                    id_midias
-                )
-                VALUES (
-                    %s, %s, %s, %s, %s, %s, %s
-                )
-            """, (
-                usuario_id,
-                float(latitude),  
-                float(longitude),
-                endereco,
-                classificacao,
-                descricao,
-                id_midias if id_midias else None,
-            ))
-
-            conn.commit()
             cursor.close()
             conn.close()
             logger.debug(f"cadastro endereco: {endereco}")
@@ -1097,4 +1089,23 @@ class ActionSair(Action):
             SlotSet("midias", []),
             SlotSet("contexto_endereco_corrigido", False), 
             SlotSet("contexto_classificacao_corrigida", False)
+            ]
+
+
+
+    
+class ActionAgradecimento(Action):
+    def name(self) -> str:
+        return "action_agradecimento"
+
+    def run(self, dispatcher, tracker, domain):
+        logger.debug("rodando action: action_agradecimento")
+        dispatcher.utter_message(text="❤️")
+        trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) - timedelta(minutes=3)
+        return [ ReminderScheduled(
+                "inatividade_timeout",
+                trigger_date_time = trigger_date_time,
+                name="lembrete_inatividade",
+                kill_on_user_message=True
+            ),
             ]
