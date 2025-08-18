@@ -558,31 +558,6 @@ nlu:
     - terminar
     - fechar
 
-- intent: receber_notificacoes
-  examples: |
-    - /receber_notificacoes
-    - receber_notificacoes
-    - quero receber notificações
-    - Receber informações
-    - Quero notificações
-
-- intent: nao_receber_notificacoes
-  examples: |
-    - /nao_receber_notificacoes
-    - nao_receber
-    - nao_receber_notificacoes
-    - não receber notificações
-
-- intent: parar_notificacoes
-  examples: |
-    - parar de receber notificações
-    - parar de receber notificacoes
-    - Não quero mais receber notificações
-    - pare de me mandar mensagens
-    - Pare de enviar mensagens
-    - não quero mais receber
-    - nao quero mais receber
-
 - intent: mais_riscos
   examples: |
     - mais_riscos
@@ -615,3 +590,34 @@ nlu:
     - falou
     - é nois
     - ja é
+    - ok
+    - ok!
+    - beleza
+    - tudo certo
+    - tudo certo!
+    - valeu mesmo
+    - valeu mesmo!
+    - bele
+    - beleza!
+    - valeu, mona
+    - valeu, mona!
+    - valeu, mana
+    - valeu, mana!
+    - valeu, mano
+    - valeu, mano!
+    - valeu, cara
+    - valeu, cara!
+    - valeu, meu chapa
+    - valeu, minha chapa
+    - valeu, meu amor
+    - valeu amor
+    - valeu, meu bem
+    
+
+- intent: fallback_texto
+  examples: |
+    - Quero dinheiro
+    - Me faz um pix
+    - quero pix
+    - dinheiro
+    - pix

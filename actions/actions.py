@@ -64,6 +64,7 @@ class ActionFallbackButtons(Action):
                 FollowupAction("action_buscar_endereco_texto")
             ]
         if last_action == "utter_menu_inicial":
+            dispatcher.utter_message(text="Não consegui entender. Tente escolher um dos botões abaixo.")
             logger.debug(f"Fallback de menu inicial")
             return [
                 FollowupAction("utter_menu_inicial")
@@ -71,9 +72,23 @@ class ActionFallbackButtons(Action):
         if last_action == "action_buscar_endereco_texto":
             logger.debug(f"Fallback de buscar endereço")
             logger.debug(f"user_message: {user_message}")
-            dispatcher.utter_message(text="Não consegui entender esse endereço.\nVocê pode tentar de novo.")
+            dispatcher.utter_message(text="Não consegui entender.\nVocê pode tentar de novo.")
             return [
                     FollowupAction("action_request_location")
+            ]
+        if last_action == "action_agradecimento":
+            logger.debug(f"Fallback de agradecimento")
+            logger.debug(f"user_message: {user_message}")
+            dispatcher.utter_message(text="Não consegui entender. Se você quiser começar novamente por favor mande um oi.")
+            return [
+                    FollowupAction("action_listen")
+            ]
+        if last_action == "utter_menu_dicas":
+            logger.debug(f"Fallback de menu_dicas")
+            logger.debug(f"user_message: {user_message}")
+            dispatcher.utter_message(text="Não consegui entender. Por favor aperte um dos botões.")
+            return [
+                    FollowupAction("utter_menu_dicas")
             ]
         # Caso contrário, volta ao fallback padrão
         last_bot_message = None
@@ -523,6 +538,20 @@ class ActionSalvarMidiaRisco(Action):
                 ])
             logger.error(f"Erro ao salvar mídia no slot: {e}")
             return []
+
+class ActionPerguntarPorNovaMidia(Action):
+    def name(self) -> str:
+        return "action_perguntar_por_nova_midia"
+    def run(self, dispatcher, tracker, domain):
+        time.sleep(3)
+        logger.debug("rodando action: action_perguntar_por_nova_midia")
+        dispatcher.utter_message(
+            text="📸 Você pode mandar mais fotos e vídeos ou clicar em Não enviar mais para seguir.",
+            buttons=[
+                {"title": "Não enviar mais", "payload": "/pular_enviar_midia_risco"}
+            ]
+        )
+        return []
 
 class ActionConfirmarRisco(Action):
     def name(self) -> str:

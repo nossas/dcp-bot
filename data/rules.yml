@@ -66,7 +66,7 @@ rules:
     steps:
       - intent: receber_midia_risco
       - action: action_salvar_midia_risco
-      - action: utter_perguntar_por_nova_midia
+      - action: action_perguntar_por_nova_midia
 
   - rule: Confirmação positiva de risco
     steps:
@@ -129,26 +129,6 @@ rules:
       - intent: dicas_de
       - action: action_buscar_dicas
       - action: utter_pos_ajuda_dicas
-
-  - rule: Receber notificações
-    steps:
-      - intent: receber_notificacoes
-      - action: action_receber_notificacoes
-
-  - rule: não receber notificacoes
-    steps:
-      - intent: nao_receber_notificacoes
-      - action: action_parar_notificacoes
-
-  - rule: interromper notificações
-    steps:
-      - intent: parar_notificacoes
-      - action: action_parar_notificacoes
-
-  - rule: interromper notificações
-    steps:
-      - action: utter_finalizar
-      - action: action_listen
 
   - rule: Agendar verificação de inatividade (via conector)
     steps:
@@ -273,3 +253,23 @@ rules:
     steps:
       - intent: agradecimento
       - action: action_agradecimento
+
+
+  - rule: fallback texto
+    steps:
+      - intent: fallback_texto
+      - action: action_fallback_buttons
+      - action: action_listen
+
+  - rule: pos lista riscos
+    steps:
+      - action: utter_menu_pos_lista
+      - action: action_listen
+
+  - rule: saida riscos
+    steps:
+      - action: utter_saida_riscos
+      - action: action_listen
+
+
+      

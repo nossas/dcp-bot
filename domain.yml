@@ -4,6 +4,7 @@ session_config:
   carry_over_slots_to_new_session: false
 
 intents:
+- fallback_texto
 - alterar_nome
 - inatividade_timeout
 - inatividade_monitoramento
