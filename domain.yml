@@ -4,6 +4,7 @@ session_config:
   carry_over_slots_to_new_session: false
 
 intents:
+- fallback_texto
 - alterar_nome
 - inatividade_timeout
 - inatividade_monitoramento
@@ -28,9 +29,8 @@ intents:
 - recusar_confirmacao_risco
 - menu_inicial
 - como_ta_minha_area
-- o_que_fazer
+- preciso_de_ajuda
 - contatos_emergencia
-- ajuda
 - dicas_de
 - menu_dicas
 - sair
@@ -48,6 +48,7 @@ intents:
 - agradecimento
 
 actions:
+- utter_menu_pos_lista
 - utter_pos_ajuda_dicas
 - action_alterar_nome
 - action_agendar_inatividade
@@ -69,13 +70,13 @@ actions:
 - action_salvar_descricao_risco
 - utter_perguntar_por_midia
 - action_salvar_midia_risco
-- utter_perguntar_por_nova_midia
+- action_perguntar_por_nova_midia
 - action_confirmar_relato
 - action_recusar_risco
 - action_salvar_risco
 - action_listar_riscos
 - action_perguntar_mais_riscos
-- utter_o_que_fazer
+- utter_preciso_de_ajuda
 - action_listar_abrigos
 - action_listar_contatos_emergencia
 - utter_menu_dicas
@@ -171,10 +172,23 @@ responses:
     buttons:
     - title: Informar um risco
       payload: /informar_risco
-    - title: Como tá minha área
+    - title: Como tá minha área?
       payload: /como_ta_minha_area
-    - title: Saber o que fazer
-      payload: /o_que_fazer
+    - title: Preciso de ajuda
+      payload: /preciso_de_ajuda
+
+  utter_menu_pos_lista:
+  - text: | 
+      Como podemos te ajudar agora? 
+    buttons:
+    - title: Informar um risco
+      payload: /informar_risco
+    - title: Preciso de ajuda
+      payload: /preciso_de_ajuda
+    - title: Menu inicial
+      payload: /menu_inicial
+
+
 
   utter_classificar_risco:
   - text: "Perfeito {nome}. Você quer falar sobre:" 
@@ -189,25 +203,22 @@ responses:
 
   utter_perguntar_por_midia:
   - text: | 
-      📸 Se você tiver uma foto ou vídeo, envie agora ou clique em pular. 
+      📸 Se tiver uma *foto* ou *vídeo*, pode mandar por aqui ou clicar em pular para continuar. 
     buttons:
     - title: Pular
       payload: '/pular_enviar_midia_risco'
 
-
-  utter_perguntar_por_nova_midia:
-  - text: Você pode mandar mais mídias ou clicar em Não enviar mais para seguir.
-    buttons:
-    - title: Não enviar mais
-      payload: '/pular_enviar_midia_risco'
-
-  utter_o_que_fazer:
+  utter_preciso_de_ajuda:
   - text: |
-      ⚠️ Recomendamos que você:
+      Recomendamos que você:
+       
         • Separe agora mesmo um kit de sobrevivência com documentos, remédios e itens essenciais.
+         
         • Tenha cuidado com fios caídos ou locais com risco de choque elétrico.
-        • Evite contato com a água de enchentes, pois pode estar contaminada.
-        ⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil* – tel:199 .
+         
+        •  Evite contato com a água de enchentes, pois pode estar contaminada.
+         
+        ⚠️ Em caso de urgência, ligue para a *Defesa Civil: 199*.
         
   utter_ajuda:
   - text: |
@@ -255,12 +266,12 @@ responses:
   
   utter_saida_riscos:
   - text: |
-      ℹ️ Te ajudo em algo mais? Você pode clicar em:
+      Te ajudo em algo mais? Você pode:
     buttons:
-    - title: Voltar ao menu
+    - title: Preciso de ajuda
+      payload: '/preciso_de_ajuda'
+    - title: Menu inicial
       payload: '/menu_inicial'
-    - title: Saber o que fazer
-      payload: '/o_que_fazer'
     - title: Encerrar
       payload: /sair
 

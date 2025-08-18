@@ -20,6 +20,17 @@ def get_last_action(tracker, depth=1):
             depth -= 1
     return last_action
 
+def get_last_intent(tracker, depth=1):
+    last_intent = None
+    for event in reversed(tracker.events):
+        if (event.get("event") == "intent" ):
+            last_intent = event.get("name")
+            logger.debug(f"Last intent:{last_intent} depth:{depth}")
+            if depth < 2: 
+                logger.debug(f"Last intent:{last_intent} break:{depth}")
+                break
+            depth -= 1
+    return last_intent
 
 def extrair_riscos(json_data: Dict) -> List[Dict]:
     riscos_extraidos = []

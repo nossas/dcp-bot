@@ -64,6 +64,7 @@ class ActionFallbackButtons(Action):
                 FollowupAction("action_buscar_endereco_texto")
             ]
         if last_action == "utter_menu_inicial":
+            dispatcher.utter_message(text="Não consegui entender. Tente escolher um dos botões abaixo.")
             logger.debug(f"Fallback de menu inicial")
             return [
                 FollowupAction("utter_menu_inicial")
@@ -71,9 +72,23 @@ class ActionFallbackButtons(Action):
         if last_action == "action_buscar_endereco_texto":
             logger.debug(f"Fallback de buscar endereço")
             logger.debug(f"user_message: {user_message}")
-            dispatcher.utter_message(text="Não consegui entender esse endereço.\nVocê pode tentar de novo.")
+            dispatcher.utter_message(text="Não consegui entender.\nVocê pode tentar de novo.")
             return [
                     FollowupAction("action_request_location")
+            ]
+        if last_action == "action_agradecimento":
+            logger.debug(f"Fallback de agradecimento")
+            logger.debug(f"user_message: {user_message}")
+            dispatcher.utter_message(text="Não consegui entender. Se você quiser começar novamente por favor mande um oi.")
+            return [
+                    FollowupAction("action_listen")
+            ]
+        if last_action == "utter_menu_dicas":
+            logger.debug(f"Fallback de menu_dicas")
+            logger.debug(f"user_message: {user_message}")
+            dispatcher.utter_message(text="Não consegui entender. Por favor aperte um dos botões.")
+            return [
+                    FollowupAction("utter_menu_dicas")
             ]
         # Caso contrário, volta ao fallback padrão
         last_bot_message = None
@@ -149,16 +164,20 @@ class ActionRequestLocation(Action):
 
     def run(self, dispatcher, tracker, domain): 
         logger.debug("rodando action: action_request_location")
-        
+        last_action = get_last_action(tracker)
+        if last_action == "utter_classificar_risco":
+            dispatcher.utter_message(text="Você aceitou o endereço e depois cancelou. Vamos precisar recomeçar.")
+            return [
+                FollowupAction("utter_menu_inicial")
+            ]
+
         latitude = tracker.get_slot("latitude")
         longitude = tracker.get_slot("longitude")
         endereco = tracker.get_slot("endereco")
         nome = tracker.get_slot("nome")
         classificacao_risco = tracker.get_slot("classificacao_risco")
         logger.debug(f"solicitando localização")
-        dispatcher.utter_message(text="Precisamos saber onde está o risco que você quer compartilhar. Você pode:")
-        dispatcher.utter_message(text="✏️ *Digitar o endereço:* Como por exemplo 'Rua Senador Nabuco, 11, Jacarezinho'")
-        dispatcher.utter_message(text="📍 *Enviar sua localização atual:* Se clicar no botão abaixo o WhatsApp vai pedir permissão para usar sua localização - é só aceitar.",custom={"type": "location_request"})
+        dispatcher.utter_message(text="Precisamos saber qual o local do risco. Você pode:\n \n📍 *Clicar no botão abaixo* e o WhatsApp vai pedir para usar sua localização - é só aceitar.\n \n✏️ Ou você pode *digitar o endereço* (ex: “Rua do Rio, 20”).",custom={"type": "location_request"})
         return [
             SlotSet("endereco", None),
             SlotSet("latitude", None),
@@ -236,7 +255,7 @@ class ActionPerguntarNome(Action):
             logger.error(f"Erro ao buscar nome no banco: {e}")
 
         dispatcher.utter_message(
-            text="Oie! Bem-vindo(a) à Defesa Climática Popular.\nPra começar, *como você prefere ser chamado(a)?*"
+            text="Oie! 👋 \n \n Bem-vindo(a) à *Defesa Climática Popular*.\n \nPra começar, *como você prefere ser chamado(a)?*"
         )
         
         return [SlotSet("pagina_risco",1)]
@@ -352,7 +371,7 @@ class ActionBuscarEndereco(Action):
                     ]
                 else:
                     logger.debug(f"Endereço fora do retangulo {latitude},{longitude}")
-                    dispatcher.utter_message(text="Não consegui encontrar esse lugar. Este lugar pode estar fora do alcance.\nVocê pode tentar de novo.")
+                    dispatcher.utter_message(text="Não consegui entender esse endereço. Pode tentar de novo?")
                     return [FollowupAction("action_request_location")]
             else:
                 logger.debug(f"tem endereço")
@@ -373,7 +392,7 @@ class ActionBuscarEndereco(Action):
                         FollowupAction("action_listen")
                         ]
                 else:
-                    dispatcher.utter_message(text="Não consegui encontrar esse lugar. Este lugar pode estar fora do alcance.\nVocê pode tentar de novo.")
+                    dispatcher.utter_message(text="Não consegui entender esse endereço. Pode tentar de novo?")
                     return [FollowupAction("action_request_location")]
                 
         except (json.JSONDecodeError, KeyError) as e:
@@ -427,7 +446,7 @@ class ActionBuscarEnderecoTexto(Action):
             ]
         else:
             logger.debug(f"Não encontrou endereço: {endereco_texto}")
-            dispatcher.utter_message(text="Não consegui encontrar esse lugar. Este lugar pode estar fora do alcance.\nVocê pode tentar de novo.")
+            dispatcher.utter_message(text="Não consegui entender esse endereço. Pode tentar de novo?")
         return [FollowupAction("action_request_location")]
 
 class ActionSalvarClassificacaoRisco(Action):
@@ -461,10 +480,7 @@ class ActionSolicitarDescricaoRisco(Action):
         action_classificar = "utter_classificar_risco" if last_action == "utter_classificar_risco" else "action_classificar_risco_corrigir"
         if risco:
             dispatcher.utter_message(
-                text=f"Se puder, conte um pouco mais sobre o que está acontecendo. Isso ajuda a entender melhor a situação.",
-            )
-            dispatcher.utter_message(
-                text=f"Você pode *escrever uma mensagem* ou clicar em *pular* para continuar.",
+                text=f"Se puder, conte um pouco mais sobre o que está acontecendo.\n \nVocê pode *escrever* uma mensagem com a descrição ou clicar em *pular* para continuar.",
                 buttons=[
                     {"title": "Pular", "payload": "/pular_descricao_risco"},
                 ]
@@ -496,6 +512,15 @@ class ActionSalvarMidiaRisco(Action):
 
     def run(self, dispatcher, tracker, domain):
         logger.debug("rodando action: action_salvar_midia_risco")
+        last_action = get_last_action(tracker,1)
+        logger.debug(f"last_action: {last_action}")
+        if last_action != "action_perguntar_por_nova_midia" and last_action != "utter_perguntar_por_midia":
+            return [
+                SlotSet("midias", []),
+                dispatcher.utter_message(
+                text="Algo errado aconteceu. Vamos tentar de novo"),
+                FollowupAction("utter_menu_inicial")
+            ]
         try:
             user_message = tracker.latest_message.get("text")
             midia_data = json.loads(user_message)
@@ -506,13 +531,12 @@ class ActionSalvarMidiaRisco(Action):
             if midia_data.get("tipo") == "mídia_combinada":
                 novas_midias = [m["path"] for m in midia_data["midias"]]
                 midias_slot.extend(novas_midias)
-                dispatcher.utter_message(text=f"Estou recebendo. Se ainda tiver arquivos carregando, aguarde concluir.")
             else:
                 # Caso venha uma mídia só
                 path = midia_data["path"]
                 midias_slot.append(path)
-                dispatcher.utter_message(text="Foto/vídeo adicionado!")
 
+            dispatcher.utter_message(text=f"Recebendo... Se ainda estiver algo carregando, aguarde concluir.")
             return [SlotSet("midias", midias_slot)]
 
         except Exception as e:
@@ -523,6 +547,20 @@ class ActionSalvarMidiaRisco(Action):
                 ])
             logger.error(f"Erro ao salvar mídia no slot: {e}")
             return []
+
+class ActionPerguntarPorNovaMidia(Action):
+    def name(self) -> str:
+        return "action_perguntar_por_nova_midia"
+    def run(self, dispatcher, tracker, domain):
+        time.sleep(3)
+        logger.debug("rodando action: action_perguntar_por_nova_midia")
+        dispatcher.utter_message(
+            text="📸 Você pode mandar mais fotos e vídeos ou clicar em Não enviar mais para seguir.",
+            buttons=[
+                {"title": "Não enviar mais", "payload": "/pular_enviar_midia_risco"}
+            ]
+        )
+        return []
 
 class ActionConfirmarRisco(Action):
     def name(self) -> str:
@@ -537,14 +575,14 @@ class ActionConfirmarRisco(Action):
         midias_slot = tracker.get_slot("midias") or []
         
         mensagem = (
-            f"Resumo do seu relato:\n"
-            f"📍 *Endereço:* {endereco}\n"
-            f"⚠️ *Tipo de risco:* {classificacao}\n"
-            f"📝 *Descrição:* {descricao}\n\n"
+            f"*Resumo do seu relato:*\n \n"
+            f"📍 *Endereço:* {endereco}\n \n"
+            f"⚠️ *Tipo:* {classificacao.capitalize()}\n \n"
+            f"📝 *Descrição:* {descricao}\n \n"
         )
         dispatcher.utter_message(text=mensagem)
         if (len(midias_slot)):
-            dispatcher.utter_message(text="📸 Fotos/vídeos: ")
+            dispatcher.utter_message(text="📸 *Fotos/vídeos:* ")
             for midia in midias_slot:
                 media_type = verificar_tipo_arquivo(midia)
                 media_path = os.path.splitext(midia)[0]
@@ -561,11 +599,8 @@ class ActionConfirmarRiscoPosMidia(Action):
     def run(self, dispatcher, tracker, domain):
         time.sleep(3)
         logger.debug("rodando action: action_confirmar_relato_pos_midia")
-        dispatcher.utter_message(text="Essas informações estão corretas? Se sim, clique em *Confirmar e enviar*.")
-        dispatcher.utter_message(text="Seu relato será salvo com segurança, passará por uma verificação rápida e, se aprovado, será publicado no mapa. Tudo conforme nossa política de privacidade (saiba mais em bit.ly/termo-privacidade)")
-        mensagem = ("Confirmar envio:")
         dispatcher.utter_message(
-            text=mensagem,
+            text="Essas informações estão corretas? Se sim, clique em *Confirmar e enviar*.\n \nSeu relato passará por uma *verificação* antes de ser publicado, tudo de acordo com a política de privacidade (bit.ly/termo-privacidade).",
             buttons=[
                 {"title": "Confirmar e enviar", "payload": "/afirmar_confirmacao_risco"},
                 {"title": "Corrigir informações", "payload": "/recusar_confirmacao_risco"}
@@ -700,17 +735,14 @@ class ActionSalvarRisco(Action):
             return []
 
         dispatcher.utter_message(
-            text='✅ *Registrado!*\nEstamos verificando suas informações. Assim que a revisão for concluída, você receberá uma mensagem de confirmação.'
-        )
-        dispatcher.utter_message(
-            text='⛑️ Se precisar de ajuda urgente, ligue para a *Defesa Civil – 199.*', 
+            text='*Registrado!*\n \nVamos *revisar suas informações* e, assim que finalizarmos, você receberá uma mensagem de confirmação.\n \n⚠️ Em caso de urgência, ligue para a *Defesa Civil: 199*.'
         )
         
         dispatcher.utter_message(
-            text='ℹ️ Te ajudo em algo mais? Você pode clicar em:',
+            text='ℹ️ Te ajudo em algo mais? Você pode:',
             buttons=[
-                {"title": "Voltar ao menu", "payload": "/menu_inicial"},
-                {"title": "Como tá minha área", "payload": "/como_ta_minha_area"},
+                {"title": "Como tá minha área?", "payload": "/como_ta_minha_area"},
+                {"title": "Menu inicial", "payload": "/menu_inicial"},
                 {"title": "Encerrar", "payload": "/sair"}
             ]
         )
@@ -753,18 +785,20 @@ class ActionListarRiscos(Action):
             response.raise_for_status()
             dados = response.json()
             riscos = extrair_riscos(dados)
-
+            if not riscos and pagina == 1:
+                dispatcher.utter_message(text="Nenhuma informação foi compartilhada pela comunidade recentemente!")
+                return [SlotSet("pagina_risco", 1),FollowupAction("utter_saida_riscos")]
             if not riscos:
-                dispatcher.utter_message(text="Não temos mais relatos na sua região.")
-                return [SlotSet("pagina_risco", 1)]
+                dispatcher.utter_message(text="Você já viu todos os relatos da comunidade.")
+                return [SlotSet("pagina_risco", 1),FollowupAction("utter_saida_riscos")]
             
-            mensagem = ''
+            mensagem = '⬇️ Confira abaixo as informações enviadas pela comunidade:\n \n \n' if pagina == 1  else ''
             for risco in riscos:
                 classificacao = risco['classificacao'][0]
                 classificacao_dict = {
-                    "Alagamento": "☔️ Alagamento informado",
-                    "Lixo": "🗑️ Lixo registrado",
-                    "Outros": "🔺 Risco informado"
+                    "Alagamento": "*Alagamento* informado",
+                    "Lixo": "*Lixo* registrado",
+                    "Outros": "*Risco* informado"
                 }
                 classificacao_texto = classificacao_dict.get(classificacao, "")
                 data_hora = formata_data(risco['data'],'%H:%M do dia %d/%m/%Y')
@@ -829,7 +863,7 @@ class ActionNivelDeRisco(Action):
                 return []
 
             nivel = data["grau_risco"]
-            mensagem = f"🚨 O nível de risco atual da sua região é: *{nivel.upper()}*."
+            mensagem = f"O nível de risco atual é *{nivel.upper()}*."
             dispatcher.utter_message(text=mensagem)
 
         except Exception as e:
@@ -856,10 +890,14 @@ class ActionListarAbrigos(Action):
                 dispatcher.utter_message(text="Não encontrei nenhum abrigo no momento.")
                 return []
 
-            mensagem = "Aqui estão alguns abrigos disponíveis:\n\n"
+            mensagem = "*Alguns abrigos disponíveis:*\n \n"
             for abrigo in abrigos:
-                mensagem += f"🏠 *{abrigo['nome']}*\n{abrigo['endereco']}\n\n"
-
+                if abrigo.get('nome'):
+                    mensagem += f"📍 *{abrigo['nome']}*"
+                if abrigo.get('telefone'):
+                    mensagem += f"\nTelefone:{abrigo['telefone']}\n \n"
+                if abrigo.get('endereco'):
+                    mensagem += f"\n{format_address(abrigo['endereco'])}\n \n"
             dispatcher.utter_message(text=mensagem)
 
         except Exception as e:
@@ -891,15 +929,15 @@ class ActionListarContatosEmergencia(Action):
                 dispatcher.utter_message(text="Nenhum contato de emergência encontrado.")
                 return []
 
-            mensagens = []
+            mensagem = ""
             for contato in contatos:
                 nome = contato.get("nome", "Nome não disponível")
                 descricao = contato.get("descricao", "")
                 telefone = contato.get("telefone", "Telefone não disponível")
-                mensagens.append(f"*{nome}*: {telefone}")
-                mensagens.append(f"\n{descricao}")
+                mensagem += f"*{nome}: {telefone}*"
+                mensagem += f"\n{descricao}\n \n"
 
-            mensagem_final = "Contatos de emergência:\n" + "\n".join(mensagens)
+            mensagem_final = f"Contatos de emergência:\n \n{mensagem}"
             dispatcher.utter_message(text=mensagem_final)
 
         except requests.exceptions.RequestException as e:
@@ -916,7 +954,7 @@ class ActionBuscarDicas(Action):
         logger.debug("rodando action: action_buscar_dicas")
         tipo_dica = tracker.get_slot("dicas")
         if not tipo_dica:
-            dispatcher.utter_message(text="Desculpe, não entendi o tipo de dica que você deseja.")
+            dispatcher.utter_message(text="Desculpe, não entendi o tipo de dica que você deseja. Por favor aperte em um dos botões.")
             return []
 
         wordpress_url = os.getenv("WORDPRESS_URL")
@@ -1071,8 +1109,7 @@ class ActionSair(Action):
 
     def run(self, dispatcher, tracker, domain):
         logger.debug("rodando action: action_sair")
-        dispatcher.utter_message(text="Certo! Se quiser mais informações é só mandar um “oi” por aqui. \n \nVocê também pode acompanhar atualizações no site www.defesaclimaticapopular.org\n\n")
-        dispatcher.utter_message(text="E, se quiser receber avisos sobre sua região, entre no grupo da Defesa Climática Popular pelo link bit.ly/grupodefesaclimaticapopular. \n \nPor lá, avisamos quando houver mudanças ou novidades no Jacarezinho.")
+        dispatcher.utter_message(text='Quer saber mais e conversar com a comunidade?\n \n💬 Entre no *grupo de WhatsApp* clicando no link: bit.ly/grupodefesaclimaticapopular\n \n🌐 Acompanhe também pelo site: www.defesaclimaticapopular.org\n \n👋 E se quiser falar por aqui de novo, é só mandar um "oi"!')
         dispatcher.utter_message(text="Estamos por aqui pra ajudar no que for possível! 🫂")
         trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) - timedelta(minutes=3)
         return [ ReminderScheduled(
@@ -1106,6 +1143,6 @@ class ActionAgradecimento(Action):
                 "inatividade_timeout",
                 trigger_date_time = trigger_date_time,
                 name="lembrete_inatividade",
-                kill_on_user_message=True
+                kill_on_user_message=False
             ),
             ]

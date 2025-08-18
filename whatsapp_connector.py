@@ -235,7 +235,12 @@ class WhatsAppInput(InputChannel):
 
                 await self.handle_media(sender, media_object, on_new_message, out_channel)
                 return response.text("", status=200)
-
+            if message_type in ["audio"]:
+                # responde com mensagem avisando que não é possível enviar áudio
+                logger.debug(f"Recebido áudio de {sender}, mas não é possível processar áudio.")
+                await out_channel.send_text_message(sender, "Não podemos ouvir áudio, por favor mande escrito.")
+                return response.text("", status=200)
+                
             # Caso não seja mídia
             text = self.get_message(request.json)
             if sender and text:
