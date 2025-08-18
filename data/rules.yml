@@ -85,11 +85,6 @@ rules:
       - action: utter_perguntar_por_midia
       - action: action_listen
   
-  - rule: pedido de ajuda
-    steps: 
-      - intent: ajuda
-      - action: utter_ajuda
-
   - rule: como está minha área
     steps:
       - intent: como_ta_minha_area
@@ -103,8 +98,8 @@ rules:
 
   - rule: O que fazer
     steps:
-      - intent: o_que_fazer
-      - action: utter_o_que_fazer
+      - intent: preciso_de_ajuda
+      - action: utter_preciso_de_ajuda
       - action: utter_ajuda
 
   - rule: Encontrar Abrigo

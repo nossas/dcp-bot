@@ -475,16 +475,10 @@ nlu:
     - É seguro sair agora?
 
 
-- intent: ajuda
+- intent: preciso_de_ajuda
   examples: |
-    - Preciso de ajuda
-    - não sei o que fazer
-    - /ajuda
-
-- intent: o_que_fazer
-  examples: |
-    - o_que_fazer
-    - /o_que_fazer
+    - preciso_de_ajuda
+    - /preciso_de_ajuda
     - o que fazer agora?
     - o que faço?
     - saber o que fazer
@@ -492,6 +486,10 @@ nlu:
     - Preciso me proteger?
     - O que não fazer?
     - O que evitar?
+    - não sei o que fazer
+    - /ajuda
+    - eu estou na enchente
+    - estou com medo
 
 
 - intent: contatos_emergencia
