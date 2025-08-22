@@ -41,7 +41,7 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
         logger.debug(f"➡️ Enviando mensagem para {recipient_id}: {text}")
         for message_part in text.strip().split("\n\n"):
             self.send_message(message_part, recipient_id=recipient_id)
-        await asyncio.sleep(1)
+        await asyncio.sleep(1.5)
     
     async def send_custom_json(self,recipient_id, custom, **kwargs: Any) -> None:
         logger.debug(f"Enviando custom json para {recipient_id}: {custom}")
@@ -97,7 +97,7 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
             self.send_video(custom.get('url'),recipient_id)
             if custom.get('is_last'):
                 await asyncio.sleep(0.5)    
-        await asyncio.sleep(1)
+        await asyncio.sleep(1.5)
             
 
     async def send_text_with_buttons(
@@ -117,31 +117,31 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
         }
 
         self.send_reply_button(recipient_id=recipient_id,button=button_dict )  
-        await asyncio.sleep(1)
+        await asyncio.sleep(1.5)
 
     async def send_image_url(self, recipient_id: Text, image: Text, **kwargs: Any) -> None:
         """Sends an image."""
         # self.send_custom_json(recipient_id,{type: "typing"})
         self.send_image(image, recipient_id=recipient_id)
-        await asyncio.sleep(1)
+        await asyncio.sleep(1.5)
 
     async def send_video_url(self, recipient_id: Text, video: Text, **kwargs: Any) -> None:
         # self.send_custom_json(recipient_id,{type: "typing"})
         """Sends a Video"""
         self.send_video(video, recipient_id=recipient_id)
-        await asyncio.sleep(1)
+        await asyncio.sleep(1.5)
 
     async def send_document_url(self, recipient_id: Text, document: Text, **kwargs: Any) -> None:
         # self.send_custom_json(recipient_id,{type: "typing"})
         """Sends a Document"""
         self.send_document(document, recipient_id=recipient_id)
-        await asyncio.sleep(1)
+        await asyncio.sleep(1.5)
 
     async def send_audio_url(self, recipient_id: Text, audio: Text, **kwargs: Any) -> None:
         # self.send_custom_json(recipient_id,{type: "typing"})
         """Sends an Audio"""
         self.send_audio(audio, recipient_id=recipient_id)
-        await asyncio.sleep(1)
+        await asyncio.sleep(1.5)
 
 class WhatsAppInput(InputChannel):
     """WhatsApp Cloud API input channel"""
@@ -193,7 +193,7 @@ class WhatsAppInput(InputChannel):
 
     async def finalize_media_batch(self, sender_id, on_new_message, out_channel):
         try:
-            await asyncio.sleep(3)
+            await asyncio.sleep(4)
             medias = self.media_cache.pop(sender_id, [])
             self.media_timers.pop(sender_id, None)
 
