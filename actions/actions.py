@@ -802,12 +802,12 @@ class ActionListarRiscos(Action):
                 }
                 classificacao_texto = classificacao_dict.get(classificacao, "")
                 data_hora = formata_data(risco['data'],'%H:%M do dia %d/%m/%Y')
-                mensagem = (
+                mensagem += (
                     f"{classificacao_texto} às {data_hora}\n \n"
                     f"*Local:* {risco['endereco']}\n \n"
                 )
                 if risco['descricao']:
-                    mensagem += f"*Descrição:* {risco['descricao']}\n\n"
+                    mensagem += f"*Descrição:* {risco['descricao']}\n \n"
                 if risco['imagens'] or risco['videos']:
                     mensagem = mensagem + f"*Fotos/vídeos:*\n \n"
                 dispatcher.utter_message(text=mensagem)
@@ -833,7 +833,7 @@ class ActionPerguntarMaisRiscos(Action):
 
     def run(self, dispatcher, tracker, domain):
         logger.debug("rodando action: action_perguntar_mais_riscos")
-        time.sleep(2)
+        # time.sleep(2)
         dispatcher.utter_message(
             text="Quer ver mais relatos da comunidade?",
             buttons=[
@@ -863,7 +863,15 @@ class ActionNivelDeRisco(Action):
                 return []
 
             nivel = data["grau_risco"]
-            mensagem = f"O nível de risco atual é *{nivel.upper()}*."
+            alerta = nivel.get("tipo_de_alerta", "Não temos informações sobre a região no momento.")
+            alerta_icon = {
+                'NORMAL':"🟢",
+                'ATENÇÃO':"🟡",
+                'PERIGO':"🔴",
+            }
+            if alerta in alerta_icon:
+                alerta = f"O nível de risco atual é *{alerta}* {alerta_icon[alerta]}."
+            mensagem = f"{alerta}"
             dispatcher.utter_message(text=mensagem)
 
         except Exception as e:

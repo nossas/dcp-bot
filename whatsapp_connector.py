@@ -36,11 +36,15 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
     
     async def send_text_message(self, recipient_id: Text, text: Text, **kwargs: Any) -> None:
         """Sends text message"""
+        await asyncio.sleep(0.5)
+
         logger.debug(f"➡️ Enviando mensagem para {recipient_id}: {text}")
         for message_part in text.strip().split("\n\n"):
             self.send_message(message_part, recipient_id=recipient_id)
     
     async def send_custom_json(self,recipient_id, custom, **kwargs: Any) -> None:
+        await asyncio.sleep(0.5)
+
         if custom.get('type') == "location_request":
             json={
                "messaging_product": "whatsapp",
@@ -80,14 +84,15 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
         elif custom.get('type') == "video":
             logger.debug(f"Video usando custom recipient: {recipient_id} ")
             self.send_video(custom.get('url'),recipient_id)
-            if custom.get('is_last'):
-                await asyncio.sleep(2)
+            # if custom.get('is_last'):
+            #     await asyncio.sleep(2)
             
             
 
     async def send_text_with_buttons(
         self, recipient_id: Text, text: Text, buttons: List[Dict[Text, Any]], **kwargs: Any
     ) -> None:
+        await asyncio.sleep(0.5)
         """Sends text message with buttons"""
         buttons_list = [
             {"type": "reply", "reply": {"id": button["payload"], "title": button["title"]}}
@@ -104,17 +109,25 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
 
     async def send_image_url(self, recipient_id: Text, image: Text, **kwargs: Any) -> None:
         """Sends an image."""
+        await asyncio.sleep(0.5)
+
         self.send_image(image, recipient_id=recipient_id)
 
     async def send_video_url(self, recipient_id: Text, video: Text, **kwargs: Any) -> None:
+        await asyncio.sleep(0.5)
+
         """Sends a Video"""
         self.send_video(video, recipient_id=recipient_id)
 
     async def send_document_url(self, recipient_id: Text, document: Text, **kwargs: Any) -> None:
+        await asyncio.sleep(0.5)
+
         """Sends a Document"""
         self.send_document(document, recipient_id=recipient_id)
 
     async def send_audio_url(self, recipient_id: Text, audio: Text, **kwargs: Any) -> None:
+        await asyncio.sleep(0.5)
+
         """Sends an Audio"""
         self.send_audio(audio, recipient_id=recipient_id)
 
