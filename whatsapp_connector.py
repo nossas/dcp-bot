@@ -41,21 +41,9 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
         logger.debug(f"➡️ Enviando mensagem para {recipient_id}: {text}")
         for message_part in text.strip().split("\n\n"):
             self.send_message(message_part, recipient_id=recipient_id)
-        await asyncio.sleep(1.5)
     
     async def send_custom_json(self,recipient_id, custom, **kwargs: Any) -> None:
         logger.debug(f"Enviando custom json para {recipient_id}: {custom}")
-        if custom.get('type') == "typing":
-            json = {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": recipient_id,
-                "type": "typing"
-            }
-            logger.debug(f"Enviando mensagem de digitação para {recipient_id}")
-            WhatsApp.send_custom_json(self, data=json, recipient_id=recipient_id)
-        # else:
-            # self.send_custom_json(recipient_id,{type: "typing"})
         if custom.get('type') == "location_request":
             json={
                "messaging_product": "whatsapp",
@@ -96,8 +84,7 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
             logger.debug(f"Video usando custom recipient: {recipient_id} ")
             self.send_video(custom.get('url'),recipient_id)
             if custom.get('is_last'):
-                await asyncio.sleep(0.5)    
-        await asyncio.sleep(1.5)
+                await asyncio.sleep(2)    
             
 
     async def send_text_with_buttons(
@@ -117,33 +104,28 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
         }
 
         self.send_reply_button(recipient_id=recipient_id,button=button_dict )  
-        await asyncio.sleep(1.5)
 
     async def send_image_url(self, recipient_id: Text, image: Text, **kwargs: Any) -> None:
         """Sends an image."""
         # self.send_custom_json(recipient_id,{type: "typing"})
         self.send_image(image, recipient_id=recipient_id)
-        await asyncio.sleep(1.5)
 
     async def send_video_url(self, recipient_id: Text, video: Text, **kwargs: Any) -> None:
         # self.send_custom_json(recipient_id,{type: "typing"})
         """Sends a Video"""
         self.send_video(video, recipient_id=recipient_id)
-        await asyncio.sleep(1.5)
 
     async def send_document_url(self, recipient_id: Text, document: Text, **kwargs: Any) -> None:
         # self.send_custom_json(recipient_id,{type: "typing"})
         """Sends a Document"""
         self.send_document(document, recipient_id=recipient_id)
-        await asyncio.sleep(1.5)
 
     async def send_audio_url(self, recipient_id: Text, audio: Text, **kwargs: Any) -> None:
         # self.send_custom_json(recipient_id,{type: "typing"})
         """Sends an Audio"""
         self.send_audio(audio, recipient_id=recipient_id)
-        await asyncio.sleep(1.5)
 
-class WhatsAppInput(InputChannel):
+class WhatsAppInput(WhatsApp, InputChannel):
     """WhatsApp Cloud API input channel"""
     media_cache = defaultdict(list)
     media_timers = {}
@@ -175,6 +157,7 @@ class WhatsAppInput(InputChannel):
         self.verify_token = verify_token
         self.debug_mode = debug_mode
         self.client = WhatsApp(self.auth_token, phone_number_id=self.phone_number_id)
+        super().__init__(auth_token, phone_number_id=phone_number_id)
 
         # Log do auth_token para depuração
         logger.debug(f"WhatsAppInput initialized with auth_token: {self.auth_token}")
@@ -193,7 +176,7 @@ class WhatsAppInput(InputChannel):
 
     async def finalize_media_batch(self, sender_id, on_new_message, out_channel):
         try:
-            await asyncio.sleep(4)
+            await asyncio.sleep(10)
             medias = self.media_cache.pop(sender_id, [])
             self.media_timers.pop(sender_id, None)
 
@@ -207,7 +190,19 @@ class WhatsAppInput(InputChannel):
             )
         except asyncio.CancelledError:
             pass
-
+    
+    async def send_typing(self, recipient_id,message_id):
+        
+        json = {
+            "messaging_product": "whatsapp",
+            "status": "read",
+            "message_id": message_id,
+            "typing_indicator": {
+                "type": "text"
+            }
+        }
+        return WhatsApp.send_custom_json(self, data=json, recipient_id=recipient_id)
+        
     def get_message(self, data):
         message_type = self.client.get_message_type(data)
         if message_type == "interactive":
@@ -244,10 +239,17 @@ class WhatsAppInput(InputChannel):
             message_type = self.client.get_message_type(request.json)
             metadata = self.get_metadata(request)
             out_channel = self.get_output_channel()
-
+            message_id = self.client.get_message_id(request.json)
+            logger.debug(f"sender: {sender}")
+            logger.debug(f"message_id: {message_id}")
+            if (message_id and sender):
+                await self.send_typing(sender,message_id)
+                if message_type not in ["image", "video"] ):
+                    await asyncio.sleep(4)
+                logger.debug(f"Enviando typing para {sender} com message_id {message_id}")
             if message_type in ["image", "video"]:
                 media_data = self.client.get_video(request.json) if message_type == "video" else self.client.get_image(request.json)
-
+                await self.send_typing(sender,message_id)
                 media_id = media_data.get("id")
                 url = self.client.query_media_url(media_id)
                 mime_type = media_data.get("mime_type")

@@ -553,7 +553,7 @@ class ActionPerguntarPorNovaMidia(Action):
     def name(self) -> str:
         return "action_perguntar_por_nova_midia"
     def run(self, dispatcher, tracker, domain):
-        time.sleep(3)
+        time.sleep(1)
         logger.debug("rodando action: action_perguntar_por_nova_midia")
         dispatcher.utter_message(
             text="📸 Você pode mandar mais fotos e vídeos ou clicar em Não enviar mais para seguir.",
