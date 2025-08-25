@@ -244,7 +244,7 @@ class WhatsAppInput(WhatsApp, InputChannel):
             logger.debug(f"message_id: {message_id}")
             if (message_id and sender):
                 await self.send_typing(sender,message_id)
-                if message_type not in ["image", "video"] ):
+                if message_type not in ["image", "video"] :
                     await asyncio.sleep(4)
                 logger.debug(f"Enviando typing para {sender} com message_id {message_id}")
             if message_type in ["image", "video"]:
