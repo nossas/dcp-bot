@@ -3,19 +3,19 @@ version: "3.1"
 rules:
   - rule: menu inicial
     steps:
-    - intent: menu_inicial
-    - action: utter_menu_inicial
+      - intent: menu_inicial
+      - action: utter_menu_inicial
 
   - rule: informar_risco
     steps:
-    - intent: informar_risco
-    - action: action_request_location
+      - intent: informar_risco
+      - action: action_request_location
 
   - rule: Tentar novamente
     steps:
       - intent: tentar_novamente
       - action: action_repeat_last_message
-  
+
   - rule: Processar localização e confirmar endereço
     steps:
       - intent: informar_localizacao
@@ -25,35 +25,11 @@ rules:
     steps:
       - intent: informar_endereco_texto
       - action: action_buscar_endereco_texto
-  
-  - rule: Processar endereço localização 
+
+  - rule: Processar endereço localização
     steps:
       - intent: informar_localizacao
       - action: action_buscar_endereco
-
-  - rule: Confirmar endereço leva para classificação de risco
-    steps:
-      - action: action_buscar_endereco_texto
-      - intent: affirm
-      - action: utter_classificar_risco
-
-  - rule: Confirmar localização leva para classificação de risco
-    steps:
-      - action: action_buscar_endereco
-      - intent: affirm
-      - action: utter_classificar_risco
-  
-  - rule: recusar endereço texto
-    steps:
-    - action: action_buscar_endereco
-    - intent: deny
-    - action: action_request_location 
-  
-  - rule: recusar endereço localização
-    steps:  
-    - action: action_buscar_endereco_texto
-    - intent: deny
-    - action: action_request_location 
 
   - rule: Não enviar midia de risco e partir para revisão
     steps:
@@ -84,7 +60,7 @@ rules:
       - action: action_corrigir_midias
       - action: utter_perguntar_por_midia
       - action: action_listen
-  
+
   - rule: como está minha área
     steps:
       - intent: como_ta_minha_area
@@ -137,7 +113,6 @@ rules:
       - action: action_inatividade_timeout
       - action: action_listen
 
-
   - rule: Alterar nome
     steps:
       - intent: alterar_nome
@@ -168,14 +143,14 @@ rules:
 
   - rule: Corrigir classificação
     steps:
-    - intent: corrigir_classificacao
-    - action: action_classificar_risco_corrigir
-    - action: action_listen
+      - intent: corrigir_classificacao
+      - action: action_classificar_risco_corrigir
+      - action: action_listen
 
   - rule: Pular descrição do risco sem correção
     condition:
       - slot_was_set:
-        - contexto_classificacao_corrigida: false
+          - contexto_classificacao_corrigida: false
     steps:
       - intent: pular_descricao_risco
       - action: utter_perguntar_por_midia
@@ -194,7 +169,7 @@ rules:
   - rule: Salvar descrição do risco sem correção
     condition:
       - slot_was_set:
-        - contexto_classificacao_corrigida: false
+          - contexto_classificacao_corrigida: false
     steps:
       - action: action_salvar_classificacao_risco
       - action: utter_perguntar_por_midia
@@ -215,13 +190,13 @@ rules:
       - intent: corrigir_endereco
       - action: action_corrigir_endereco
 
-  - rule: aceitar endereço 
+  - rule: aceitar endereço
     condition:
       - slot_was_set:
           - contexto_endereco_corrigido: false
     steps:
-      - intent: affirm_address    
-      - action: utter_classificar_risco 
+      - intent: affirm_address
+      - action: utter_classificar_risco
       - action: action_listen
 
   - rule: aceitar endereço na correção
@@ -229,8 +204,8 @@ rules:
       - slot_was_set:
           - contexto_endereco_corrigido: true
     steps:
-      - intent: affirm_address    
-      - action: action_confirmar_relato 
+      - intent: affirm_address
+      - action: action_confirmar_relato
       - action: action_confirmar_relato_pos_midia
       - action: action_listen
 
@@ -238,7 +213,7 @@ rules:
     steps:
       - intent: just_listen
       - action: action_listen
-  
+
   - rule: listen apos action_agendar_inatividade
     steps:
       - action: action_agendar_inatividade
@@ -248,7 +223,6 @@ rules:
     steps:
       - intent: agradecimento
       - action: action_agradecimento
-
 
   - rule: fallback texto
     steps:
@@ -265,6 +239,3 @@ rules:
     steps:
       - action: utter_saida_riscos
       - action: action_listen
-
-
-      

@@ -279,34 +279,7 @@ nlu:
   examples: |
     - /deny_address
     - deny_address
-- intent: affirm
-  examples: |
-    - sim
-    - claro
-    - com certeza
-    - pode sim
-    - está certo
-    - está correto
-    - é esse mesmo
-    - isso
-    - correto
-    - pode ser
-    - /affirm
-    - Sim
-    - stop
-- intent: deny
-  examples: |
-    - não
-    - de jeito nenhum
-    - negativo
-    - prefiro não
-    - errado
-    - está errado
-    - não é esse
-    - não pode ser
-    - não quero
-    - não mesmo
-    - /deny
+
 - intent: informar_classificacao_risco
   examples: |
     - Alagamento
@@ -555,6 +528,7 @@ nlu:
     - quero Sair
     - terminar
     - fechar
+    - encerrar
 
 - intent: mais_riscos
   examples: |
@@ -619,3 +593,25 @@ nlu:
     - quero pix
     - dinheiro
     - pix
+    - sim
+    - claro
+    - com certeza
+    - pode sim
+    - está certo
+    - está correto
+    - é esse mesmo
+    - isso
+    - correto
+    - pode ser
+    - Sim
+    - stop
+    - não
+    - de jeito nenhum
+    - negativo
+    - prefiro não
+    - errado
+    - está errado
+    - não é esse
+    - não pode ser
+    - não quero
+    - não mesmo

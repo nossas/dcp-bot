@@ -515,10 +515,11 @@ class ActionSalvarMidiaRisco(Action):
         last_action = get_last_action(tracker,1)
         logger.debug(f"last_action: {last_action}")
         if last_action != "action_perguntar_por_nova_midia" and last_action != "utter_perguntar_por_midia":
+            dispatcher.utter_message(
+                text="Algo errado aconteceu. Vamos tentar de novo"
+            )
             return [
                 SlotSet("midias", []),
-                dispatcher.utter_message(
-                text="Algo errado aconteceu. Vamos tentar de novo"),
                 FollowupAction("utter_menu_inicial")
             ]
         try:
