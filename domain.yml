@@ -10,8 +10,6 @@ intents:
 - inatividade_monitoramento
 - saudacao
 - informar_nome
-- affirm
-- deny
 - deny_name
 - affirm_name
 - deny_address

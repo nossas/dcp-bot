@@ -51,9 +51,7 @@ stories:
     - action: action_listen
     - intent: informar_endereco_texto
     - action: action_buscar_endereco_texto
-    - or:
-      - intent: affirm
-      - intent: affirm_address    
+    - intent: affirm_address    
     - action: utter_classificar_risco 
     - intent: informar_classificacao_risco
     - action: action_salvar_classificacao_risco
@@ -66,9 +64,7 @@ stories:
     - action: action_listen
     - intent: informar_localizacao
     - action: action_buscar_endereco
-    - or:
-      - intent: affirm
-      - intent: affirm_address    
+    - intent: affirm_address    
     - action: utter_classificar_risco 
 
 
@@ -104,9 +100,7 @@ stories:
     - action: action_listen
     - intent: informar_localizacao
     - action: action_buscar_endereco
-    - or:
-      - intent: deny
-      - intent: deny_address    
+    - intent: deny_address    
     - action: action_request_location 
     - action: action_listen
 
@@ -118,9 +112,7 @@ stories:
     - action: action_listen
     - intent: informar_endereco_texto
     - action: action_buscar_endereco_texto
-    - or:
-      - intent: deny
-      - intent: deny_address
+    - intent: deny_address
     - action: action_request_location
     - action: action_listen
 
@@ -206,9 +198,7 @@ stories:
     - action: action_listen
     - intent: informar_endereco_texto
     - action: action_buscar_endereco_texto
-    - or:
-      - intent: affirm
-      - intent: affirm_address    
+    - intent: affirm_address    
     - action: action_confirmar_relato
     - action: action_confirmar_relato_pos_midia
     - action: action_listen
@@ -223,9 +213,7 @@ stories:
     - action: action_listen
     - intent: informar_localizacao
     - action: action_buscar_endereco
-    - or:
-      - intent: affirm
-      - intent: affirm_address    
+    - intent: affirm_address    
     - action: action_confirmar_relato 
     - action: action_listen
 
@@ -253,9 +241,7 @@ stories:
     - action: action_listen
     - intent: informar_endereco_texto    
     - action: action_buscar_endereco_texto
-    - or:
-      - intent: deny
-      - intent: deny_address
+    - intent: deny_address
     - action: action_request_location 
     - intent: inatividade_monitoramento
     - action: action_listen
@@ -271,9 +257,7 @@ stories:
     - action: action_listen
     - intent: informar_localizacao
     - action: action_buscar_endereco
-    - or:
-      - intent: deny
-      - intent: deny_address    
+    - intent: deny_address    
     - action: action_request_location 
     - intent: inatividade_monitoramento
     - action: action_listen
