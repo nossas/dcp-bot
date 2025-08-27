@@ -245,12 +245,12 @@ class WhatsAppInput(WhatsApp, InputChannel):
             if (message_id and sender):
                 await self.send_typing(sender,message_id)
                 if message_type not in ["image", "video"] :
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(4)
                 reply = self.get_interactive_response(request.json) if self.get_interactive_response(request.json) != None else {}
                 reply_buttons = reply.get("button_reply",{}).get("id","") 
                 if sender and reply and reply_buttons == "/mais_riscos":
                     logger.debug(f"maior delay para /mais_riscos")
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(4)
                 logger.debug(f"Enviando typing para {sender} com message_id {message_id}")
             if message_type in ["image", "video"]:
                 media_data = self.client.get_video(request.json) if message_type == "video" else self.client.get_image(request.json)
