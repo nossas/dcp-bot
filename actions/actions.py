@@ -792,7 +792,9 @@ class ActionListarRiscos(Action):
             if not riscos:
                 dispatcher.utter_message(text="Você já viu todos os relatos da comunidade.")
                 return [SlotSet("pagina_risco", 1),FollowupAction("utter_saida_riscos")]
-            
+            if pagina > 5:
+                dispatcher.utter_message(text="Para visualizar mais riscos entre no nosso site: https://defesaclimaticapopular.org.br/")
+                return [SlotSet("pagina_risco", 1),FollowupAction("utter_saida_riscos")]
             mensagem = '⬇️ Confira abaixo as informações enviadas pela comunidade:\n \n \n' if pagina == 1  else ''
             for risco in riscos:
                 classificacao = risco['classificacao'][0]
