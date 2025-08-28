@@ -1,4 +1,4 @@
-from rasa_sdk import Action
+from rasa_sdk import Action, Tracker
 from rasa_sdk.events import UserUtteranceReverted, SlotSet
 import requests
 import json
@@ -12,13 +12,14 @@ import time
 import sys
 from whatsapp_connector import WhatsAppOutput
 import pytz
-from typing import Any, Text, Dict, List
+from typing import Any, Text, Dict, List, Optional
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 logging.basicConfig(level=logging.DEBUG)  # Força o nível global de debug
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
 from .utils import *
 import re
+from rasa_sdk.types import DomainDict
         
 class ActionFallbackButtons(Action):
     def name(self):
@@ -83,13 +84,13 @@ class ActionFallbackButtons(Action):
             return [
                     FollowupAction("action_listen")
             ]
-        if last_action == "utter_menu_dicas":
-            logger.debug(f"Fallback de menu_dicas")
-            logger.debug(f"user_message: {user_message}")
-            dispatcher.utter_message(text="Não consegui entender. Por favor aperte um dos botões.")
-            return [
-                    FollowupAction("utter_menu_dicas")
-            ]
+        # if last_action == "utter_menu_dicas":
+        #     logger.debug(f"Fallback de menu_dicas")
+        #     logger.debug(f"user_message: {user_message}")
+        #     dispatcher.utter_message(text="Não consegui entender. Por favor aperte um dos botões.")
+        #     return [
+        #             FollowupAction("utter_menu_dicas")
+        #     ]
         # Caso contrário, volta ao fallback padrão
         last_bot_message = None
         for event in reversed(tracker.events):
@@ -883,6 +884,62 @@ class ActionNivelDeRisco(Action):
         
         return []
 
+
+
+
+class ActionPrecisoDeAjuda(Action):
+    def name(self) -> Text:
+        return "action_preciso_de_ajuda"
+
+    def _formata_itens(self, itens: List[Any]) -> Optional[str]:
+        bullets = [str(x).strip() for x in itens if str(x).strip()]
+        if not bullets:
+            return None
+        return "Recomendamos que você:\n \n" + "".join(f"• {b}\n" for b in bullets) + " \n⚠️ Em caso de urgência, ligue para a *Defesa Civil: 199*."
+
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: DomainDict,
+    ) -> List[Dict[Text, Any]]:
+        logger.debug("rodando action: action_preciso_de_ajuda")
+
+        FALLBACK_TEXTO = (
+            "Recomendamos que você:\n\n"
+            "• Separe agora mesmo um kit de sobrevivência com documentos, remédios e itens essenciais.\n\n"
+            "• Tenha cuidado com fios caídos ou locais com risco de choque elétrico.\n\n"
+            "• Evite contato com a água de enchentes, pois pode estar contaminada.\n\n"
+            "⚠️ Em caso de urgência, ligue para a *Defesa Civil: 199*."
+        )
+        wordpress_url = os.getenv("WORDPRESS_URL")
+        endpoint = f"{wordpress_url}/wp-json/dcp/v1/dicas?active=1"
+
+        texto_final: Optional[str] = None
+
+        if endpoint:
+            try:
+                # aceita JSON ou texto puro
+                headers = {"Accept": "application/json, text/plain;q=0.5"}
+                resp = requests.get(endpoint, headers=headers, timeout=8)
+                resp.raise_for_status()
+
+                ctype = resp.headers.get("content-type", "")
+                if "application/json" in ctype:
+                    data = resp.json()
+                    recomendacoes = data[0].get("recomendacoes")
+                    if recomendacoes:
+                        texto_final = self._formata_itens(recomendacoes)
+
+            except Exception as e:
+                logger.error(f"[action_preciso_de_ajuda] erro consultando {endpoint}: {e}")
+
+        if not texto_final:
+            texto_final = FALLBACK_TEXTO
+
+        dispatcher.utter_message(text=texto_final)
+        return []
+
 class ActionListarAbrigos(Action):
     def name(self):
         return "action_listar_abrigos"
@@ -957,44 +1014,43 @@ class ActionListarContatosEmergencia(Action):
 
         return []
 
-class ActionBuscarDicas(Action):
-    def name(self):
-        return "action_buscar_dicas"
+# class ActionBuscarDicas(Action):
+#     def name(self):
+#         return "action_buscar_dicas"
 
-    def run(self, dispatcher, tracker, domain):
-        logger.debug("rodando action: action_buscar_dicas")
-        tipo_dica = tracker.get_slot("dicas")
-        if not tipo_dica:
-            dispatcher.utter_message(text="Desculpe, não entendi o tipo de dica que você deseja. Por favor aperte em um dos botões.")
-            return []
+#     def run(self, dispatcher, tracker, domain):
+#         logger.debug("rodando action: action_buscar_dicas")
+#         tipo_dica = tracker.get_slot("dicas")
+#         if not tipo_dica:
+#             dispatcher.utter_message(text="Desculpe, não entendi o tipo de dica que você deseja. Por favor aperte em um dos botões.")
+#             return []
 
-        wordpress_url = os.getenv("WORDPRESS_URL")
-        if not wordpress_url:
-            dispatcher.utter_message(text="Erro: URL do WordPress não configurada.")
-            return []
+#         wordpress_url = os.getenv("WORDPRESS_URL")
+#         if not wordpress_url:
+#             dispatcher.utter_message(text="Erro: URL do WordPress não configurada.")
+#             return []
 
-        endpoint = f"{wordpress_url}/wp-json/dcp/v1/dicas?tipo={tipo_dica}"
-        try:
-            response = requests.get(endpoint, timeout=5)
-            response.raise_for_status()
-            dicas = response.json()
+#         endpoint = f"{wordpress_url}/wp-json/dcp/v1/dicas?tipo={tipo_dica}"
+#         try:
+#             response = requests.get(endpoint, timeout=5)
+#             response.raise_for_status()
+#             dicas = response.json()
 
-            if not dicas:
-                dispatcher.utter_message(text=f"Não encontrei dicas para '{tipo_dica}'.")
-                return []
+#             if not dicas:
+#                 dispatcher.utter_message(text=f"Não encontrei dicas para '{tipo_dica}'.")
+#                 return []
 
-            mensagem = f"Dicas para {tipo_dica}:\n"
-            for dica in dicas:
-                mensagem += f"- {dica}\n"
+#             mensagem = f"Dicas para {tipo_dica}:\n"
+#             for dica in dicas:
+#                 mensagem += f"- {dica}\n"
 
-            dispatcher.utter_message(text=mensagem)
-        except requests.RequestException as e:
-            dispatcher.utter_message(text="Desculpe, ocorreu um erro ao buscar as dicas.")
-            # Aqui você pode adicionar um log do erro, se desejar
-        return []
+#             dispatcher.utter_message(text=mensagem)
+#         except requests.RequestException as e:
+#             dispatcher.utter_message(text="Desculpe, ocorreu um erro ao buscar as dicas.")
+#             # Aqui você pode adicionar um log do erro, se desejar
+#         return []
     
     
-    from rasa_sdk import Action
 
 class ActionPerguntaNotificacoes(Action):
     def name(self) -> str:

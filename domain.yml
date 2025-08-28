@@ -29,8 +29,8 @@ intents:
 - como_ta_minha_area
 - preciso_de_ajuda
 - contatos_emergencia
-- dicas_de
-- menu_dicas
+# - dicas_de
+# - menu_dicas
 - sair
 - receber_notificacoes
 - encontrar_abrigo
@@ -47,7 +47,7 @@ intents:
 
 actions:
 - utter_menu_pos_lista
-- utter_pos_ajuda_dicas
+# - utter_pos_ajuda_dicas
 - action_alterar_nome
 - action_agendar_inatividade
 - action_inatividade_timeout
@@ -74,11 +74,11 @@ actions:
 - action_salvar_risco
 - action_listar_riscos
 - action_perguntar_mais_riscos
-- utter_preciso_de_ajuda
+- action_preciso_de_ajuda
 - action_listar_abrigos
 - action_listar_contatos_emergencia
-- utter_menu_dicas
-- action_buscar_dicas
+# - utter_menu_dicas
+# - action_buscar_dicas
 - utter_ajuda
 - utter_pos_ajuda
 - action_receber_notificacoes
@@ -129,11 +129,11 @@ slots:
     mappings:
       - type: from_entity
         entity: classificacao_risco
-  dicas:
-    type: text
-    mappings:
-      - type: from_entity
-        entity: dicas
+  # dicas:
+  #   type: text
+  #   mappings:
+  #     - type: from_entity
+  #       entity: dicas
   descricao_risco:
     type: text
     influence_conversation: false
@@ -161,7 +161,7 @@ slots:
 entities:
 - nome
 - classificacao_risco
-- dicas
+# - dicas
 responses:
   utter_menu_inicial:
   - text: | 
@@ -206,18 +206,6 @@ responses:
     - title: Pular
       payload: '/pular_enviar_midia_risco'
 
-  utter_preciso_de_ajuda:
-  - text: |
-      Recomendamos que você:
-       
-        • Separe agora mesmo um kit de sobrevivência com documentos, remédios e itens essenciais.
-         
-        • Tenha cuidado com fios caídos ou locais com risco de choque elétrico.
-         
-        •  Evite contato com a água de enchentes, pois pode estar contaminada.
-         
-        ⚠️ Em caso de urgência, ligue para a *Defesa Civil: 199*.
-        
   utter_ajuda:
   - text: |
       Como podemos te ajudar agora?
@@ -226,19 +214,19 @@ responses:
       payload: '/encontrar_abrigo'
     - title: Contatos emergência
       payload: '/contatos_emergencia'
-    - title: Dicas de segurança
-      payload: '/dicas_segurança'
+    # - title: Dicas de segurança
+    #   payload: '/dicas_segurança'
 
-  utter_menu_dicas:
-  - text: |
-      Você quer dicas para qual tipo de situação?
-    buttons:
-    - title: Enchente
-      payload: '/dicas_de{"dicas": "enchente"}'    
-    - title: Focos de lixo
-      payload: '/dicas_de{"dicas": "lixo"}'
-    - title: Calor extremo
-      payload: '/dicas_de{"dicas": "calor"}'
+  # utter_menu_dicas:
+  # - text: |
+  #     Você quer dicas para qual tipo de situação?
+  #   buttons:
+  #   - title: Enchente
+  #     payload: '/dicas_de{"dicas": "enchente"}'    
+  #   - title: Focos de lixo
+  #     payload: '/dicas_de{"dicas": "lixo"}'
+  #   - title: Calor extremo
+  #     payload: '/dicas_de{"dicas": "calor"}'
     
   utter_pos_ajuda:
   - text: |
@@ -251,16 +239,16 @@ responses:
     - title: Encerrar
       payload: /sair
 
-  utter_pos_ajuda_dicas:
-  - text: |
-       Como podemos te ajudar agora?
-    buttons:
-    - title: Outras situações
-      payload: '/menu_dicas'
-    - title: Menu inicial
-      payload: '/menu_inicial'
-    - title: Encerrar
-      payload: /sair
+  # utter_pos_ajuda_dicas:
+  # - text: |
+  #      Como podemos te ajudar agora?
+  #   buttons:
+  #   - title: Outras situações
+  #     payload: '/menu_dicas'
+  #   - title: Menu inicial
+  #     payload: '/menu_inicial'
+  #   - title: Encerrar
+  #     payload: /sair
   
   utter_saida_riscos:
   - text: |
