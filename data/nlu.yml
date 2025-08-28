@@ -499,27 +499,27 @@ nlu:
     - Preciso sair de casa, pra onde vou?
 
 
-- intent: menu_dicas
-  examples: |
-    - dicas_de_seguranca
-    - /dicas_de_seguranca
-    - dicas de segurança
-    - Como ficar em segurança
+# - intent: menu_dicas
+#   examples: |
+#     - dicas_de_seguranca
+#     - /dicas_de_seguranca
+#     - dicas de segurança
+#     - Como ficar em segurança
 
-- intent: dicas_de
-  examples: |
-    - /dicas{"dicas": "enchente"}    
-    - /dicas{"dicas": "lixo"}
-    - /dicas{"dicas": "calor"}
-    - {"dicas": "enchente"}    
-    - {"dicas": "lixo"}
-    - {"dicas": "calor"}
-    - dicas de Calor
-    - dicas de lixo
-    - dicas de enchente
-    - O que fazer quando tem enchente {"dicas": "enchente"}
-    - O que fazer quando tem lixo {"dicas": "lixo"}
-    - O que fazer quando tem calor {"dicas": "calor"}
+# - intent: dicas_de
+#   examples: |
+#     - /dicas{"dicas": "enchente"}    
+#     - /dicas{"dicas": "lixo"}
+#     - /dicas{"dicas": "calor"}
+#     - {"dicas": "enchente"}    
+#     - {"dicas": "lixo"}
+#     - {"dicas": "calor"}
+#     - dicas de Calor
+#     - dicas de lixo
+#     - dicas de enchente
+#     - O que fazer quando tem enchente {"dicas": "enchente"}
+#     - O que fazer quando tem lixo {"dicas": "lixo"}
+#     - O que fazer quando tem calor {"dicas": "calor"}
 
 - intent: sair
   examples: |
