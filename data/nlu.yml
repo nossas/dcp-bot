@@ -432,10 +432,10 @@ nlu:
     - /menu_inicial
     - começar
 
-- intent: como_ta_minha_area
+- intent: situacao_no_jacare
   examples: |
-    - /como_ta_minha_area
-    - como_ta_minha_area
+    - /situacao_no_jacare
+    - situacao_no_jacare
     - situação na minha região
     - situação na região
     - como está a região

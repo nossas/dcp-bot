@@ -743,7 +743,7 @@ class ActionSalvarRisco(Action):
         dispatcher.utter_message(
             text='ℹ️ Te ajudo em algo mais? Você pode:',
             buttons=[
-                {"title": "Situação no Jacaré", "payload": "/como_ta_minha_area"},
+                {"title": "Situação no Jacaré", "payload": "/situacao_no_jacare"},
                 {"title": "Contatos de emergência", "payload": "/contatos_emergencia"},
                 {"title": "Encerrar", "payload": "/sair"}
             ]

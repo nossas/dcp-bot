@@ -26,7 +26,7 @@ intents:
 - afirmar_confirmacao_risco
 - recusar_confirmacao_risco
 - menu_inicial
-- como_ta_minha_area
+- situacao_no_jacare
 - preciso_de_ajuda
 - contatos_emergencia
 # - dicas_de
@@ -170,8 +170,8 @@ responses:
     buttons:
     - title: Informar um risco
       payload: /informar_risco
-    - title: Como tá minha área?
-      payload: /como_ta_minha_area
+    - title: Situação no Jacaré
+      payload: /situacao_no_jacare
     - title: Preciso de ajuda
       payload: /preciso_de_ajuda
 

@@ -63,7 +63,7 @@ rules:
   
   - rule: como está minha área
     steps:
-      - intent: como_ta_minha_area
+      - intent: situacao_no_jacare
       - action: action_nivel_de_risco
       - action: action_listar_riscos
 
