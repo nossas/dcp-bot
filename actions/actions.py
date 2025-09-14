@@ -735,16 +735,12 @@ class ActionSalvarRisco(Action):
             dispatcher.utter_message(text="Erro ao salvar os dados do risco.")
             logger.error(f"[ERRO SALVAMENTO RISCO] {e}", exc_info=True)
             return []
-
-        dispatcher.utter_message(
-            text='*Registrado!*Te ajudo em algo mais? Você pode:'
-        )
         
         dispatcher.utter_message(
-            text='ℹ️ Te ajudo em algo mais? Você pode:',
+            text='*Registrado!* Te ajudo em algo mais? Você pode:',
             buttons=[
                 {"title": "Situação no Jacaré", "payload": "/situacao_no_jacare"},
-                {"title": "Contatos de emergência", "payload": "/contatos_emergencia"},
+                {"title": "Contatos emergência", "payload": "/contatos_emergencia"},
                 {"title": "Encerrar", "payload": "/sair"}
             ]
         )
