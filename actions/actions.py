@@ -737,14 +737,14 @@ class ActionSalvarRisco(Action):
             return []
 
         dispatcher.utter_message(
-            text='*Registrado!*\n \nVamos *revisar suas informações* e, assim que finalizarmos, você receberá uma mensagem de confirmação.\n \n⚠️ Em caso de urgência, ligue para a *Defesa Civil: 199*.'
+            text='*Registrado!*Te ajudo em algo mais? Você pode:'
         )
         
         dispatcher.utter_message(
             text='ℹ️ Te ajudo em algo mais? Você pode:',
             buttons=[
-                {"title": "Como tá minha área?", "payload": "/como_ta_minha_area"},
-                {"title": "Menu inicial", "payload": "/menu_inicial"},
+                {"title": "Situação no Jacaré", "payload": "/como_ta_minha_area"},
+                {"title": "Contatos de emergência", "payload": "/contatos_emergencia"},
                 {"title": "Encerrar", "payload": "/sair"}
             ]
         )
