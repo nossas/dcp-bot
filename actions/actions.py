@@ -529,7 +529,6 @@ class ActionSalvarMidiaRisco(Action):
 
             midias_slot = tracker.get_slot("midias") or []
             logger.debug(f"midia_data: {midia_data}")
-
             if midia_data.get("tipo") == "mídia_combinada":
                 novas_midias = [m["path"] for m in midia_data["midias"]]
                 midias_slot.extend(novas_midias)
@@ -538,8 +537,9 @@ class ActionSalvarMidiaRisco(Action):
                 path = midia_data["path"]
                 midias_slot.append(path)
 
-            dispatcher.utter_message(text=f"Recebendo... Se ainda estiver algo carregando, aguarde concluir.")
-            return [SlotSet("midias", midias_slot)]
+            quantidade_midias = len(midias_slot)
+            dispatcher.utter_message(text=f"Já recebemos {quantidade_midias} mídias, se ainda estiver algo carregando, aguarde concluir. Caso tenha finalizado clique em Não enviar mais.")
+            return [SlotSet("midias", midias_slot), FollowupAction("action_perguntar_por_nova_midia")]
 
         except Exception as e:
             dispatcher.utter_message(

@@ -176,7 +176,6 @@ class WhatsAppInput(WhatsApp, InputChannel):
 
     async def finalize_media_batch(self, sender_id, on_new_message, out_channel):
         try:
-            await asyncio.sleep(8)
             medias = self.media_cache.pop(sender_id, [])
             self.media_timers.pop(sender_id, None)
 
