@@ -448,22 +448,6 @@ nlu:
     - É seguro sair agora?
 
 
-- intent: preciso_de_ajuda
-  examples: |
-    - preciso_de_ajuda
-    - /preciso_de_ajuda
-    - o que fazer agora?
-    - o que faço?
-    - saber o que fazer
-    - Como me proteger?
-    - Preciso me proteger?
-    - O que não fazer?
-    - O que evitar?
-    - não sei o que fazer
-    - /ajuda
-    - eu estou na enchente
-    - estou com medo
-
 
 - intent: contatos_emergencia
   examples: |
@@ -486,41 +470,6 @@ nlu:
 
 
 
-- intent: encontrar_abrigo
-  examples: |
-    - /encontrar_abrigo
-    - encontrar_abrigo
-    - encontrar abrigo
-    - preciso me abrigar
-    - para onde ir
-    - Para onde eu vou
-    - Onde está/tá seguro
-    - Onde tem abrigo? Tem abrigo perto?
-    - Preciso sair de casa, pra onde vou?
-
-
-# - intent: menu_dicas
-#   examples: |
-#     - dicas_de_seguranca
-#     - /dicas_de_seguranca
-#     - dicas de segurança
-#     - Como ficar em segurança
-
-# - intent: dicas_de
-#   examples: |
-#     - /dicas{"dicas": "enchente"}    
-#     - /dicas{"dicas": "lixo"}
-#     - /dicas{"dicas": "calor"}
-#     - {"dicas": "enchente"}    
-#     - {"dicas": "lixo"}
-#     - {"dicas": "calor"}
-#     - dicas de Calor
-#     - dicas de lixo
-#     - dicas de enchente
-#     - O que fazer quando tem enchente {"dicas": "enchente"}
-#     - O que fazer quando tem lixo {"dicas": "lixo"}
-#     - O que fazer quando tem calor {"dicas": "calor"}
-
 - intent: sair
   examples: |
     - /sair
@@ -529,20 +478,6 @@ nlu:
     - terminar
     - fechar
     - encerrar
-
-- intent: mais_riscos
-  examples: |
-    - mais_riscos
-    - /mais_riscos
-    - quer ver mais riscos
-    - me mostre mais riscos
-
-- intent: sair_consulta_risco
-  examples: |
-    - /sair_consulta_risco
-    - não quero mais riscos
-    - sair_consulta_risco
-    - sair consulta risco
 
 - intent: just_listen 
   examples: | 
@@ -615,3 +550,4 @@ nlu:
     - não pode ser
     - não quero
     - não mesmo
+

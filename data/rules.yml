@@ -61,45 +61,19 @@ rules:
       - action: utter_perguntar_por_midia
       - action: action_listen
   
-  - rule: como está minha área
+  - rule: Situação no Jacaré
     steps:
       - intent: situacao_no_jacare
-      - action: action_nivel_de_risco
       - action: action_listar_riscos
+      - action: action_listen
 
-  - rule: como está minha área - mais riscos
-    steps:
-      - intent: mais_riscos
-      - action: action_listar_riscos
-
-  - rule: O que fazer
-    steps:
-      - intent: preciso_de_ajuda
-      - action: action_preciso_de_ajuda
-      - action: utter_ajuda
-
-  - rule: Encontrar Abrigo
-    steps:
-      - intent: encontrar_abrigo
-      - action: action_listar_abrigos
-      - action: utter_pos_ajuda
 
   - rule: Contatos de emergência
     steps:
       - intent: contatos_emergencia
       - action: action_listar_contatos_emergencia
-      - action: utter_pos_ajuda
+      - action: action_listen
 
-  # - rule: Menu dicas
-  #   steps:
-  #     - intent: menu_dicas
-  #     - action: utter_menu_dicas
-
-  # - rule: Menu dicas
-  #   steps:
-  #     - intent: dicas_de
-  #     - action: action_buscar_dicas
-  #     # - action: utter_pos_ajuda_dicas
 
   - rule: Agendar verificação de inatividade (via conector)
     steps:
@@ -125,17 +99,6 @@ rules:
       - action: action_corrigir_nome
       - action: action_listen
       - action: utter_menu_inicial
-
-  - rule: Sair da lista de riscos
-    steps:
-      - intent: sair_consulta_risco
-      - action: utter_saida_riscos
-      - action: action_listen
-
-  - rule: Sair da lista de riscos
-    steps:
-      - action: action_perguntar_mais_riscos
-      - action: action_listen
 
   - rule: Sair
     steps:
@@ -230,16 +193,6 @@ rules:
     steps:
       - intent: fallback_texto
       - action: action_fallback_buttons
-      - action: action_listen
-
-  - rule: pos lista riscos
-    steps:
-      - action: utter_menu_pos_lista
-      - action: action_listen
-
-  - rule: saida riscos
-    steps:
-      - action: utter_saida_riscos
       - action: action_listen
 
 

@@ -261,4 +261,3 @@ stories:
     - action: action_request_location 
     - intent: inatividade_monitoramento
     - action: action_listen
- 
