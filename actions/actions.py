@@ -54,6 +54,7 @@ class ActionFallbackButtons(Action):
             user_message = tracker.latest_message.get("text")
             logger.debug(f"Salvando fallback como descrição de risco: {user_message}")
             correcao_classificacao = tracker.get_slot("contexto_classificacao_corrigida")
+            dispatcher.utter_message(text="Obrigada pela descrição!")
             next_action = "utter_perguntar_por_midia" if not correcao_classificacao else "action_confirmar_relato"
             return [
                 SlotSet("descricao_risco", user_message),
