@@ -26,19 +26,13 @@ intents:
 - afirmar_confirmacao_risco
 - recusar_confirmacao_risco
 - menu_inicial
-- como_ta_minha_area
-- preciso_de_ajuda
+- situacao_no_jacare
 - contatos_emergencia
-# - dicas_de
-# - menu_dicas
 - sair
 - receber_notificacoes
-- encontrar_abrigo
 - nao_receber_notificacoes
 - parar_notificacoes
-- mais_riscos
 - corrigir_nome
-- sair_consulta_risco
 - corrigir_midias
 - corrigir_classificacao
 - corrigir_endereco
@@ -46,8 +40,6 @@ intents:
 - agradecimento
 
 actions:
-- utter_menu_pos_lista
-# - utter_pos_ajuda_dicas
 - action_alterar_nome
 - action_agendar_inatividade
 - action_inatividade_timeout
@@ -77,17 +69,11 @@ actions:
 - action_preciso_de_ajuda
 - action_listar_abrigos
 - action_listar_contatos_emergencia
-# - utter_menu_dicas
-# - action_buscar_dicas
-- utter_ajuda
-- utter_pos_ajuda
-- action_receber_notificacoes
 - utter_finalizar
 - action_remover_notificacoes
 - action_nivel_de_risco
 - action_parar_notificacoes
 - action_pergunta_notificacoes
-- utter_saida_riscos
 - action_sair
 - action_corrigir_midias
 - action_corrigir_endereco
@@ -170,21 +156,10 @@ responses:
     buttons:
     - title: Informar um risco
       payload: /informar_risco
-    - title: Como tá minha área?
-      payload: /como_ta_minha_area
-    - title: Preciso de ajuda
-      payload: /preciso_de_ajuda
-
-  utter_menu_pos_lista:
-  - text: | 
-      Como podemos te ajudar agora? 
-    buttons:
-    - title: Informar um risco
-      payload: /informar_risco
-    - title: Preciso de ajuda
-      payload: /preciso_de_ajuda
-    - title: Menu inicial
-      payload: /menu_inicial
+    - title: Situação no Jacaré
+      payload: /situacao_no_jacare
+    - title: Contatos emergência
+      payload: /contatos_emergencia
 
 
 
@@ -205,28 +180,6 @@ responses:
     buttons:
     - title: Pular
       payload: '/pular_enviar_midia_risco'
-
-  utter_ajuda:
-  - text: |
-      Como podemos te ajudar agora?
-    buttons:
-    - title: Encontrar um abrigo
-      payload: '/encontrar_abrigo'
-    - title: Contatos emergência
-      payload: '/contatos_emergencia'
-    # - title: Dicas de segurança
-    #   payload: '/dicas_segurança'
-
-  # utter_menu_dicas:
-  # - text: |
-  #     Você quer dicas para qual tipo de situação?
-  #   buttons:
-  #   - title: Enchente
-  #     payload: '/dicas_de{"dicas": "enchente"}'    
-  #   - title: Focos de lixo
-  #     payload: '/dicas_de{"dicas": "lixo"}'
-  #   - title: Calor extremo
-  #     payload: '/dicas_de{"dicas": "calor"}'
     
   utter_pos_ajuda:
   - text: |
@@ -234,28 +187,6 @@ responses:
     buttons:
     - title: Mais ajuda
       payload: '/ajuda'
-    - title: Menu inicial
-      payload: '/menu_inicial'
-    - title: Encerrar
-      payload: /sair
-
-  # utter_pos_ajuda_dicas:
-  # - text: |
-  #      Como podemos te ajudar agora?
-  #   buttons:
-  #   - title: Outras situações
-  #     payload: '/menu_dicas'
-  #   - title: Menu inicial
-  #     payload: '/menu_inicial'
-  #   - title: Encerrar
-  #     payload: /sair
-  
-  utter_saida_riscos:
-  - text: |
-      Te ajudo em algo mais? Você pode:
-    buttons:
-    - title: Preciso de ajuda
-      payload: '/preciso_de_ajuda'
     - title: Menu inicial
       payload: '/menu_inicial'
     - title: Encerrar
