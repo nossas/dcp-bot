@@ -783,8 +783,9 @@ class ActionListarRiscos(Action):
             alagamento = dados.get("alagamento", 0)
             lixo = dados.get("lixo", 0)
             outros = dados.get("outros", 0)
+            mensagem=""
             if total == 0:
-                dispatcher.utter_message(text="📝 Nas últimas 24h não houve nenhum registro de risco.")
+                mensagem = "📝 Nas últimas 24h não houve nenhum registro de risco."
             else:
                 mensagem = (
                     f"📝 Nas últimas 24h foram registrados {total} relatos: "
