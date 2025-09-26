@@ -256,7 +256,7 @@ class ActionPerguntarNome(Action):
             logger.error(f"Erro ao buscar nome no banco: {e}")
 
         dispatcher.utter_message(
-            text="Oie! 👋 \n \n Bem-vindo(a) à *Defesa Climática Popular*.\n \nPra começar, *como você prefere ser chamado(a)?*"
+            text="Oie! 👋 \n \n Bem-vindo(a) à *Defesa Climática Popular*.\n \nPra começar, *como você prefere ser chamada(o)?*"
         )
         
         return [SlotSet("pagina_risco",1)]
@@ -325,7 +325,7 @@ class ActionApagarNome(Action):
         finally:
             if conn:
                 conn.close()
-        dispatcher.utter_message(text="Sem problemas! Como você prefere ser chamado(a)?")
+        dispatcher.utter_message(text="Sem problemas! Como você prefere ser chamada(o)?")
         return [SlotSet("nome", None)]    
 class ActionBuscarEndereco(Action):
     def name(self):
@@ -356,7 +356,7 @@ class ActionBuscarEndereco(Action):
                 if endereco and dentro_do_retangulo(latitude, longitude):
                     logger.debug(f"Endereço no retangulo {latitude}{longitude}")
                     dispatcher.utter_message(
-                        text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
+                        text=f"Encontrei esse endereço:\n{endereco}\n \nEstá correto?",
                         buttons=[
                             {"title": "Sim", "payload": "/affirm_address"},
                             {"title": "Não", "payload": "/deny_address"}
@@ -380,7 +380,7 @@ class ActionBuscarEndereco(Action):
                     endereco = location_data['address']
                     endereco = format_address(endereco)
                     dispatcher.utter_message(
-                        text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
+                        text=f"Encontrei esse endereço:\n{endereco}\n \nEstá correto?",
                         buttons=[
                             {"title": "Sim", "payload": "/affirm_address"},
                             {"title": "Não", "payload": "/deny_address"}
@@ -432,7 +432,7 @@ class ActionBuscarEnderecoTexto(Action):
             latitude = coords.get("lat","")
             longitude = coords.get("lng","")
             dispatcher.utter_message(
-                text=f"Encontrei esse endereço:\n{endereco}\nEstá correto?",
+                text=f"Encontrei esse endereço:\n{endereco}\n \nEstá correto?",
                 buttons=[
                     {"title": "Sim", "payload": "/affirm_address"},
                     {"title": "Não", "payload": "/deny_address"}
@@ -501,7 +501,7 @@ class ActionSalvarDescricaoRisco(Action):
         next_action = "utter_perguntar_por_midia" if last_action == "utter_classificar_risco" else "action_confirmar_relato"
         descricao = tracker.get_slot("descricao_risco")
         if descricao:
-            dispatcher.utter_message(text="Obrigado pela descrição!")
+            dispatcher.utter_message(text="Obrigada pela descrição!")
             return [FollowupAction(next_action)]
         else:
             dispatcher.utter_message(text="Não consegui entender a descrição, tente novamente.")
@@ -538,7 +538,9 @@ class ActionSalvarMidiaRisco(Action):
                 midias_slot.append(path)
 
             quantidade_midias = len(midias_slot)
-            dispatcher.utter_message(text=f"Já recebemos {quantidade_midias} mídias, se ainda estiver algo carregando, aguarde concluir. Caso tenha finalizado clique em Não enviar mais.")
+            plural = "s" if quantidade_midias > 1 else ""
+            dispatcher.utter_message(text=f"📸  Já recebemos {quantidade_midias} arquivo{plural}. Se ainda tiver mídia sendo enviada, *espere concluir*.")
+
             return [SlotSet("midias", midias_slot), FollowupAction("action_perguntar_por_nova_midia")]
 
         except Exception as e:
@@ -557,7 +559,7 @@ class ActionPerguntarPorNovaMidia(Action):
         time.sleep(1)
         logger.debug("rodando action: action_perguntar_por_nova_midia")
         dispatcher.utter_message(
-            text="📸 Você pode mandar mais fotos e vídeos ou clicar em Não enviar mais para seguir.",
+            text="Você pode enviar mais fotos ou vídeos ou clicar em *Não enviar mais* para continuar.",
             buttons=[
                 {"title": "Não enviar mais", "payload": "/pular_enviar_midia_risco"}
             ]
@@ -780,10 +782,13 @@ class ActionListarRiscos(Action):
             alagamento = dados.get("alagamento", 0)
             lixo = dados.get("lixo", 0)
             outros = dados.get("outros", 0)
-            mensagem = (
-                f"📝 *Nas últimas 24h foram registrados {total} relatos:* "
-                f"sendo {alagamento} sobre alagamento, {lixo} sobre lixo e {outros} sobre outros riscos."
-            )
+            if total == 0:
+                dispatcher.utter_message(text="📝 Nas últimas 24h não houve nenhum registro de risco.")
+            else:
+                mensagem = (
+                    f"📝 Nas últimas 24h foram registrados {total} relatos: "
+                    f"sendo {alagamento} sobre alagamento, {lixo} sobre lixo e {outros} sobre outros riscos."
+                )
             dispatcher.utter_message(text=mensagem)
             dispatcher.utter_message(
                 text="➡️ Para ver todos os relatos e acompanhar mais detalhes, acesse: defesaclimaticapopular.org.br"
