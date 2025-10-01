@@ -557,7 +557,7 @@ class ActionPerguntarPorNovaMidia(Action):
     def name(self) -> str:
         return "action_perguntar_por_nova_midia"
     def run(self, dispatcher, tracker, domain):
-        time.sleep(1)
+        time.sleep(2)
         logger.debug("rodando action: action_perguntar_por_nova_midia")
         dispatcher.utter_message(
             text="Você pode enviar mais fotos ou vídeos ou clicar em *Não enviar mais* para continuar.",
@@ -602,7 +602,7 @@ class ActionConfirmarRiscoPosMidia(Action):
         return "action_confirmar_relato_pos_midia"
 
     def run(self, dispatcher, tracker, domain):
-        time.sleep(3)
+        time.sleep(2)
         logger.debug("rodando action: action_confirmar_relato_pos_midia")
         dispatcher.utter_message(
             text="Essas informações estão corretas? Se sim, clique em *Confirmar e enviar*.\n \nSeu relato passará por uma *verificação* antes de ser publicado, tudo de acordo com a política de privacidade (bit.ly/termo-privacidade).",
