@@ -179,7 +179,7 @@ class ActionRequestLocation(Action):
         nome = tracker.get_slot("nome")
         classificacao_risco = tracker.get_slot("classificacao_risco")
         logger.debug(f"solicitando localização")
-        dispatcher.utter_message(text="Precisamos saber qual o local do risco. Você pode:\n \n📍 *Clicar no botão abaixo* e o WhatsApp vai pedir para usar sua localização - é só aceitar.\n \n✏️ Ou você pode *digitar o endereço* (ex: “Rua do Rio, 20”).",custom={"type": "location_request"})
+        dispatcher.utter_message(text="Precisamos saber qual o local do risco. Você pode:\n \n📍 *Clicar no botão abaixo* e o WhatsApp vai pedir para usar sua localização - é só aceitar.\n \n✏️ Você também pode *digitar o endereço* (ex: “Rua do Rio, 20”) ou um *ponto de referência*.",custom={"type": "location_request"})
         return [
             SlotSet("endereco", None),
             SlotSet("latitude", None),
