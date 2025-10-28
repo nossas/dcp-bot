@@ -373,7 +373,7 @@ class ActionBuscarEndereco(Action):
                     ]
                 else:
                     logger.debug(f"Endereço fora do retangulo {latitude},{longitude}")
-                    dispatcher.utter_message(text="Não consegui entender esse endereço. Pode tentar de novo?")
+                    dispatcher.utter_message(text="Não consegui encontrar esse endereço 😕\n  \nVocê pode *tentar novamente* ou *mandar um ponto de referência perto*, como uma escola ou comércio próximo.")
                     return [FollowupAction("action_request_location")]
             else:
                 logger.debug(f"tem endereço")
@@ -394,7 +394,7 @@ class ActionBuscarEndereco(Action):
                         FollowupAction("action_listen")
                         ]
                 else:
-                    dispatcher.utter_message(text="Não consegui entender esse endereço. Pode tentar de novo?")
+                    dispatcher.utter_message(text="Não consegui encontrar esse endereço 😕\n  \nVocê pode *tentar novamente* ou *mandar um ponto de referência perto*, como uma escola ou comércio próximo.")
                     return [FollowupAction("action_request_location")]
                 
         except (json.JSONDecodeError, KeyError) as e:
@@ -448,7 +448,7 @@ class ActionBuscarEnderecoTexto(Action):
             ]
         else:
             logger.debug(f"Não encontrou endereço: {endereco_texto}")
-            dispatcher.utter_message(text="Não consegui entender esse endereço. Pode tentar de novo?")
+            dispatcher.utter_message(text="Não consegui encontrar esse endereço 😕\n  \nVocê pode *tentar novamente* ou *mandar um ponto de referência perto*, como uma escola ou comércio próximo.")
         return [FollowupAction("action_request_location")]
 
 class ActionSalvarClassificacaoRisco(Action):
