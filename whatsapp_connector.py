@@ -245,8 +245,8 @@ class WhatsAppInput(WhatsApp, InputChannel):
                 reply = self.get_interactive_response(request.json) if self.get_interactive_response(request.json) != None else {}
                 reply_buttons = reply.get("button_reply",{}).get("id","") 
                 await self.send_typing(sender,message_id)
-                # if message_type not in ["image", "video"] and reply_buttons not in ["/informar_risco"]:
-                #     await asyncio.sleep(2)
+                if message_type not in ["image", "video"] and reply_buttons not in ["/informar_risco"]:
+                    await asyncio.sleep(3)
                 # if sender and reply and reply_buttons == "/mais_riscos":
                 #     logger.debug(f"maior delay para /mais_riscos")
                 #     await asyncio.sleep(10)

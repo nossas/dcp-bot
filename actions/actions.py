@@ -179,7 +179,7 @@ class ActionRequestLocation(Action):
         nome = tracker.get_slot("nome")
         classificacao_risco = tracker.get_slot("classificacao_risco")
         logger.debug(f"solicitando localização")
-        dispatcher.utter_message(text="Precisamos saber qual o local do risco. Você pode:\n \n📍 *Clicar no botão abaixo* e o WhatsApp vai pedir para usar sua localização - é só aceitar.\n \n✏️ Ou você pode *digitar o endereço* (ex: “Rua do Rio, 20”).",custom={"type": "location_request"})
+        dispatcher.utter_message(text="Precisamos saber qual o local do risco. Você pode:\n \n📍 *Clicar no botão abaixo* e o WhatsApp vai pedir para usar sua localização - é só aceitar.\n \n✏️ Você também pode *digitar o endereço* (ex: “Rua do Rio, 20”) ou um *ponto de referência*.",custom={"type": "location_request"})
         return [
             SlotSet("endereco", None),
             SlotSet("latitude", None),
@@ -373,7 +373,7 @@ class ActionBuscarEndereco(Action):
                     ]
                 else:
                     logger.debug(f"Endereço fora do retangulo {latitude},{longitude}")
-                    dispatcher.utter_message(text="Não consegui entender esse endereço. Pode tentar de novo?")
+                    dispatcher.utter_message(text="Não consegui encontrar esse endereço 😕\n  \nVocê pode *tentar novamente* ou *mandar um ponto de referência perto*, como uma escola ou comércio próximo.")
                     return [FollowupAction("action_request_location")]
             else:
                 logger.debug(f"tem endereço")
@@ -394,7 +394,7 @@ class ActionBuscarEndereco(Action):
                         FollowupAction("action_listen")
                         ]
                 else:
-                    dispatcher.utter_message(text="Não consegui entender esse endereço. Pode tentar de novo?")
+                    dispatcher.utter_message(text="Não consegui encontrar esse endereço 😕\n  \nVocê pode *tentar novamente* ou *mandar um ponto de referência perto*, como uma escola ou comércio próximo.")
                     return [FollowupAction("action_request_location")]
                 
         except (json.JSONDecodeError, KeyError) as e:
@@ -448,7 +448,7 @@ class ActionBuscarEnderecoTexto(Action):
             ]
         else:
             logger.debug(f"Não encontrou endereço: {endereco_texto}")
-            dispatcher.utter_message(text="Não consegui entender esse endereço. Pode tentar de novo?")
+            dispatcher.utter_message(text="Não consegui encontrar esse endereço 😕\n  \nVocê pode *tentar novamente* ou *mandar um ponto de referência perto*, como uma escola ou comércio próximo.")
         return [FollowupAction("action_request_location")]
 
 class ActionSalvarClassificacaoRisco(Action):

@@ -22,6 +22,22 @@ nlu:
     - oi, como você está?
     - e aí, tudo bem?
     - bom dia, tudo bem?
+    - oiiii
+    - oioi
+    - opa
+    - opa, beleza?
+    - alô
+    - alô, bom dia
+    - tudo certo?
+    - tudo tranquilo?
+    - fala, galera
+    - fala, família
+    - fala, pessoal
+    - salve, família
+    - como tá?
+    - e aí
+
+
 - intent: informar_nome
   examples: |
     - ALDEMIR DA COSTA CARVALHO JUNIOR
@@ -182,6 +198,51 @@ nlu:
     - /informar_risco
     - Quero informar um risco
     - Informar um risco
+    - quero avisar um risco
+    - quero relatar um risco
+    - quero registrar um risco
+    - quero mandar um risco
+    - quero denunciar um risco
+    - quero comunicar um risco
+    - vou compartilhar um risco
+    - vou informar um risco
+    - vou relatar um risco
+    - preciso informar um risco
+    - preciso avisar um risco
+    - preciso relatar um risco
+    - gostaria de informar um risco
+    - gostaria de avisar um risco
+    - gostaria de compartilhar um risco
+    - posso informar um risco
+    - posso avisar um risco
+    - dá pra informar um risco
+    - dá pra registrar um risco
+    - dá pra compartilhar um risco
+    - relatar risco
+    - registrar risco
+    - comunicar risco
+    - denunciar risco
+    - avisar risco
+    - quero avisar aqui
+    - quero falar um risco
+    - preciso falar um risco
+    - tenho um risco pra avisar
+    - tenho um risco aqui
+    - tô com um risco pra falar
+    - tô vendo um risco
+    - tô vendo uma situação
+    - vi um risco aqui
+    - vi um problema
+    - rolou um risco aqui
+    - rolou um problema
+    - tem um risco aqui
+    - tem um problema aqui
+    - tem perigo aqui
+    - tá rolando risco
+    - tá rolando problema
+    - quero reportar
+    - vou reportar
+
 
 - intent: informar_localizacao
   examples: |
@@ -273,12 +334,45 @@ nlu:
     - você registrou meu nome errado
     - Apagar nome
     - Apagar meu nome
+    - nome tá errado aqui
+    - não é esse meu nome não
+    - botou meu nome errado
+    - errou meu nome aí
+    - escreveu errado
+    - trocou meu nome
+    - anotou errado meu nome
+    - tá diferente meu nome
+    - botaram nome errado
+    - não me chamo assim não
+    - não sou esse nome
+    - nome saiu errado
+    - tá outro nome aqui
+    - tá errado meu cadastro
+    - tá com nome errado aí
+    - ficou errado meu nome
+    - tá trocado o nome
+
 
 - intent: corrigir_nome
   examples: |
     - /corrigir_nome
     - corrigir_nome
     - corrigir meu nome
+    - quero corrigir meu nome
+    - preciso corrigir meu nome
+    - pode corrigir meu nome
+    - corrige meu nome aí
+    - corrigir nome errado
+    - corrigir nome cadastrado
+    - corrigir o nome que tá errado
+    - corrigir meu nome de cadastro
+    - corrigir o nome escrito errado
+    - corrigir nome digitado errado
+    - corrigir esse nome
+    - corrigir como aparece meu nome
+    - corrigir nome no sistema
+    - corrigir nome que saiu errado
+
 
 - intent: pular_descricao_risco
   examples: |
@@ -287,11 +381,50 @@ nlu:
     - Pular
     - Não quero descrever
     - Quero ir direto
+    - pular essa parte
+    - não quero falar nada
+    - não quero explicar
+    - não quero detalhar
+    - não vou descrever
+    - não quero escrever isso
+    - seguir sem descrição
+    - quero continuar sem falar
+    - posso ir sem explicar
+    - sem descrição
+    - prefiro não falar
+    - deixa sem descrição
+    - não quero colocar nada
+    - vou direto
+    - ir sem descrição
+    - passar essa parte
+    - não quero informar
+    - não vou colocar nada
+
 
 - intent: pular_enviar_midia_risco
   examples: |
     - /pular_enviar_midia_risco
     - não enviar midia
+    - não quero enviar foto
+    - não vou mandar foto
+    - não vou mandar vídeo
+    - sem foto
+    - sem vídeo
+    - não tenho foto
+    - não tenho vídeo
+    - não tenho nada pra mandar
+    - não quero anexar nada
+    - não vou anexar
+    - sem anexo
+    - quero seguir sem foto
+    - quero continuar sem mídia
+    - não vou colocar nada
+    - não quero mostrar foto
+    - não quero mandar nada
+    - deixa sem mídia
+    - prefiro não enviar mídia
+    - não dá pra mandar foto agora
+
 
 - intent: receber_midia_risco
   examples: |
@@ -312,12 +445,48 @@ nlu:
     - tentar novamente
     - tentar de novo
     - tentar mais uma vez
+    - vou tentar de novo
+    - quero tentar de novo
+    - deixa eu tentar de novo
+    - refazer
+    - repetir
+    - repetir tentativa
+    - repetir envio
+    - mandar de novo
+    - enviar de novo
+    - reenviar
+    - tentar outra vez
+    - fazer de novo
+    - vou repetir
+    - vou mandar de novo
+    - tentar outra
+
 
 - intent: recusar_confirmacao_risco
   examples: |
     - /recusar_confirmacao_risco
     - não está correto
     - as informações não estão corretas
+    - não tá certo
+    - não tá correto
+    - não é isso
+    - não é bem assim
+    - não é esse o risco
+    - não é o que eu falei
+    - tá errado
+    - tá incorreto
+    - não tá certo isso
+    - não conferem as informações
+    - tá diferente do que eu disse
+    - não tá certo não
+    - não foi isso que eu mandei
+    - não corresponde ao que falei
+    - não tá certo aqui
+    - errado
+    - incorreto
+    - informação errada
+    - não é isso aí
+
 
 - intent: corrigir_midias
   examples: |
@@ -349,6 +518,31 @@ nlu:
     - menu inicial
     - /menu_inicial
     - começar
+    - início
+    - voltar ao início
+    - voltar pro começo
+    - voltar ao começo
+    - ir para o menu
+    - ir pro início
+    - ir pro começo
+    - quero voltar
+    - quero recomeçar
+    - recomeçar
+    - reiniciar
+    - resetar
+    - voltar
+    - página inicial
+    - tela inicial
+    - abrir menu
+    - abrir início
+    - abrir começo
+    - me mostra o menu
+    - mostra o menu
+    - mostrar opções
+    - opções iniciais
+    - quero opções
+    - opções
+
 
 - intent: situacao_no_jacare
   examples: |
@@ -364,6 +558,18 @@ nlu:
     - Tem risco ainda?
     - Fico ou saio de casa?
     - É seguro sair agora?
+    - como estão as coisas aqui
+    - como tá por aqui
+    - tá arriscado sair agora?
+    - posso sair de casa?
+    - dá pra sair de casa?
+    - tá tranquilo na região?
+    - tá seguro ficar em casa?
+    - tem perigo agora?
+    - como tá a situação aí fora
+    - e a minha região, como tá?
+    - situação do bairro
+
 
 
 
@@ -385,6 +591,22 @@ nlu:
     - Numero dos bombeiros
     - Numero dos samu
     - socorro
+    - me passa o número de emergência
+    - qual o número dos bombeiros
+    - qual o telefone da defesa civil
+    - qual o contato do samu
+    - telefone de socorro
+    - contato de resgate
+    - contato urgente
+    - número de ajuda
+    - preciso do número da emergência
+    - emergência
+    - ajuda urgente
+    - preciso de ajuda agora
+    - quem eu posso ligar?
+    - telefone de bombeiro
+    - telefone do samu
+    - tem o telefone da defesa civil?
 
 
 
@@ -396,6 +618,26 @@ nlu:
     - terminar
     - fechar
     - encerrar
+    - vou sair
+    - posso sair
+    - quero encerrar
+    - encerrar chat
+    - encerrar conversa
+    - finalizar
+    - finalizar conversa
+    - finalizar chat
+    - tchau
+    - até mais
+    - valeu, tô indo
+    - parar aqui
+    - parar por aqui
+    - chega
+    - não quero mais
+    - quero parar
+    - interromper
+    - cancelar
+    - desligar
+
 
 - intent: just_listen 
   examples: | 
@@ -437,6 +679,29 @@ nlu:
     - valeu, meu amor
     - valeu amor
     - valeu, meu bem
+    - brigado
+    - brigada
+    - brigadão
+    - valeu demais
+    - valeuzão
+    - obrigadão
+    - agradecido
+    - agradecida
+    - agradecide
+    - tamo junto
+    - tmj
+    - show
+    - show de bola
+    - fechou
+    - firmeza
+    - da hora
+    - irado
+    - top
+    - mandou bem
+    - boa
+    - boa, valeu
+    - suave
+
     
 
 - intent: fallback_texto
@@ -468,4 +733,29 @@ nlu:
     - não pode ser
     - não quero
     - não mesmo
+    - uhum
+    - aham
+    - jamais
+    - nunca
+    - nope
+    - nananina não
+    - de forma alguma
+    - zero chance
+    - sei lá
+    - tanto faz
+    - quem sabe
+    - pode ser sim
+    - talvez
+    - depende
+    - bora
+    - manda aí
+    - segue o jogo
+    - continua
+    - teste
+    - testando
+    - bla bla
+    - qualquer coisa
+    - digitei errado
+    - foi mal
+
 
