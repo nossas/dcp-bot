@@ -1,7 +1,14 @@
 
 # Defesa Climática Popular
 
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+
 **Defesa Climática Popular** é um chatbot de WhatsApp desenvolvido com [Rasa](https://rasa.com/).
+
+## 📄 Licenca
+
+Este projeto esta licenciado sob a **GNU Affero General Public License v3.0 (AGPL-3.0)**.  
+Veja `LICENSE` para detalhes.
 
 ## 📦 Estrutura do Projeto
 
