@@ -14,6 +14,11 @@ logger = logging.getLogger(__name__)
 
 
 async def agendar_inatividade(sender_id: str):
+    """Dispara o intent de monitoramento de inatividade.
+
+    Args:
+        sender_id (str): Identificador do remetente no WhatsApp.
+    """
     async with aiohttp.ClientSession() as session:
         logger.debug(f"----------------------------------fazendo chamada schedule")
         rasa_url = os.environ.get("RASA_URL")
@@ -25,17 +30,34 @@ async def agendar_inatividade(sender_id: str):
             await response.read()
 
 class WhatsAppOutput(WhatsApp, OutputChannel):
-    """Output channel for WhatsApp Cloud API"""
+    """Canal de saida para a API do WhatsApp Cloud."""
 
     @classmethod
     def name(cls) -> Text:
+        """Retorna o nome do canal de saida.
+
+        Returns:
+            Text: Nome do canal.
+        """
         return "whatsapp"
 
     def __init__(self, auth_token: Optional[Text], phone_number_id: Optional[Text]) -> None:
+        """Inicializa o canal de saida com credenciais do WhatsApp.
+
+        Args:
+            auth_token (Optional[Text]): Token de autenticacao.
+            phone_number_id (Optional[Text]): ID do numero de telefone.
+        """
         super().__init__(auth_token, phone_number_id=phone_number_id)
     
     async def send_text_message(self, recipient_id: Text, text: Text, **kwargs: Any) -> None:
-        """Sends text message"""
+        """Envia uma mensagem de texto.
+
+        Args:
+            recipient_id (Text): ID do destinatario.
+            text (Text): Conteudo da mensagem.
+            **kwargs: Parametros extras (nao usados).
+        """
         # self.send_custom_json(recipient_id,{'type': "typing"})
 
         logger.debug(f"➡️ Enviando mensagem para {recipient_id}: {text}")
@@ -43,6 +65,13 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
             self.send_message(message_part, recipient_id=recipient_id)
     
     async def send_custom_json(self,recipient_id, custom, **kwargs: Any) -> None:
+        """Envia payloads customizados para o WhatsApp Cloud API.
+
+        Args:
+            recipient_id (Text): ID do destinatario.
+            custom (Dict): Payload customizado.
+            **kwargs: Parametros extras (nao usados).
+        """
         logger.debug(f"Enviando custom json para {recipient_id}: {custom}")
         if custom.get('type') == "location_request":
             json={
@@ -90,8 +119,15 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
     async def send_text_with_buttons(
         self, recipient_id: Text, text: Text, buttons: List[Dict[Text, Any]], **kwargs: Any
     ) -> None:
+        """Envia uma mensagem de texto com botoes.
+
+        Args:
+            recipient_id (Text): ID do destinatario.
+            text (Text): Conteudo da mensagem.
+            buttons (List[Dict[Text, Any]]): Botoes no formato esperado.
+            **kwargs: Parametros extras (nao usados).
+        """
         # self.send_custom_json(recipient_id,{type: "typing"})
-        """Sends text message with buttons"""
         buttons_list = [
             {"type": "reply", "reply": {"id": button["payload"], "title": button["title"]}}
             for button in buttons
@@ -106,36 +142,73 @@ class WhatsAppOutput(WhatsApp, OutputChannel):
         self.send_reply_button(recipient_id=recipient_id,button=button_dict )  
 
     async def send_image_url(self, recipient_id: Text, image: Text, **kwargs: Any) -> None:
-        """Sends an image."""
+        """Envia uma imagem por URL.
+
+        Args:
+            recipient_id (Text): ID do destinatario.
+            image (Text): URL da imagem.
+            **kwargs: Parametros extras (nao usados).
+        """
         # self.send_custom_json(recipient_id,{type: "typing"})
         self.send_image(image, recipient_id=recipient_id)
 
     async def send_video_url(self, recipient_id: Text, video: Text, **kwargs: Any) -> None:
+        """Envia um video por URL.
+
+        Args:
+            recipient_id (Text): ID do destinatario.
+            video (Text): URL do video.
+            **kwargs: Parametros extras (nao usados).
+        """
         # self.send_custom_json(recipient_id,{type: "typing"})
-        """Sends a Video"""
         self.send_video(video, recipient_id=recipient_id)
 
     async def send_document_url(self, recipient_id: Text, document: Text, **kwargs: Any) -> None:
+        """Envia um documento por URL.
+
+        Args:
+            recipient_id (Text): ID do destinatario.
+            document (Text): URL do documento.
+            **kwargs: Parametros extras (nao usados).
+        """
         # self.send_custom_json(recipient_id,{type: "typing"})
-        """Sends a Document"""
         self.send_document(document, recipient_id=recipient_id)
 
     async def send_audio_url(self, recipient_id: Text, audio: Text, **kwargs: Any) -> None:
+        """Envia um audio por URL.
+
+        Args:
+            recipient_id (Text): ID do destinatario.
+            audio (Text): URL do audio.
+            **kwargs: Parametros extras (nao usados).
+        """
         # self.send_custom_json(recipient_id,{type: "typing"})
-        """Sends an Audio"""
         self.send_audio(audio, recipient_id=recipient_id)
 
 class WhatsAppInput(WhatsApp, InputChannel):
-    """WhatsApp Cloud API input channel"""
+    """Canal de entrada para a API do WhatsApp Cloud."""
     media_cache = defaultdict(list)
     media_timers = {}
     
     @classmethod
     def name(cls) -> Text:
+        """Retorna o nome do canal de entrada.
+
+        Returns:
+            Text: Nome do canal.
+        """
         return "whatsapp"
 
     @classmethod
     def from_credentials(cls, credentials: Optional[Dict[Text, Any]]) -> InputChannel:
+        """Instancia o canal de entrada a partir das credenciais do Rasa.
+
+        Args:
+            credentials (Optional[Dict[Text, Any]]): Credenciais do canal.
+
+        Returns:
+            InputChannel: Canal de entrada configurado.
+        """
         if not credentials:
             cls.raise_missing_credentials_exception()
 
@@ -152,6 +225,14 @@ class WhatsAppInput(WhatsApp, InputChannel):
         verify_token: Optional[Text],
         debug_mode: bool = True,
     ) -> None:
+        """Inicializa o canal de entrada com tokens e modo de debug.
+
+        Args:
+            auth_token (Optional[Text]): Token de autenticacao.
+            phone_number_id (Optional[Text]): ID do numero de telefone.
+            verify_token (Optional[Text]): Token de verificacao do webhook.
+            debug_mode (bool): Se True, relanca excecoes.
+        """
         self.auth_token = auth_token
         self.phone_number_id = phone_number_id
         self.verify_token = verify_token
@@ -163,6 +244,14 @@ class WhatsAppInput(WhatsApp, InputChannel):
         logger.debug(f"WhatsAppInput initialized with auth_token: {self.auth_token}")
     
     async def handle_media(self, sender_id, media_object, on_new_message, out_channel):
+        """Acumula midias e agenda o processamento em lote.
+
+        Args:
+            sender_id (Text): ID do remetente.
+            media_object (Dict): Metadados da midia.
+            on_new_message (Callable): Callback de nova mensagem.
+            out_channel (OutputChannel): Canal de saida.
+        """
         if sender_id not in self.media_cache:
             self.media_cache[sender_id] = []
         self.media_cache[sender_id].append(media_object)
@@ -175,6 +264,13 @@ class WhatsAppInput(WhatsApp, InputChannel):
         )
 
     async def finalize_media_batch(self, sender_id, on_new_message, out_channel):
+        """Agrupa midias recebidas e envia como uma unica mensagem.
+
+        Args:
+            sender_id (Text): ID do remetente.
+            on_new_message (Callable): Callback de nova mensagem.
+            out_channel (OutputChannel): Canal de saida.
+        """
         try:
             medias = self.media_cache.pop(sender_id, [])
             self.media_timers.pop(sender_id, None)
@@ -191,6 +287,12 @@ class WhatsAppInput(WhatsApp, InputChannel):
             pass
     
     async def send_typing(self, recipient_id,message_id):
+        """Marca a mensagem como lida e ativa indicador de digitando.
+
+        Args:
+            recipient_id (Text): ID do destinatario.
+            message_id (Text): ID da mensagem recebida.
+        """
         
         json = {
             "messaging_product": "whatsapp",
@@ -203,6 +305,14 @@ class WhatsAppInput(WhatsApp, InputChannel):
         return WhatsApp.send_custom_json(self, data=json, recipient_id=recipient_id)
         
     def get_message(self, data):
+        """Extrai o texto ou payload equivalente da mensagem recebida.
+
+        Args:
+            data (Dict): Payload do webhook do WhatsApp.
+
+        Returns:
+            str: Texto ou payload equivalente.
+        """
         message_type = self.client.get_message_type(data)
         if message_type == "interactive":
             response = self.client.get_interactive_response(data)
@@ -217,14 +327,35 @@ class WhatsAppInput(WhatsApp, InputChannel):
         return self.client.get_message(data)
 
     def blueprint(self, on_new_message: Callable[[UserMessage], Awaitable[Any]]) -> Blueprint:
+        """Define as rotas HTTP do webhook do WhatsApp.
+
+        Args:
+            on_new_message (Callable): Callback de nova mensagem.
+
+        Returns:
+            Blueprint: Blueprint do Sanic com as rotas do webhook.
+        """
         whatsapp_webhook = Blueprint("whatsapp_webhook", __name__)
 
         @whatsapp_webhook.route("/", methods=["GET"])
         async def health(_: Request) -> HTTPResponse:
+            """Endpoint simples de healthcheck.
+
+            Returns:
+                HTTPResponse: Resposta JSON com status.
+            """
             return response.json({"status": "ok"})
 
         @whatsapp_webhook.route("/webhook", methods=["GET"])
         async def verify_token(request: Request) -> HTTPResponse:
+            """Valida o token de verificacao do webhook.
+
+            Args:
+                request (Request): Requisicao HTTP do Sanic.
+
+            Returns:
+                HTTPResponse: Challenge ou erro 403.
+            """
             if request.args.get("hub.verify_token") == self.verify_token:
                 return response.text(request.args.get("hub.challenge"))
             logger.error("Webhook Verification failed")
@@ -232,6 +363,14 @@ class WhatsAppInput(WhatsApp, InputChannel):
 
         @whatsapp_webhook.route("/webhook", methods=["POST"])
         async def message(request: Request) -> HTTPResponse:
+            """Processa mensagens recebidas do WhatsApp.
+
+            Args:
+                request (Request): Requisicao HTTP do Sanic.
+
+            Returns:
+                HTTPResponse: Resposta HTTP do webhook.
+            """
             logger.debug(f"full message: {request.json}")
 
             sender = self.client.get_mobile(request.json)
@@ -296,4 +435,9 @@ class WhatsAppInput(WhatsApp, InputChannel):
         return whatsapp_webhook
 
     def get_output_channel(self) -> OutputChannel:
+        """Retorna o canal de saida configurado.
+
+        Returns:
+            OutputChannel: Canal de saida do WhatsApp.
+        """
         return WhatsAppOutput(self.auth_token, self.phone_number_id)

@@ -5,6 +5,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 def load_db_credentials(filepath="credentials.yml"):
+    """Carrega credenciais do banco a partir de um arquivo YAML.
+
+    Args:
+        filepath (str): Caminho do arquivo de credenciais.
+
+    Returns:
+        Dict: Dicionario de credenciais (ou vazio em erro).
+    """
     try:
         with open(filepath, "r") as file:
             credentials = yaml.safe_load(file)
@@ -14,6 +22,11 @@ def load_db_credentials(filepath="credentials.yml"):
         return {}
 
 def get_db_connection():
+    """Cria e retorna uma conexao com o banco usando as credenciais.
+
+    Returns:
+        Optional[psycopg2.extensions.connection]: Conexao ativa ou None em erro.
+    """
     config = load_db_credentials()
     try:
         conn = psycopg2.connect(

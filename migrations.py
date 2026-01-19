@@ -1,6 +1,11 @@
 from actions.db_utils import get_db_connection
 
 def create_tables():
+    """Cria as tabelas base no banco de dados.
+
+    Returns:
+        None
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
 

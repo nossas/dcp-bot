@@ -9,6 +9,15 @@ logger = logging.getLogger('actions')
 logger.setLevel(logging.DEBUG) 
 from datetime import datetime
 def get_last_action(tracker, depth=1):
+    """Retorna a ultima action relevante do tracker.
+
+    Args:
+        tracker: Tracker do Rasa com o historico de eventos.
+        depth (int): Profundidade de busca a partir do fim da conversa.
+
+    Returns:
+        Optional[str]: Nome da action ou None se nao encontrada.
+    """
     last_action = None
     for event in reversed(tracker.events):
         if (event.get("event") == "action" and event.get("name") not in ["action_listen","action_repeat_last_message","action_fallback_buttons","action_agendar_inatividade"]):
@@ -21,6 +30,15 @@ def get_last_action(tracker, depth=1):
     return last_action
 
 def get_last_intent(tracker, depth=1):
+    """Retorna a ultima intent do tracker.
+
+    Args:
+        tracker: Tracker do Rasa com o historico de eventos.
+        depth (int): Profundidade de busca a partir do fim da conversa.
+
+    Returns:
+        Optional[str]: Nome da intent ou None se nao encontrada.
+    """
     last_intent = None
     for event in reversed(tracker.events):
         if (event.get("event") == "intent" ):
@@ -33,6 +51,14 @@ def get_last_intent(tracker, depth=1):
     return last_intent
 
 def extrair_riscos(json_data: Dict) -> List[Dict]:
+    """Extrai e normaliza a lista de riscos de uma resposta JSON.
+
+    Args:
+        json_data (Dict): Payload com a chave "data" contendo riscos.
+
+    Returns:
+        List[Dict]: Lista de riscos normalizados.
+    """
     riscos_extraidos = []
     logger.debug(f"Json data: {json_data}")
 
@@ -58,6 +84,14 @@ def extrair_riscos(json_data: Dict) -> List[Dict]:
     return riscos_extraidos
 
 def verificar_tipo_arquivo(caminho_arquivo):
+    """Detecta o tipo do arquivo pelo MIME.
+
+    Args:
+        caminho_arquivo (str): Caminho do arquivo local.
+
+    Returns:
+        str: "image", "video" ou "outro".
+    """
     mime_type, _ = mimetypes.guess_type(caminho_arquivo)
     
     if mime_type:
@@ -81,6 +115,20 @@ def enviar_risco_para_wordpress(
     autoriza_contato,
     classificacao,
 ):
+    """Envia os dados do risco e midias para o endpoint do WordPress.
+
+    Args:
+        endereco (str): Endereco do risco.
+        descricao (str): Descricao textual do risco.
+        midias_paths (List[str]): Caminhos locais das midias.
+        latitude (float): Latitude do risco.
+        longitude (float): Longitude do risco.
+        nome_completo (str): Nome completo do usuario.
+        email (str): Email do usuario.
+        telefone (str): Telefone do usuario.
+        autoriza_contato (bool): Se o usuario autoriza contato.
+        classificacao (str): Classificacao do risco.
+    """
     try:
         files = []
         for path in midias_paths:
@@ -123,11 +171,29 @@ def enviar_risco_para_wordpress(
         
         
 def formata_data(data_str,formato = '%H:%M do dia %d/%m/%Y'):
+    """Formata uma data ISO para uma string no formato desejado.
+
+    Args:
+        data_str (str): Data em formato ISO.
+        formato (str): Mascara de formatacao.
+
+    Returns:
+        str: Data formatada.
+    """
     dt = datetime.fromisoformat(data_str)
     resultado = dt.strftime(formato)
     return resultado
 
 def dentro_do_retangulo(lat, lng):
+    """Verifica se a coordenada esta dentro do retangulo definido.
+
+    Args:
+        lat (float): Latitude.
+        lng (float): Longitude.
+
+    Returns:
+        bool: True se estiver dentro da area.
+    """
     #Restringe ao Jacarezinho, Rio de Janeiro
     # Coordenadas do retângulo delimitador
     
@@ -136,8 +202,13 @@ def dentro_do_retangulo(lat, lng):
     return Y1 <= lat <= Y0 and X0 <= lng <= X1
 
 def verifica_poligono(google_response):
-    """
-    Filtra os resultados da resposta do Google Maps, retornando apenas os que estão dentro do retângulo.
+    """Filtra resultados do Google Maps dentro do retangulo definido.
+
+    Args:
+        google_response: Response da API do Google Maps.
+
+    Returns:
+        List[Dict]: Resultados filtrados.
     """
     dados = google_response.json()
     resultados_filtrados = []
@@ -152,6 +223,15 @@ def verifica_poligono(google_response):
     return resultados_filtrados    
     
 def chamada_google_maps(*args, **kwargs):
+        """Consulta o Google Maps e filtra resultados dentro da area definida.
+
+        Args:
+            *args: Nao utilizado.
+            **kwargs: endereco ou latitude/longitude.
+
+        Returns:
+            List[Dict] | bool: Lista filtrada ou False em erro.
+        """
         api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
         if kwargs.get("endereco"):
             args = f'?address={kwargs["endereco"]}'
@@ -178,11 +258,16 @@ def chamada_google_maps(*args, **kwargs):
             return False
 
 def format_address(endereco):
+    """Normaliza o endereco removendo CEP, estado e pais.
+
+    Args:
+        endereco (str): Endereco bruto.
+
+    Returns:
+        str: Endereco normalizado.
+    """
     if not endereco:
         return ""
-    """
-    Formata o endereço para remover palavras irrelevantes, CEP, estado e país.
-    """
     # Remove CEP (formato 5 dígitos - 3 dígitos)
     endereco = re.sub(r'\b\d{5}-\d{3}\b', '', endereco)
     # Remove país (Brazil ou Brasil)
@@ -199,6 +284,15 @@ def format_address(endereco):
     return endereco
 
 def get_endereco_latlong(latitude,longitude):
+    """Busca endereco a partir de latitude e longitude.
+
+    Args:
+        latitude (float): Latitude.
+        longitude (float): Longitude.
+
+    Returns:
+        str: Endereco formatado.
+    """
     response = chamada_google_maps(latitude=latitude,longitude=longitude )
     print(f"response do google maps:{response}")
     if response and len(response) > 0:
@@ -210,6 +304,14 @@ def get_endereco_latlong(latitude,longitude):
 
 
 def get_endereco_texto(endereco):
+    """Busca latitude, longitude e endereco formatado a partir de um texto.
+
+    Args:
+        endereco (str): Endereco informado pelo usuario.
+
+    Returns:
+        Dict: Dicionario com lat, lng e endereco quando encontrado.
+    """
     logger.debug(f"Buscando endereço pelo texto: {endereco}")
     response = chamada_google_maps(endereco=endereco)
     print(f"response do google maps:{response}")
