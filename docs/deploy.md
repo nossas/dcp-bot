@@ -17,27 +17,28 @@ Arquivo: `docker/Dockerfile`
 
 ## docker-compose-local.yml (desenvolvimento)
 
-- Monta o codigo local em `/app`.
+- Monta o código local em `/app`.
 - Usa `docker/entrypoint.sh` para aguardar banco e rodar migrations.
 - Exige variáveis `POSTGRES_*`, `RASA_URL` e `WORDPRESS_URL`.
 
-Observação: este arquivo contem valores reais de tokens. Substitua por valores seguros.
+Observação: este arquivo contém valores reais de tokens. Substitua por valores seguros.
 
-## docker-compose.deploy.yml (producao)
+## docker-compose.deploy.yml (produção)
 
-- Usa imagem pre-buildada `nossas/dcp-bot:latest`.
+- Usa imagem pré-buildada `nossas/dcp-bot:latest`.
 - Monta `credentials.yml` e `endpoints.yml` externos.
 - Monta volume de `media/` para persistência.
 
 ## entrypoint.sh
 
-- Aguarda Postgres ficar disponivel.
-- Executa `migrations.py` se a tabela `usuários` nao existir.
+- Aguarda Postgres ficar disponível.
+- Executa `migrations.py` se a tabela `usuarios` não existir.
 - Treina o modelo e sobe o Rasa com conector do WhatsApp.
 
 ## Variáveis de ambiente
 
 Principais variáveis usadas:
+
 - `WORDPRESS_URL`
 - `GOOGLE_MAPS_API_KEY`
 - `WHATSAPP_AUTH_TOKEN`
@@ -45,4 +46,4 @@ Principais variáveis usadas:
 - `RASA_URL`
 - `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `POSTGRES_HOST`
 
-[Voltar ao indice](README.md)
+[Voltar ao índice](README.md)

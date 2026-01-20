@@ -1,20 +1,21 @@
 # Conector do WhatsApp
 
-O conector customizado esta em `whatsapp_connector.py`..
+O conector customizado está em `whatsapp_connector.py`.
 
 ## Componentes principais
 
 - `WhatsAppInput` (InputChannel)
   - Recebe mensagens do webhook.
-  - Interpreta mensagens de texto, botoes, localização e mídias.
+  - Interpreta mensagens de texto, botões, localização e mídias.
 
 - `WhatsAppOutput` (OutputChannel)
-  - Envia mensagens de texto, botoes e mídias.
+  - Envia mensagens de texto, botões e mídias.
   - Implementa envio de payloads customizados.
 
 ## Rotas HTTP
 
 O `WhatsAppInput.blueprint()` registra as rotas:
+
 - `GET /` healthcheck simples.
 - `GET /webhook` validação do token.
 - `POST /webhook` processamento das mensagens.
@@ -25,7 +26,7 @@ O `WhatsAppInput.blueprint()` registra as rotas:
 
 2) O conector identifica o tipo de mensagem.
 
-3) Para texto/botoes: envia para `on_new_message`.
+3) Para texto/botões: envia para `on_new_message`.
 
 4) Para localização: serializa como JSON string e envia ao Rasa.
 
@@ -33,15 +34,15 @@ O `WhatsAppInput.blueprint()` registra as rotas:
 
 ## Tratamento de mídias
 
-- Mídias sao baixadas via `heyoo` e salvas em `media/`.
-- O conector agrupa mídias enviadas em sequencia.
+- Mídias são baixadas via `heyoo` e salvas em `media/`.
+- O conector agrupa mídias enviadas em sequência.
 - O payload final possui o formato:
 
 ```json
 {"tipo": "midia_combinada", "midias": [{"mime_type": "...", "path": "..."}]}
 ```
 
-Esse payload e consumido por `action_salvar_mídia_risco`.
+Esse payload é consumido por `action_salvar_midia_risco`.
 
 ## Indicador de digitando
 
@@ -53,12 +54,13 @@ Esse payload e consumido por `action_salvar_mídia_risco`.
 O `WhatsAppOutput.send_custom_json()` aceita:
 
 - `{"type": "location_request"}`: solicita localização.
-- `{"type": "media_id"}`: envia mídia ja cadastrada no WhatsApp.
-- `{"type": "video"}`: envia video por URL.
+- `{"type": "media_id"}`: envia mídia já cadastrada no WhatsApp.
+- `{"type": "video"}`: envia vídeo por URL.
 
 ## Inatividade
 
-A funcao `agendar_inatividade()` chama o endpoint do Rasa:
+A função `agendar_inatividade()` chama o endpoint do Rasa:
+
 - `POST /conversations/<sender_id>/trigger_intent`
 - intent: `inatividade_monitoramento`
 
@@ -73,4 +75,4 @@ Isso aciona a action que agenda o reminder.
   - `RASA_URL`
 
 
-[Voltar ao indice](README.md)
+[Voltar ao índice](README.md)

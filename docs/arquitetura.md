@@ -3,15 +3,15 @@
 ## Componentes
 
 - Rasa Server: interpreta mensagens, aplica regras/stories e chama actions.
-- Action Server: executa logica customizada, integra com APIs e banco.
-- WhatsApp Connector: canal customizado para entrada/saida.
+- Action Server: executa lógica customizada, integra com APIs e banco.
+- WhatsApp Connector: canal customizado para entrada/saída.
 - WordPress: pública e consulta riscos, dicas e informações públicas.
-- Google Maps: geocoding de endereços e validação geografica.
-- Postgres: tracker store do Rasa e dados basicos do bot.
+- Google Maps: geocoding de endereços e validação geográfica.
+- Postgres: tracker store do Rasa e dados básicos do bot.
 
-## Diagrama de alto nivel (texto)
+## Diagrama de alto nível (texto)
 
-Usuario (WhatsApp)
+Usuário (WhatsApp)
   -> WhatsApp Cloud API
     -> `whatsapp_connector.WhatsAppInput`
       -> Rasa Server (NLU + Core)
@@ -22,7 +22,7 @@ Usuario (WhatsApp)
         -> Rasa Server
       -> `WhatsAppOutput`
     -> WhatsApp Cloud API
-  -> Usuario
+  -> Usuário
 
 ## Comunicação entre serviços
 
@@ -34,17 +34,17 @@ Usuario (WhatsApp)
 ## Persistência de dados
 
 - Tracker Store (Rasa): configurado em `endpoints.yml` para Postgres.
-- Usuarios e mídias: tabelas criadas por `migrations.py`.
-- Relatos: enviados ao WordPress, nao gravados localmente no fluxo atual.
+- Usuários e mídias: tabelas criadas por `migrations.py`.
+- Relatos: enviados ao WordPress, não gravados localmente no fluxo atual.
 
-## Media e arquivos
+## Mídias e arquivos
 
-- Mídias recebidas sao baixadas no caminho `media/`.
+- Mídias recebidas são baixadas no caminho `media/`.
 - Em deploy, recomenda-se montar `media/` como volume persistente.
 
-## Limites geograficos
+## Limites geográficos
 
 - A validação de endereço restringe a área por um retângulo que limita os endereços ao Jacarezinho.
 - Coordenadas do retângulo ficam em `actions/utils.py`.
 
-[Voltar ao indice](README.md)
+[Voltar ao índice](README.md)

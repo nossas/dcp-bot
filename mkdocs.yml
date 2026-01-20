@@ -1,11 +1,12 @@
 site_name: ""
-site_description: Documentacao tecnica do chatbot Defesa Climatica Popular
+site_description: Documentação técnica do chatbot Defesa Climática Popular
 docs_dir: docs
 
 theme:
   name: material
   language: pt-BR
   logo: logo-defesa-climatica-popular-full.svg
+  favicon: logo-defesa-climatica-popular-full.svg
 
 nav:
   - Home: README.md
@@ -18,3 +19,4 @@ nav:
   - Banco de dados: banco-de-dados.md
   - Deploy e ambientes: deploy.md
   - Operação e manutenção: operacao-e-manutencao.md
+  - FAQ: faq.md

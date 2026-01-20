@@ -2,7 +2,7 @@
 
 ## Treinamento do modelo
 
-- O treinamento e executado no build do Dockerfile e no `entrypoint.sh`.
+- O treinamento é executado no build do Dockerfile e no `entrypoint.sh`.
 - Para treinar manualmente:
 
 ```
@@ -15,11 +15,11 @@ O modelo gerado fica em `models/`.
 
 - Rasa e actions registram logs no console.
 - Existem arquivos de log no repo (`log.log`, `log-actions.log`, etc.).
-- Em producao, prefira coletar logs via stdout/stack do container.
+- Em produção, prefira coletar logs via stdout/stack do container.
 
 ## Mídias recebidas
 
-- Mídias sao baixadas para `media/`.
+- Mídias são baixadas para `media/`.
 - Em deploy, monte `media/` como volume persistente.
 
 ## Inatividade
@@ -30,8 +30,8 @@ O modelo gerado fica em `models/`.
 
 ## Manutenção de dados
 
-- Se for necessario resetar cadastro local, limpe as tabelas em Postgres.
-- `migrations.py` recria as tabelas básicas, mas nao apaga dados.
+- Se for necessário resetar cadastro local, limpe as tabelas em Postgres.
+- `migrations.py` recria as tabelas básicas, mas não apaga dados.
 
 ## Segurança e segredos
 
@@ -44,4 +44,4 @@ O modelo gerado fica em `models/`.
 - O conector expõe `GET /` para healthcheck simples.
 - A rota `GET /webhook` valida o token do WhatsApp.
 
-[Voltar ao indice](README.md)
+[Voltar ao índice](README.md)
