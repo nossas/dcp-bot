@@ -10,6 +10,19 @@
 Este projeto esta licenciado sob a **GNU Affero General Public License v3.0 (AGPL-3.0)**.  
 Veja `LICENSE` para detalhes.
 
+## 📚 Documentacao (MkDocs)
+
+Para visualizar a documentacao navegavel localmente:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-docs.txt
+mkdocs serve
+```
+
+Acesse: `http://127.0.0.1:8000`
+
 ## 📦 Estrutura do Projeto
 
 ```
