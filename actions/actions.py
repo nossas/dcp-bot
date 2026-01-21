@@ -23,9 +23,24 @@ from rasa_sdk.types import DomainDict
         
 class ActionFallbackButtons(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_fallback_buttons"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_fallback_buttons")
         logger.debug("Fallback!")
         last_action = None
@@ -110,9 +125,24 @@ class ActionFallbackButtons(Action):
 
 class ActionAgendarInatividade(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_agendar_inatividade"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_agendar_inatividade")
         trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) + timedelta(minutes=5)
         logger.debug(f"agendando timeout para: {trigger_date_time}")
@@ -130,9 +160,24 @@ class ActionAgendarInatividade(Action):
         
 class ActionInatividadeTimeout(Action):
     def name(self) -> Text:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_inatividade_timeout"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_inatividade_timeout")
         recipient_id = tracker.sender_id
         message = "Percebi que você não respondeu. Vou encerrar a conversa, mas se quiser falar comigo novamente, é só mandar um ‘oi’. 👋🏽"
@@ -162,9 +207,24 @@ class ActionInatividadeTimeout(Action):
 
 class ActionRequestLocation(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_request_location"
 
     def run(self, dispatcher, tracker, domain): 
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_request_location")
         last_action = get_last_action(tracker)
         if last_action == "utter_classificar_risco":
@@ -189,9 +249,24 @@ class ActionRequestLocation(Action):
 
 class ActionAlterarNome(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_alterar_nome"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_alterar_nome")
         dispatcher.utter_message(
                 text="Entendi, você quer corrigir o nome que foi informado, certo?",
@@ -204,23 +279,29 @@ class ActionAlterarNome(Action):
 
 class ActionRepeatLastMessage(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_repeat_last_message"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_repeat_last_message")
         last_bot_messages = []
         last_action = None
         last_action = get_last_action(tracker)
         
-        # for event in reversed(tracker.events):
-        #     if event.get("event") == "bot":
-        #         last_bot_messages.append(event.get("text"))
-        #         if len(last_bot_messages) == 2:
-        #             break
-
-        # if len(last_bot_messages) == 2:
-        #     penultima_mensagem = last_bot_messages[1]
-        #     dispatcher.utter_message(text=penultima_mensagem)
         if last_action:
             dispatcher.utter_message("Vamos tentar de novo.")
             return [FollowupAction(last_action)]
@@ -230,9 +311,24 @@ class ActionRepeatLastMessage(Action):
     
 class ActionPerguntarNome(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_perguntar_nome"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_perguntar_nome")
         sender_id = tracker.sender_id
        
@@ -264,9 +360,24 @@ class ActionPerguntarNome(Action):
 
 class ActionSalvarNome(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_salvar_nome"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_salvar_nome")
         last_action = get_last_action(tracker)
         if last_action == 'action_request_location':
@@ -302,9 +413,24 @@ class ActionSalvarNome(Action):
 
 class ActionApagarNome(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_corrigir_nome"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_corrigir_nome")
         logger.debug("Apagando nome do slot e do banco.")
 
@@ -330,9 +456,24 @@ class ActionApagarNome(Action):
         return [SlotSet("nome", None)]    
 class ActionBuscarEndereco(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_buscar_endereco"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_buscar_endereco")
         user_message = tracker.latest_message.get("text")
         logger.debug(f"entrou na action user_message: {user_message}")
@@ -410,9 +551,24 @@ class ActionBuscarEndereco(Action):
 
 class ActionBuscarEnderecoTexto(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_buscar_endereco_texto"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_buscar_endereco_texto")
         logger.debug(f"ultima mensagem: {tracker.latest_message}")
         last_action = None
@@ -453,9 +609,24 @@ class ActionBuscarEnderecoTexto(Action):
 
 class ActionSalvarClassificacaoRisco(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_salvar_classificacao_risco"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_salvar_classificacao_risco")
         last_action = get_last_action(tracker)
         risco = tracker.get_slot("classificacao_risco")
@@ -472,9 +643,24 @@ class ActionSalvarClassificacaoRisco(Action):
 
 class ActionSolicitarDescricaoRisco(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_ask_descricao_risco"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_ask_descricao_risco")
         
         last_action = get_last_action(tracker,2)
@@ -494,9 +680,24 @@ class ActionSolicitarDescricaoRisco(Action):
 
 class ActionSalvarDescricaoRisco(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_salvar_descricao_risco"
     
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_salvar_descricao_risco")
         last_action = get_last_action(tracker,3)
         next_action = "utter_perguntar_por_midia" if last_action == "utter_classificar_risco" else "action_confirmar_relato"
@@ -510,9 +711,24 @@ class ActionSalvarDescricaoRisco(Action):
 
 class ActionSalvarMidiaRisco(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_salvar_midia_risco"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_salvar_midia_risco")
         last_action = get_last_action(tracker,1)
         logger.debug(f"last_action: {last_action}")
@@ -555,8 +771,23 @@ class ActionSalvarMidiaRisco(Action):
 
 class ActionPerguntarPorNovaMidia(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_perguntar_por_nova_midia"
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         time.sleep(2)
         logger.debug("rodando action: action_perguntar_por_nova_midia")
         dispatcher.utter_message(
@@ -569,9 +800,24 @@ class ActionPerguntarPorNovaMidia(Action):
 
 class ActionConfirmarRisco(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_confirmar_relato"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_confirmar_relato")
         
         endereco = tracker.get_slot("endereco") or "não informado"
@@ -599,9 +845,24 @@ class ActionConfirmarRisco(Action):
 
 class ActionConfirmarRiscoPosMidia(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_confirmar_relato_pos_midia"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         time.sleep(2)
         logger.debug("rodando action: action_confirmar_relato_pos_midia")
         dispatcher.utter_message(
@@ -618,9 +879,24 @@ class ActionConfirmarRiscoPosMidia(Action):
 
 class ActionRecusarRisco(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_recusar_risco"
     
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_recusar_risco")
         dispatcher.utter_message(
             text="Qual informação deseja atualizar?",
@@ -634,9 +910,24 @@ class ActionRecusarRisco(Action):
 
 class ActionCorrigirMidias(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_corrigir_midias"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_corrigir_midias")
         return [
             SlotSet("midias", []),
@@ -645,9 +936,24 @@ class ActionCorrigirMidias(Action):
 
 class ActionClassificarRiscoCorrigir(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_classificar_risco_corrigir"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_classificar_risco_corrigir")
         nome = tracker.get_slot("nome") or ""
         dispatcher.utter_message(
@@ -662,17 +968,47 @@ class ActionClassificarRiscoCorrigir(Action):
 
 class ActionEnderecoRiscoCorrigir(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_corrigir_endereco"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_corrigir_endereco")
         return [SlotSet("contexto_endereco_corrigido", True), FollowupAction("action_request_location")]
     
 class ActionSalvarRisco(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_salvar_risco"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_salvar_risco")
         try:
             conn = get_db_connection()
@@ -760,9 +1096,24 @@ class ActionSalvarRisco(Action):
 
 class ActionListarRiscos(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_listar_riscos"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_listar_riscos")
         wordpress_url = os.getenv("WORDPRESS_URL")
         if not wordpress_url:
@@ -805,9 +1156,24 @@ class ActionListarRiscos(Action):
 
 class ActionPerguntarMaisRiscos(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_perguntar_mais_riscos"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_perguntar_mais_riscos")
         # time.sleep(2)
         dispatcher.utter_message(
@@ -821,9 +1187,24 @@ class ActionPerguntarMaisRiscos(Action):
 
 class ActionNivelDeRisco(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_nivel_de_risco"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_nivel_de_risco")
         wordpress_url = os.getenv("WORDPRESS_URL")
         endpoint = f"{wordpress_url}/wp-json/dcp/v1/risco-regiao"
@@ -861,9 +1242,22 @@ class ActionNivelDeRisco(Action):
 
 class ActionPrecisoDeAjuda(Action):
     def name(self) -> Text:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_preciso_de_ajuda"
 
     def _formata_itens(self, itens: List[Any]) -> Optional[str]:
+        """Formata itens em texto com bullets.
+        
+        Args:
+            itens (List[Any]): Lista de itens a formatar.
+        
+        Returns:
+            Optional[str]: Texto formatado ou None se vazio.
+        """
         bullets = [str(x).strip() for x in itens if str(x).strip()]
         if not bullets:
             return None
@@ -875,6 +1269,16 @@ class ActionPrecisoDeAjuda(Action):
         tracker: Tracker,
         domain: DomainDict,
     ) -> List[Dict[Text, Any]]:
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_preciso_de_ajuda")
 
         FALLBACK_TEXTO = (
@@ -923,9 +1327,24 @@ class ActionPrecisoDeAjuda(Action):
 
 class ActionListarAbrigos(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_listar_abrigos"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_listar_abrigos")
         try:
             wordpress_url = os.getenv("WORDPRESS_URL")
@@ -957,9 +1376,24 @@ class ActionListarAbrigos(Action):
     
 class ActionListarContatosEmergencia(Action):
     def name(self):
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_listar_contatos_emergencia"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_listar_contatos_emergencia")
 
         wordpress_url = os.getenv("WORDPRESS_URL")
@@ -1011,49 +1445,26 @@ class ActionListarContatosEmergencia(Action):
 
         return [FollowupAction('action_listen')]
 
-# class ActionBuscarDicas(Action):
-#     def name(self):
-#         return "action_buscar_dicas"
-
-#     def run(self, dispatcher, tracker, domain):
-#         logger.debug("rodando action: action_buscar_dicas")
-#         tipo_dica = tracker.get_slot("dicas")
-#         if not tipo_dica:
-#             dispatcher.utter_message(text="Desculpe, não entendi o tipo de dica que você deseja. Por favor aperte em um dos botões.")
-#             return []
-
-#         wordpress_url = os.getenv("WORDPRESS_URL")
-#         if not wordpress_url:
-#             dispatcher.utter_message(text="Erro: URL do WordPress não configurada.")
-#             return []
-
-#         endpoint = f"{wordpress_url}/wp-json/dcp/v1/dicas?tipo={tipo_dica}"
-#         try:
-#             response = requests.get(endpoint, timeout=5)
-#             response.raise_for_status()
-#             dicas = response.json()
-
-#             if not dicas:
-#                 dispatcher.utter_message(text=f"Não encontrei dicas para '{tipo_dica}'.")
-#                 return []
-
-#             mensagem = f"Dicas para {tipo_dica}:\n"
-#             for dica in dicas:
-#                 mensagem += f"- {dica}\n"
-
-#             dispatcher.utter_message(text=mensagem)
-#         except requests.RequestException as e:
-#             dispatcher.utter_message(text="Desculpe, ocorreu um erro ao buscar as dicas.")
-#             # Aqui você pode adicionar um log do erro, se desejar
-#         return []
-    
-    
-
 class ActionPerguntaNotificacoes(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_pergunta_notificacoes"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_pergunta_notificacoes")
         whatsapp_id = tracker.sender_id
 
@@ -1101,9 +1512,24 @@ class ActionPerguntaNotificacoes(Action):
     
 class ActionReceberNotificacoes(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_receber_notificacoes"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_receber_notificacoes")
         # Obtém o número de telefone do usuário (ID da conversa)
         telefone = tracker.sender_id
@@ -1135,9 +1561,24 @@ class ActionReceberNotificacoes(Action):
     
 class ActionPararNotificacoes(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_parar_notificacoes"  
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_parar_notificacoes")
         # Obtém o número de telefone do usuário (ID da conversa)
         telefone = tracker.sender_id
@@ -1169,9 +1610,24 @@ class ActionPararNotificacoes(Action):
     
 class ActionSair(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_sair"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_sair")
         dispatcher.utter_message(text='Quer saber mais e conversar com a comunidade?\n \n💬 Entre no *grupo de WhatsApp* clicando no link: bit.ly/grupodefesaclimaticapopular\n \n🌐 Acompanhe também pelo site: www.defesaclimaticapopular.org\n \n👋 E se quiser falar por aqui de novo, é só mandar um "oi"!')
         dispatcher.utter_message(text="Estamos por aqui pra ajudar no que for possível! 🫂")
@@ -1197,9 +1653,24 @@ class ActionSair(Action):
     
 class ActionAgradecimento(Action):
     def name(self) -> str:
+        """Retorna o nome da action.
+        
+        Returns:
+            Text: Nome registrado no Rasa.
+        """
         return "action_agradecimento"
 
     def run(self, dispatcher, tracker, domain):
+        """Executa a action.
+        
+        Args:
+            dispatcher (CollectingDispatcher): Envia mensagens ao usuario.
+            tracker (Tracker): Estado atual da conversa.
+            domain (DomainDict): Configuracao do dominio.
+        
+        Returns:
+            List[Dict[Text, Any]]: Eventos retornados ao tracker.
+        """
         logger.debug("rodando action: action_agradecimento")
         dispatcher.utter_message(text="❤️")
         trigger_date_time = datetime.now(pytz.timezone("America/Sao_Paulo")) - timedelta(minutes=3)

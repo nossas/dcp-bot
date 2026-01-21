@@ -1,0 +1,22 @@
+site_name: ""
+site_description: Documentação técnica do chatbot Defesa Climática Popular
+docs_dir: docs
+
+theme:
+  name: material
+  language: pt-BR
+  logo: logo-defesa-climatica-popular-full.svg
+  favicon: logo-defesa-climatica-popular-full.svg
+
+nav:
+  - Home: README.md
+  - Visão geral: visao-geral.md
+  - Arquitetura e integrações: arquitetura.md
+  - Configuração do Rasa: configuracao-rasa.md
+  - Ações customizadas: acoes-customizadas.md
+  - Conector do WhatsApp: conector-whatsapp.md
+  - Dados de treinamento: dados-treinamento.md
+  - Banco de dados: banco-de-dados.md
+  - Deploy e ambientes: deploy.md
+  - Operação e manutenção: operacao-e-manutencao.md
+  - FAQ: faq.md
